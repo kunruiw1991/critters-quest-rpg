@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2a1d52">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Chuyu's Critter Quest: Rainbow Island RPG — a big 2D classic RPG where Chuyu explores 8 lands and catches 20 Critters!">
+<title>Chuyu's Critter Quest: Rainbow Island RPG</title>
+<link rel="icon" href="icons/dogday.jpg">
+<link rel="stylesheet" href="css/style.css?v=r10">
+</head>
+<body class="at-title">
+<canvas id="world" aria-label="Rainbow Island world map"></canvas>
+
+<div id="hud">
+  <div id="topbar">
+    <button id="partnerCard" class="partner-card" aria-label="Partner Critter">
+      <img id="pcImg" alt="">
+      <span class="pc-txt"><b id="pcName">Partner</b> <span id="pcLv" class="pc-lv">Lv 5</span>
+        <span class="pc-hp"><span class="bar"><i id="pcHp"></i></span><small id="pcHpTxt"></small></span></span>
+    </button>
+    <div id="stats">
+      <span class="chip" title="Gold">🪙 <b id="gold">0</b></span>
+      <span class="chip" title="Sweet Berries">🍓 <b id="berries">0</b></span>
+      <span class="chip" title="Rainbow Capsules">🌈 <b id="rainbows">0</b></span>
+      <span class="chip" title="Master Star Capsules">👑 <b id="masters">0</b></span>
+    </div>
+    <div id="sysBtns">
+      <span id="saveInd" class="save-ind" title="Auto-save">💾</span>
+      <button id="muteBtn" class="icon-btn" aria-label="Mute">🔊</button>
+      <button id="menuBtn" class="icon-btn" aria-label="Menu">⚙️</button>
+    </div>
+  </div>
+  <div id="banner" class="banner"></div>
+  <div id="toasts"></div>
+  <div id="controls">
+    <div id="dpad" aria-label="Direction pad">
+      <span class="arrow up">▲</span><span class="arrow down">▼</span><span class="arrow left">◄</span><span class="arrow right">►</span><span class="hub"></span>
+    </div>
+    <div id="menuRow">
+      <button id="mapBtn" class="menu-btn">🗺️ <span>World Map</span></button>
+      <button id="dexBtn" class="menu-btn">📖 <span>Dex</span> <b id="dexCount">1/20</b></button>
+      <button id="bagBtn" class="menu-btn">🎒 <span>Shop / Bag</span></button>
+    </div>
+    <div id="abPad">
+      <button id="btnB" class="pad-btn b" aria-label="B: Roller-skate dash">B<small id="btnBLabel">Dash</small></button>
+      <button id="btnA" class="pad-btn a" aria-label="A: Talk, open, catch">A<small><span class="lbl-long">Talk/Catch</span><span class="lbl-short">Talk</span></small></button>
+    </div>
+  </div>
+</div>
+
+<div id="dialog" class="hidden" role="dialog" aria-live="polite">
+  <div class="dlg-face" id="dlgFace"></div>
+  <div class="dlg-body"><div class="dlg-name" id="dlgName"></div><div class="dlg-text" id="dlgText"></div><div class="dlg-more" id="dlgMore">▶</div></div>
+</div>
+
+<div id="battle" class="hidden">
+  <div class="b-stage">
+    <canvas id="battleCanvas"></canvas>
+    <div class="b-card b-wild">
+      <div class="b-name"><span id="bwName">Critter</span> <span class="b-lv" id="bwLv">Lv 1</span> <span id="bwBadge" class="b-badge"></span></div>
+      <div class="hpbar"><i id="bwHp"></i></div>
+      <div class="b-sub"><span id="bwHpTxt"></span> <span id="bwStatus" class="b-status"></span></div>
+      <div class="catchbar"><i id="bwCatch"></i><span id="bwCatchTxt">🎯 Catch Chance</span></div>
+    </div>
+    <div class="b-card b-mine">
+      <div class="b-name"><span id="bmName">Partner</span> <span class="b-lv" id="bmLv">Lv 1</span></div>
+      <div class="hpbar"><i id="bmHp"></i></div>
+      <div class="b-sub"><span id="bmHpTxt"></span></div>
+      <div class="expbar"><i id="bmExp"></i></div>
+    </div>
+  </div>
+  <div class="b-panel">
+    <div class="b-msg" id="bMsg" aria-live="polite"></div>
+    <div class="b-actions" id="bActions">
+      <button class="bbtn b-attack" data-act="attack"><span class="k">1</span><b>⚡ Attack</b><small id="bMoveName">Elemental Skill</small></button>
+      <button class="bbtn b-catch" data-act="catch"><span class="k">2</span><b>🎯 Throw Capsule</b><small id="bCatchInfo">Catch!</small></button>
+      <button class="bbtn b-feed" data-act="feed"><span class="k">3</span><b>🍓 Feed Treat</b><small id="bFeedInfo">+HP & +45% Catch Rate!</small></button>
+      <button class="bbtn b-run" data-act="switch"><span class="k">4</span><b>🔄 Switch / 🏃 Run</b><small>Swap friend or wave bye</small></button>
+    </div>
+    <div class="b-sub-menu hidden" id="bSub"></div>
+  </div>
+</div>
+
+<div id="modal" class="hidden">
+  <div class="modal-panel" role="dialog">
+    <div class="modal-head"><h2 id="modalTitle"></h2><button id="modalClose" class="close-btn" aria-label="Close">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="title" class="hidden">
+  <div class="title-card">
+    <div class="title-logo">
+      <h1>Chuyu's Critter Quest</h1>
+      <h2>🌈 Rainbow Island RPG 🌈</h2>
+    </div>
+    <p class="title-sub">Pick your very first Critter partner!</p>
+    <div id="starters" class="starters"></div>
+    <p class="title-hint">🐾 The other two can still be caught in the wild! · 8 lands · 20 Critters · 40+ treasure chests</p>
+  </div>
+</div>
+
+<div id="celebrate" class="hidden">
+  <div class="cele-card" id="celeCard">
+    <div class="cele-title">✨ GOTCHA! ✨</div>
+    <div class="cele-img"><img id="celeImg" alt=""></div>
+    <div class="cele-name" id="celeName"></div>
+    <ul class="cele-lines" id="celeLines"></ul>
+    <div class="cele-btns"><button class="big-btn" id="celeOk">Yay! 🎉</button><button class="big-btn green hidden" id="celePartner">🐾 Make it my partner!</button></div>
+  </div>
+</div>
+
+<div id="loading"><div class="ld-card"><div class="ld-spin">🌈</div><div>Loading Rainbow Island...</div></div></div>
+<div id="flash"></div>
+<canvas id="fx"></canvas>
+
+<script src="js/data.js?v=r10"></script>
+<script src="js/util.js?v=r10"></script>
+<script src="js/world.js?v=r10"></script>
+<script src="js/art.js?v=r10"></script>
+<script src="js/audio.js?v=r10"></script>
+<script src="js/ui.js?v=r10"></script>
+<script src="js/battle.js?v=r10"></script>
+<script src="js/game.js?v=r10"></script>
+<script>
+  window.CritterQuest = Game;
+  window.addEventListener('DOMContentLoaded', () => Game.init());
+</script>
+</body>
+</html>
