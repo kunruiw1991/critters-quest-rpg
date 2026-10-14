@@ -220,7 +220,7 @@ const UI = (() => {
       const done = st.total > 0 && st.caught === st.total;
       const here = z === Game.zone, atCrystal = here && nearCrystal(z);
       list += '<button class="map-tp' + (done ? ' done' : '') + '" data-tp="' + z + '" style="--c:' + reg.color + '"><span class="mt-e">' + reg.emoji + '</span><span class="mt-t"><b>' + esc(reg.name) + '</b><small>' +
-        (st.total ? (done ? '✅ All ' + st.total + ' Critters caught!' : '🐾 ' + st.caught + '/' + st.total + ' Critters caught') : '🏡 Home sweet home') + ' · 🎁 ' + st.opened + '/' + st.chests + (s.visited[z] ? ' · ✨ visited' : '') + '</small>' +
+        (st.total ? (done ? '✅ All ' + st.total + ' Critters caught!' : '🐾 ' + st.caught + '/' + st.total + ' Critters caught') : '🏡 Home sweet home') + ' · ' + (st.chests > 0 && st.opened === st.chests ? '🎁 All ' + st.chests + ' opened! ✨' : '🎁 ' + st.opened + '/' + st.chests) + (s.visited[z] ? ' · ✨ visited' : '') + '</small>' +
         (habRow ? '<span class="mt-h">' + habRow + '</span>' : '') + '</span><span class="mt-go">' + (here ? (atCrystal ? '📍 At Crystal' : '📍 Re-center') : '✨ Teleport') + '</span></button>';
     }
     const caught = Object.keys(s.team).length;
@@ -281,7 +281,7 @@ const UI = (() => {
     if (!s || Game.mode === 'battle') return;
     const caught = Object.keys(s.team).length, seen = D.SPECIES.filter(sp => s.seen[sp.id]).length;
     let html = (caught >= 20 ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all 20/20 Rainbow Island Critters! 🌈👑</div>' : '') +
-      '<div class="dex-head">📖 <b>' + caught + '/20</b> caught · 👀 ' + seen + '/20 seen · ⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
+      '<div class="dex-head"><span>📖 <b>' + caught + '/20</b> caught</span><span>👀 ' + seen + '/20 seen</span><span>⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b></span><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
     for (const sp of D.SPECIES) {
       const t = s.team[sp.id], seenIt = !!s.seen[sp.id];
       const cls = t ? 'caught' : seenIt ? 'seen' : 'unknown';
@@ -519,10 +519,12 @@ const UI = (() => {
     lines.push('⭐ +' + info.gain + ' EXP for your whole team!');
     lines.push('🪙 +' + info.gold + ' gold');
     info.ups.forEach(([id, lv]) => lines.push('🎉 ' + D.SP[id].name + ' grew to Lv ' + lv + '!'));
-    if (info.count >= 20) lines.push('🏆 WOW! Chuyu caught ALL 20 Critters! CritterDex complete! 🏆');
-    $('celeLines').innerHTML = lines.map(l => '<li>' + esc(l) + '</li>').join('');
+    const isMaster = info.count >= 20;
+    if (isMaster) lines.push('🏆 WOW! Chuyu caught ALL 20 Critters! CritterDex complete! 🏆');
+    const trophyHtml = isMaster ? '<div class="cele-trophy">🏆 Master Critter Trainer! Chuyu caught all 20 Critters! 🌈👑</div>' : '';
+    $('celeLines').innerHTML = trophyHtml + lines.map(l => '<li>' + esc(l) + '</li>').join('');
     $('celebrate').classList.remove('hidden');
-    confettiBurst(140);
+    confettiBurst(isMaster ? 260 : 140);
     if (info.ups.length) setTimeout(() => Sound.sfx('levelup'), 900);
     setTimeout(() => { try { $('celeOk').focus({ preventScroll: true }); } catch (e) { /* ignore */ } }, 50);
   }

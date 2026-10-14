@@ -1328,7 +1328,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg';
+      img.src = 'icons/' + icon + '.jpg?v=r11';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {

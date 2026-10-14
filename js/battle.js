@@ -115,7 +115,7 @@ const Battle = (() => {
     $('bmHp').style.width = (mr * 100).toFixed(1) + '%'; $('bmHp').style.background = hpColor(mr);
     $('bmHpTxt').textContent = 'HP ' + Math.ceil(m.shown) + '/' + mMax;
     $('bmExp').style.width = (m.t.lv >= 50 ? 100 : (m.t.exp / D.expToNext(m.t.lv) * 100)).toFixed(1) + '%';
-    $('bMoveName').textContent = w.dizzy ? 'Already Dizzy (1 HP) — Toss 🎯!' : m.sp.move + ' ' + D.TYPES[m.sp.type].emoji;
+    $('bMoveName').textContent = w.dizzy ? (caught ? '🏁 Finish Battle (Nap & EXP) 💤' : 'Already Dizzy (1 HP) — Toss 🎯!') : m.sp.move + ' ' + D.TYPES[m.sp.type].emoji;
     const full = m.t.hp >= mMax;
     const bc = s.inv.berry > 0 ? '(x' + s.inv.berry + ')' : s.inv.gold >= D.ITEMS.berry.price ? '(🪙 ' + D.ITEMS.berry.price + ' Quick-Buy)' : '(x0)';
     $('bFeedInfo').textContent = w.fed ? (full ? '💕 Already +45% & Full HP! ' + bc : '💕 Already +45%! · Heal +HP ' + bc) : '+HP & +45% Catch Rate! ' + bc;
@@ -191,8 +191,13 @@ const Battle = (() => {
 
   /* ---------------- actions ---------------- */
   async function doAttack() {
-    const m = st.mine, w = st.wild;
+    const s = Game.state, m = st.mine, w = st.wild;
     if (w.hp <= 1) {
+      if (s && s.team[w.sp.id]) {
+        // Already caught and dizzy: peaceful Finish Battle with EXP & gold!
+        doFinish();
+        return;
+      }
       // Mercy Catch Rule: a Dizzy Critter can't be hurt, so don't waste a turn - go straight to catching!
       w.shake = 0.5;
       say('💫 ' + w.sp.name + ' is already Dizzy (1 HP)! Pick a capsule to catch it! 🎯');
@@ -300,7 +305,6 @@ const Battle = (() => {
     const gain = 8 + w.lv * 3;
     const ups = [];
     if (isNew) s.team[id] = { lv: w.lv, exp: 0, hp: D.maxHp(w.sp, w.lv), caught: Date.now() };
-    else { const n = Game.addExp(id, gain); if (n) ups.push([id, s.team[id].lv]); }
     for (const tid of Object.keys(s.team)) {
       if (isNew && tid === id) continue;
       const n = Game.addExp(tid, gain);
@@ -357,7 +361,7 @@ const Battle = (() => {
   }
   async function wildTurn() {
     const w = st.wild, m = st.mine;
-    const calm = w.fed ? 0.7 : w.dizzy ? 0.6 : 0.35;
+    const calm = w.fed ? 0.7 : w.dizzy ? 0.85 : 0.35;
     if (Math.random() < calm) {
       const lines = w.dizzy ? [w.sp.name + ' is seeing stars! 💫', w.sp.name + ' wobbles around dizzily... 😵'] : w.fed ? [w.sp.name + ' does a happy dance! 💃', w.sp.name + ' munches happily! 😋'] : [w.sp.name + ' watches Chuyu curiously... 👀', w.sp.name + ' says "' + pick(w.sp.bubbles) + '"'];
       say(pick(lines));
@@ -373,7 +377,8 @@ const Battle = (() => {
     await projectile(w.sp.type, wildPos(), minePos(), 0.55);
     if (!active) return 'gone';
     const mx = D.maxHp(m.sp, m.t.lv);
-    const dmg = Math.max(1, Math.min(Math.round((3 + w.lv * 0.55) * (0.8 + Math.random() * 0.4)), Math.ceil(mx * 0.22)));
+    let dmg = Math.max(1, Math.min(Math.round((3 + w.lv * 0.55) * (0.8 + Math.random() * 0.4)), Math.ceil(mx * 0.22)));
+    if (w.dizzy) dmg = Math.min(dmg, Math.max(1, m.t.hp - 1));
     m.t.hp = Math.max(0, m.t.hp - dmg);
     m.shake = 1; m.flash = 1;
     Sound.sfx('hit');

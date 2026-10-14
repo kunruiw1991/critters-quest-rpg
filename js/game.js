@@ -89,9 +89,9 @@ const Game = (() => {
   }
 
   /* ---------------- team helpers ---------------- */
-  function member(id) { return state.team[id]; }
-  function partnerSp() { return D.SP[state.partner]; }
-  function maxHpOf(id) { return D.maxHp(D.SP[id], state.team[id].lv); }
+  function member(id) { return state && state.team ? state.team[id] : null; }
+  function partnerSp() { return state && state.partner ? D.SP[state.partner] : null; }
+  function maxHpOf(id) { const m = member(id); return m ? D.maxHp(D.SP[id], m.lv) : 10; }
   function addExp(id, amount) {
     const t = state.team[id];
     if (!t) return 0;
@@ -331,6 +331,7 @@ const Game = (() => {
     if (z !== curZone) enterZone(z);
     const g = World.groundAt(player.x, player.y);
     if (g === T.SHALLOW && (!mv || World.groundAt(mv.fx, mv.fy) !== T.SHALLOW)) { Sound.sfx('splash'); addFx('ripple', player.x * TS + 24, player.y * TS + 40); }
+    if (g === T.STONES) { Sound.sfx('splash'); addFx('ripple', player.x * TS + 24, player.y * TS + 40); }
     const ob = World.objectAt(player.x, player.y);
     if (ob && ob.kind === 'trampoline' && !(mv && mv.arc)) { bounce(); return; }
     if (encounterCooldown > 0) encounterCooldown--;
@@ -670,7 +671,7 @@ const Game = (() => {
       if (n.shop) UI.openBag('shop');
     });
   }
-  function openedChests() { return Object.keys(state.chests).length; }
+  function openedChests() { return state && state.chests ? Object.keys(state.chests).length : 0; }
 
   /* ---------------- battles ---------------- */
   function startWildBattle(w) {
@@ -736,11 +737,11 @@ const Game = (() => {
   }
 
   /* ---------------- teleport ---------------- */
-  function teleportTo(x, y, quiet) {
-    if (!state || !World.inb(x, y)) return false;
+  function teleportTo(x, y, quiet, dir) {
+    if (!state || !World.inb(x, y) || !World.walkable(x, y) || !World.reach[World.I(x, y)]) return false;
     if (!quiet) { addFx('warp', player.px + 24, player.py + 24); Sound.sfx('warp'); }
     player.x = x; player.y = y; player.px = x * TS; player.py = y * TS; player.mv = null; player.path = []; player.target = null; dest = null;
-    player.dir = 'down';
+    player.dir = dir || (y >= 75 ? 'up' : 'down');
     placeFollowerBehind();
     snapCamera();
     const z = zoneHere();
@@ -755,7 +756,7 @@ const Game = (() => {
       for (let r = 0; r < 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
         const x = 58 + dx, y = 47 + dy;
         if (Math.max(Math.abs(dx), Math.abs(dy)) === r && World.walkable(x, y) && World.reach[World.I(x, y)] && !wildAt(x, y) && World.zoneAt(x, y) === 9) {
-          teleportTo(x, y); ensureNearbyWilds(9, x, y); UI.banner(D.REGIONS[9]); save('warp'); return true;
+          teleportTo(x, y, false, 'down'); ensureNearbyWilds(9, x, y); UI.banner(D.REGIONS[9]); save('warp'); return true;
         }
       }
       return false;
@@ -772,7 +773,7 @@ const Game = (() => {
       }
     }
     if (!spot) return false;
-    teleportTo(spot[0], spot[1]);
+    teleportTo(spot[0], spot[1], false, (z === 8 || z === 7 || z === 4) ? 'up' : 'down');
     ensureNearbyWilds(z, spot[0], spot[1]);
     state.visited[z] = true;
     UI.banner(D.REGIONS[z]);
@@ -916,9 +917,9 @@ const Game = (() => {
     const fl = World.groundAt(follower.x, follower.y) === T.SHALLOW;
     ctx.fillStyle = fl ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.2)';
     ctx.beginPath(); ctx.ellipse(follower.px + 24, follower.py + 42, 13, 4.5, 0, 0, Math.PI * 2); ctx.fill();
-    if (fl) Art.drawMiniFloat(ctx, x, y + 20, 15, false, '#ff7ab8');
+    if (fl) Art.drawMiniFloat(ctx, x, y + 12, 15, false, '#ff7ab8');
     Art.drawMedallion(ctx, sp, x, y + 8, 14, time, { aura: true });
-    if (fl) Art.drawMiniFloat(ctx, x, y + 20, 15, true, '#ff7ab8');
+    if (fl) Art.drawMiniFloat(ctx, x, y + 12, 15, true, '#ff7ab8');
     if (inTall(follower.x, follower.y) && !fl && !follower.mv) tallOverlay(follower.x, follower.y, 37);
   }
   function drawWild(w) {
@@ -933,8 +934,8 @@ const Game = (() => {
     if (fl) Art.drawMiniFloat(ctx, x, y + 15, 18, true, '#4fb3ff');
     if (inTall(w.x, w.y) && !w.mv) tallOverlay(w.x, w.y, 35);
     const caught = !!state.team[w.sp];
-    const badge = !caught ? 'NEW!' : (sp.rarity === 'legendary' ? '👑' : sp.rarity === 'rare' ? '★' : '');
-    Art.nameTag(ctx, x, w.py + 52, sp.name + ' Lv' + w.lv, sp.color, badge);
+    const badge = (sp.rarity === 'legendary' ? '👑 ' : sp.rarity === 'rare' ? '★ ' : '') + (!caught ? 'NEW!' : '');
+    Art.nameTag(ctx, x, w.py + 52, sp.name + ' Lv' + w.lv, sp.color, badge.trim());
     if (w.bubble) Art.bubble(ctx, x, y - 24, w.bubble);
   }
   function drawNPC(n) {
