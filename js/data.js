@@ -5,7 +5,8 @@
 const CQData = (() => {
   const TILE = 48;
   const MAP_W = 120;
-  const MAP_H = 90;
+  const MAP_H = 118;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island (KPop Demon Hunters)
+  const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay exactly the same)
   const MAP_VERSION = 1;
 
   /* Elemental "types" are pure flavor: they pick the attack visual + colors. */
@@ -22,6 +23,11 @@ const CQData = (() => {
     flower:  { name: 'Flower',  emoji: '🌸', fx: 'petals',  color: '#ff9ccf', color2: '#ffe3f1' },
     ice:     { name: 'Frost',   emoji: '❄️', fx: 'snow',    color: '#9fe8ff', color2: '#ffffff' },
     galaxy:  { name: 'Galaxy',  emoji: '🌌', fx: 'galaxy',  color: '#8b7bff', color2: '#ffd6ff' },
+    /* Honmoon Island (KPop Demon Hunters) */
+    golden:  { name: 'Golden',  emoji: '🎤', fx: 'notes',   color: '#ffc93c', color2: '#fff3b0' },
+    pop:     { name: 'Pop',     emoji: '🎶', fx: 'notes',   color: '#ff5fa2', color2: '#8ff3ff' },
+    demon:   { name: 'Demon',   emoji: '👹', fx: 'flames',  color: '#9b4dff', color2: '#ff7ad9' },
+    spirit:  { name: 'Spirit',  emoji: '🐯', fx: 'stars',   color: '#3fa7ff', color2: '#ffffff' },
   };
 
   const RARITY = {
@@ -94,6 +100,44 @@ const CQData = (() => {
     { id: 'solar', name: 'Solar Crown DogDay', emoji: '👑', icon: 'dogday', base: 'dogday', variant: 'solar', type: 'sun', rarity: 'legendary',
       color: '#ff7b00', ears: 'dog', move: 'Royal Solar Flare', bubbles: ['👑', '☀️', '🔥', '🌞'], hpB: 4, atkB: 4,
       desc: 'The legendary sun king pup! His golden crown shines brighter than noon.' },
+    /* ---- 12 friends from Honmoon Island (KPop Demon Hunters) ---- */
+    /* HUNTR/X join your team when you talk to them (they are not caught with capsules). */
+    { id: 'rumi', name: 'Rumi', emoji: '🎤', icon: 'rumi', type: 'golden', rarity: 'rare', color: '#8e4bff', ears: 'braid', hero: true,
+      move: 'Golden Sword Song', bubbles: ['🎤', '✨', 'Golden!', '💜'], hpB: 3, atkB: 4,
+      desc: 'The brave leader of HUNTR/X! Her golden voice and glowing sword keep the Honmoon shining bright.' },
+    { id: 'mira', name: 'Mira', emoji: '💃', icon: 'mira', type: 'golden', rarity: 'rare', color: '#ff3d8b', ears: 'pigtails', hero: true,
+      move: 'Gokdo Twirl', bubbles: ['💃', '💖', "Let's go!", '✨'], hpB: 3, atkB: 4,
+      desc: 'The tallest dancer of HUNTR/X. She spins her long gokdo like a twirling ribbon of light!' },
+    { id: 'zoey', name: 'Zoey', emoji: '🎧', icon: 'zoey', type: 'golden', rarity: 'rare', color: '#2ec4b6', ears: 'buns', hero: true,
+      move: 'Shinkal Star Toss', bubbles: ['🎧', '✌️', 'Yay!', '🍜'], hpB: 2, atkB: 4,
+      desc: 'The youngest of HUNTR/X! She writes the best rhymes and LOVES a big bowl of ramen.' },
+    { id: 'derpy', name: 'Derpy Tiger', emoji: '🐯', icon: 'derpy', type: 'spirit', rarity: 'common', color: '#3f8fe0', ears: 'tiger',
+      move: 'Derpy Pounce', bubbles: ['🐯', 'Rawr~', '😜', '🐾'], hpB: 3, atkB: 1,
+      desc: 'A goofy blue tiger with a giant toothy grin. He loves snacks, hugs and making silly faces.' },
+    { id: 'sussie', name: 'Sussie', emoji: '🐦', icon: 'sussie', type: 'spirit', rarity: 'common', color: '#2b3a55', ears: 'magpie',
+      move: 'Magpie Swoop', bubbles: ['🐦', 'Caw!', '🎩', '💌'], hpB: 1, atkB: 2,
+      desc: 'A clever magpie in a tiny black gat hat. She flies around delivering happy messages.' },
+    { id: 'jinu', name: 'Jinu', emoji: '🦁', icon: 'jinu', type: 'pop', rarity: 'rare', color: '#6a4bd8', ears: 'gat',
+      move: 'Soda Pop Serenade', bubbles: ['🎶', '🦁', '💜', '...hi'], hpB: 2, atkB: 4,
+      desc: 'The gentle leader of the Saja Boys. Deep down he is kind and just wants a friend.' },
+    { id: 'abby', name: 'Abby Saja', emoji: '💪', icon: 'abby', type: 'pop', rarity: 'uncommon', color: '#ff4f8b', ears: 'gat',
+      move: 'Muscle Pop Pose', bubbles: ['💪', '🎶', 'Flex!', '😎'], hpB: 3, atkB: 2,
+      desc: 'The strongest Saja Boy! He shows off his muscles and his very best dance moves.' },
+    { id: 'mystery', name: 'Mystery Saja', emoji: '🔮', icon: 'mystery', type: 'pop', rarity: 'uncommon', color: '#8f8cff', ears: 'gat',
+      move: 'Hidden Hush Wave', bubbles: ['🔮', '...', '✨', '🤫'], hpB: 1, atkB: 3,
+      desc: 'Nobody has ever seen his eyes under that lavender hair! He says very little, but he waves hello.' },
+    { id: 'romance', name: 'Romance Saja', emoji: '💘', icon: 'romance', type: 'pop', rarity: 'uncommon', color: '#ff7ab8', ears: 'gat',
+      move: 'Heart Wink', bubbles: ['💘', '😉', '💕', '🌹'], hpB: 2, atkB: 2,
+      desc: 'His fluffy pink hair is shaped like a heart. Every wink sends tiny hearts floating by!' },
+    { id: 'baby', name: 'Baby Saja', emoji: '🧢', icon: 'baby', type: 'pop', rarity: 'uncommon', color: '#2ad1c9', ears: 'gat',
+      move: 'Bubble Pop Beat', bubbles: ['🧢', '🎶', 'Hehe!', '🫧'], hpB: 2, atkB: 2,
+      desc: 'The youngest-looking Saja Boy with a turquoise mop-top and a surprisingly deep voice!' },
+    { id: 'imp', name: 'Gat Demon', emoji: '😈', icon: 'imp', type: 'demon', rarity: 'common', color: '#8a4dff', ears: 'horns',
+      move: 'Sneaky Swirl', bubbles: ['😈', 'Hehe!', '💜', '👀'], hpB: 1, atkB: 2,
+      desc: 'A chubby little purple demon in a tiny gat hat. Mischievous, but it just wants to play.' },
+    { id: 'gwima', name: 'Gwi-Ma', emoji: '👹', icon: 'gwima', type: 'demon', rarity: 'legendary', color: '#9b4dff', ears: 'flame',
+      move: 'Violet Flame Chomp', bubbles: ['👹', 'CHOMP!', '🔥', '💜'], hpB: 5, atkB: 4,
+      desc: 'The demon king: a giant grinning mouth of purple flames! Even he calms down when HUNTR/X sing the Golden song.' },
   ];
   SPECIES.forEach((s, i) => { s.num = i + 1; s.rate = RARITY[s.rarity].rate; });
   const SP = {};
@@ -120,9 +164,13 @@ const CQData = (() => {
       color: '#a98bf0', music: 'castle', table: [['catnap', 46], ['luna', 44], ['galaxy', 5], ['solar', 5]] },
     { id: 9, key: 'cross', name: 'Rainbow Crossroads Park', short: 'Crossroads', emoji: '🌳', rect: [45, 33, 73, 61], lv: [2, 5],
       color: '#7fd36a', music: 'nature', table: [['dogday', 25], ['catnap', 25], ['hoppy', 25], ['picky', 25]] },
+    { id: 10, key: 'honmoon', name: 'Honmoon Island (K-Pop Demon Hunters)', short: 'Honmoon', emoji: '🎤', rect: [22, 92, 97, 113], lv: [9, 13],
+      color: '#ff6fb5', music: 'honmoon', isNew: true,
+      table: [['derpy', 18], ['sussie', 16], ['imp', 16], ['baby', 12], ['abby', 12], ['mystery', 10], ['romance', 10], ['jinu', 6]] },
   ];
-  /* The 8 official biome regions (fast-travel destinations); Crossroads is a bonus park. */
-  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+  /* The official lands (fast-travel destinations); Crossroads is a bonus park. Honmoon Island (10) is reached over
+     the Golden Honmoon Bridge south of Sunshine Village. */
+  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10];
 
   /* Where each rare / legendary always waits (until caught) — so 20/20 is always possible. */
   const SPECIAL_SPOTS = [
@@ -132,6 +180,8 @@ const CQData = (() => {
     { sp: 'aurora', zone: 7, at: [84, 10], lv: 16, place: 'the Aurora Crystals' },
     { sp: 'galaxy', zone: 8, at: [65, 18], lv: 20, place: 'the Moon Altar' },
     { sp: 'solar', zone: 8, at: [53, 18], lv: 20, place: 'the Sun Altar' },
+    { sp: 'jinu', zone: 10, at: [37, 100], lv: 15, place: 'the N Seoul Tower lookout' },
+    { sp: 'gwima', zone: 10, at: [92, 103], lv: 22, place: 'the Demon Gate' },
   ];
 
   const ITEMS = {
@@ -147,8 +197,8 @@ const CQData = (() => {
       lines: ['Good morning, Chuyu! 🌞 Did you sleep well?', 'If your Critters get sleepy, splash them at a 💖 Healing Fountain — or come home for a nap!', 'Here, take some snacks for your adventure! I love you! 💕'],
       gift: { berry: 5 }, after: ['Be careful and have fun, sweetie! Come home any time for a nap. 🏡'] },
     { id: 'prof', name: 'Professor Bubba', zone: 1, at: [63, 69], look: { skin: '#f5cfa5', hair: '#d9d9d9', hairStyle: 'short', shirt: '#ffffff', pants: '#5a7bd6', hat: 'elephant', coat: true, glasses: true },
-      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Twenty different Critters live all over Rainbow Island!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
-      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!'] },
+      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Thirty-two different Critters live on Rainbow Island and Honmoon Island!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
+      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the golden bridge south of the village to meet the K-Pop Demon Hunters! 🎤'] },
     { id: 'shopkeeper', name: 'Shopkeeper Penny', zone: 1, at: [54, 76], look: { skin: '#e8b48a', hair: '#2b2b2b', hairStyle: 'ponytail', shirt: '#2fb39a', pants: '#3c4a6b', hat: 'none', apron: '#fff3c4' },
       lines: ['Welcome to the Capsule & Berry Shop! 🛒'], shop: true },
     { id: 'timmy', name: 'Timmy', zone: 1, at: [57, 74], look: { skin: '#ffe0c2', hair: '#e8b84a', hairStyle: 'spiky', shirt: '#ffb020', pants: '#3b6fd6', hat: 'none' },
@@ -187,6 +237,27 @@ const CQData = (() => {
     { id: 'princess', name: 'Princess Stella', zone: 8, at: [62, 11], look: { skin: '#ffe0c8', hair: '#ffd84d', hairStyle: 'long', shirt: '#c58bff', pants: '#ffb3e6', hat: 'crown' },
       lines: ['Hello, brave Critter friend! 👸', 'Legendary Critters are very shy... This Master Star Capsule catches ANY Critter, 100%!'],
       gift: { master: 1 }, after: ['May the stars light your way, Chuyu! 🌟'] },
+    /* ---- Honmoon Island (KPop Demon Hunters). `join` = this hero joins Chuyu's team after the chat. ---- */
+    { id: 'rumi', name: 'Rumi', zone: 10, at: [77, 101], join: 'rumi', joinLv: 15,
+      look: { skin: '#f6d7b8', hair: '#8e4bff', hairStyle: 'dragonbraid', ribbon: '#ffc93c', shirt: '#ffd23b', pants: '#2b2350', hat: 'none', weapon: 'saingeom', glow: '#ffd84d' },
+      lines: ['Hi, Chuyu! I\'m Rumi, the leader of HUNTR/X! 🎤✨', 'When we sing, a golden shield called the Honmoon keeps everyone safe.', 'Silly demons are hopping all over the island... but you know what? Even demons can become friends! 💜', 'Let\'s make the Honmoon shine GOLDEN together. I\'m joining your team! 🌟'],
+      after: ['Let\'s keep singing! 🎤'] },
+    { id: 'mira', name: 'Mira', zone: 10, at: [31, 102], join: 'mira', joinLv: 15,
+      look: { skin: '#f3d2b3', hair: '#ff3d8b', hairStyle: 'longpig', shirt: '#1f1f2e', pants: '#f2b632', hat: 'none', weapon: 'gokdo', glow: '#ffd84d' },
+      lines: ['Hey! I\'m Mira. 💃 I was practicing my gokdo spins by N Seoul Tower.', 'A shy boy named Jinu keeps looking at the city lights from the tower lookout... 🦁', 'You seem super brave. Want a dancer on your team? Here I come! 💖'],
+      after: ['Spin, spin, sparkle! 💃'] },
+    { id: 'zoey', name: 'Zoey', zone: 10, at: [66, 104], join: 'zoey', joinLv: 15,
+      look: { skin: '#f4d4b5', hair: '#1b1b24', hairStyle: 'spacebuns', shirt: '#2ec4b6', pants: '#3a3a55', hat: 'none', weapon: 'shinkal', glow: '#ffd84d' },
+      lines: ['Hiii! I\'m Zoey! 🎧 Wanna know a secret? This ramen shop has the BEST noodles! 🍜', 'Tap the shop and your Critters slurp up some ramen — all their energy comes back! 💖', 'Derpy the blue tiger and Sussie the magpie are my buddies. Let\'s go find them together! ✌️'],
+      after: ['Ramen time! 🍜'] },
+    { id: 'celine', name: 'Celine', zone: 10, at: [52, 104],
+      look: { skin: '#f0cfa8', hair: '#2a2a2a', hairStyle: 'sidepart', streak: '#bfbfbf', shirt: '#ffffff', pants: '#2c3e70', hat: 'none' },
+      lines: ['Welcome to Honmoon Island, little one. I am Celine. I trained Rumi, Mira and Zoey. 🍵', 'The Honmoon shines brightest when friends sing together and are not afraid to be themselves.', 'Gwi-Ma, the grumpy demon king, waits by the Demon Gate in the east. 👹', 'Take these Rainbow Capsules for your journey. 🌈'],
+      gift: { rainbow: 3 }, after: ['Be brave, be kind, and be YOU. 💛'] },
+    { id: 'bobby', name: 'Bobby', zone: 10, at: [84, 103],
+      look: { skin: '#f2c9a0', hair: '#3a2a1a', hairStyle: 'short', shirt: '#ff7a45', pants: '#3b3b4f', hat: 'none', glasses: true, headset: true },
+      lines: ['Whoa, a VIP guest! I\'m Bobby, HUNTR/X\'s manager! 📋🎤', 'The Golden Honmoon Stage is right here — the girls give the best concerts!', 'Here\'s a little backstage bonus for you! 🎁'],
+      gift: { gold: 120, berry: 3 }, after: ['Showtime soon! Don\'t forget to say hi to Rumi! 🌟'] },
   ];
 
   /* Chest contents are decided by world generation; these are the reward tiers. */
@@ -200,11 +271,12 @@ const CQData = (() => {
     'Tip: Attacks never knock a wild Critter out — they just get dizzy 🎯 and easier to catch!',
     'Tip: Press B for ⚡ roller-skate dash!',
     'Tip: The 🗺️ Map can teleport you to any land in one tap!',
+    'Tip: Cross the Golden Honmoon Bridge south of Sunshine Village to meet the K-Pop Demon Hunters! 🎤',
   ];
 
   function maxHp(sp, lv) { return Math.round(18 + lv * 4 + sp.hpB * lv * 0.5); }
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
 })();

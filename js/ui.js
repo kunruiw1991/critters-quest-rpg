@@ -64,7 +64,7 @@ const UI = (() => {
     $('berries').textContent = s.inv.berry;
     $('rainbows').textContent = s.inv.rainbow;
     $('masters').textContent = s.inv.master;
-    $('dexCount').textContent = Object.keys(s.team).length + '/20';
+    $('dexCount').textContent = Object.keys(s.team).length + '/' + D.SPECIES.length;
     $('btnB').classList.toggle('on', !!s.dash);
     $('btnBLabel').textContent = s.dash ? 'Dash ON' : 'Dash';
   }
@@ -189,6 +189,7 @@ const UI = (() => {
     const reg = D.REGIONS[z], s = Game.state;
     const ids = Array.from(new Set(reg.table.map(e => e[0])));
     D.SPECIAL_SPOTS.forEach(sp => { if (sp.zone === z && ids.indexOf(sp.sp) < 0) ids.push(sp.sp); });
+    D.NPCS.forEach(n => { if (n.zone === z && n.join && ids.indexOf(n.join) < 0) ids.unshift(n.join); });
     const caught = ids.filter(id => s.team[id]).length;
     const chests = World.chests.filter(c => !c.removed && c.z === z);
     const opened = chests.filter(c => s.chests[c.key]).length;
@@ -200,9 +201,10 @@ const UI = (() => {
     if (!minimap) minimap = Art.renderMinimap(6);
     const pct = (x, y) => 'left:' + ((x + 0.5) / World.W * 100).toFixed(2) + '%;top:' + ((y + 0.5) / World.H * 100).toFixed(2) + '%';
     let labels = '';
-    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50] };
-    for (let z = 1; z <= 9; z++) {
+    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105] };
+    for (let z = 1; z < D.REGIONS.length; z++) {
       const reg = D.REGIONS[z], st = regionStats(z);
+      if (!labelAt[z]) continue;
       const habs = st.ids.map(id => '<img src="' + Art.portraitURL(id) + '" class="' + (s.team[id] ? 'got' : 'nope') + '" alt="" title="' + esc(D.SP[id].name) + '">').join('');
       const [lx, ly] = labelAt[z];
       const done = st.total > 0 && st.caught === st.total;
@@ -219,13 +221,15 @@ const UI = (() => {
       const habRow = st.ids.map(id => '<img src="' + Art.portraitURL(id) + '" class="' + (s.team[id] ? 'got' : 'nope') + '" alt="" title="' + esc(D.SP[id].name) + '">').join('');
       const done = st.total > 0 && st.caught === st.total;
       const here = z === Game.zone, atCrystal = here && nearCrystal(z);
-      list += '<button class="map-tp' + (done ? ' done' : '') + '" data-tp="' + z + '" style="--c:' + reg.color + '"><span class="mt-e">' + reg.emoji + '</span><span class="mt-t"><b>' + esc(reg.name) + '</b><small>' +
+      const fresh = reg.isNew && !s.visited[z];
+      list += '<button class="map-tp' + (done ? ' done' : '') + (fresh ? ' fresh' : '') + '" data-tp="' + z + '" style="--c:' + reg.color + '"><span class="mt-e">' + reg.emoji + '</span><span class="mt-t"><b>' + (fresh ? '🆕 ' : '') + esc(reg.name) + '</b><small>' +
         (st.total ? (done ? '✅ All ' + st.total + ' Critters caught!' : '🐾 ' + st.caught + '/' + st.total + ' Critters caught') : '🏡 Home sweet home') + ' · ' + (st.chests > 0 && st.opened === st.chests ? '🎁 All ' + st.chests + ' opened! ✨' : '🎁 ' + st.opened + '/' + st.chests) + (s.visited[z] ? ' · ✨ visited' : '') + '</small>' +
         (habRow ? '<span class="mt-h">' + habRow + '</span>' : '') + '</span><span class="mt-go">' + (here ? (atCrystal ? '📍 At Crystal' : '📍 Re-center') : '✨ Teleport') + '</span></button>';
     }
     const caught = Object.keys(s.team).length;
-    const html = '<div class="map-top"><span>📍 Chuyu is in <b>' + esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island') + '</b></span><span>📖 ' + caught + '/20 caught · 🎁 ' + Game.openedChests() + '/' + World.chests.length + ' chests</span></div>' +
-      '<div class="map-layout"><div class="map-col"><div class="map-wrap"><div class="map-inner" id="mapInner"><canvas id="mapCanvas" width="' + minimap.width + '" height="' + minimap.height + '"></canvas>' + labels + '</div></div>' +
+    const ar = (World.W / World.H).toFixed(4);
+    const html = '<div class="map-top"><span>📍 Chuyu is in <b>' + esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island') + '</b></span><span>📖 ' + caught + '/' + D.SPECIES.length + ' caught · 🎁 ' + Game.openedChests() + '/' + World.chests.length + ' chests</span></div>' +
+      '<div class="map-layout"><div class="map-col"><div class="map-wrap" style="--map-ar:' + ar + '"><div class="map-inner" id="mapInner" style="aspect-ratio:' + World.W + ' / ' + World.H + '"><canvas id="mapCanvas" width="' + minimap.width + '" height="' + minimap.height + '"></canvas>' + labels + '</div></div>' +
       '<div class="map-legend">🎁 chest · 💖 healing fountain · 🔮 rainbow crystal · ⭐ rare Critter spot · 🔴 Chuyu · ✅ land complete</div></div>' +
       '<div class="map-regions">' + list + '</div></div>';
     openModal('map', '🗺️ World Map / Fast Travel <small>tap any land to teleport!</small>', html);
@@ -272,16 +276,17 @@ const UI = (() => {
   /* ---------------- CritterDex ---------------- */
   function habitatsOf(id) {
     const out = [];
-    for (let z = 1; z <= 9; z++) { const reg = D.REGIONS[z]; if (reg.table.some(e => e[0] === id)) out.push(z); }
+    for (let z = 1; z < D.REGIONS.length; z++) { const reg = D.REGIONS[z]; if (reg.table.some(e => e[0] === id)) out.push(z); }
     D.SPECIAL_SPOTS.forEach(s => { if (s.sp === id && out.indexOf(s.zone) < 0) out.push(s.zone); });
+    D.NPCS.forEach(n => { if (n.join === id && out.indexOf(n.zone) < 0) out.push(n.zone); });
     return out;
   }
   function openDex(focusId) {
     const s = Game.state;
     if (!s || Game.mode === 'battle') return;
-    const caught = Object.keys(s.team).length, seen = D.SPECIES.filter(sp => s.seen[sp.id]).length;
-    let html = (caught >= 20 ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all 20/20 Rainbow Island Critters! 🌈👑</div>' : '') +
-      '<div class="dex-head"><span>📖 <b>' + caught + '/20</b> caught</span><span>👀 ' + seen + '/20 seen</span><span>⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b></span><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
+    const caught = Object.keys(s.team).length, seen = D.SPECIES.filter(sp => s.seen[sp.id]).length, total = D.SPECIES.length;
+    let html = (caught >= total ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + '/' + total + ' Critters of Rainbow Island & Honmoon Island! 🌈👑</div>' : '') +
+      '<div class="dex-head"><span>📖 <b>' + caught + '/' + total + '</b> caught</span><span>👀 ' + seen + '/' + total + ' seen</span><span>⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b></span><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
     for (const sp of D.SPECIES) {
       const t = s.team[sp.id], seenIt = !!s.seen[sp.id];
       const cls = t ? 'caught' : seenIt ? 'seen' : 'unknown';
@@ -297,7 +302,7 @@ const UI = (() => {
         '</div>';
     }
     html += '</div>';
-    openModal('dex', '📖 CritterDex <span class="pill">' + caught + '/20</span>', html);
+    openModal('dex', '📖 CritterDex <span class="pill">' + caught + '/' + total + '</span>', html);
     bindDex();
     if (focusId) dexDetail(focusId);
   }
@@ -320,6 +325,7 @@ const UI = (() => {
     const known = t || seenIt;
     const habs = habitatsOf(id).map(z => D.REGIONS[z].emoji + ' ' + esc(D.REGIONS[z].name)).join('<br>');
     const spot = D.SPECIAL_SPOTS.find(x => x.sp === id);
+    const joiner = D.NPCS.find(n => n.join === id);
     let html = '<div class="dex-detail" style="--c:' + sp.color + '"><button class="dex-back" id="dexBack">◀ All Critters</button>' +
       '<div class="dd-top"><div class="dd-img' + (known ? '' : ' unknown') + '"><img src="' + Art.portraitURL(id) + '" alt="" class="' + (known ? '' : 'sil') + '"></div><div class="dd-info">' +
       '<div class="dd-num">#' + String(sp.num).padStart(2, '0') + ' · ' + D.RARITY[sp.rarity].label + '</div>' +
@@ -332,7 +338,8 @@ const UI = (() => {
         '<div class="dd-bar"><span>EXP ' + t.exp + '/' + need + '</span><div class="bar exp"><i style="width:' + (t.lv >= 50 ? 100 : t.exp / need * 100).toFixed(1) + '%"></i></div></div>';
     }
     html += '</div></div><p class="dd-desc">' + (known ? esc(sp.desc) : 'A mysterious Critter! Explore to find it.') + '</p>' +
-      '<div class="dd-hab"><b>🏞️ Lives in:</b><br>' + habs + (spot ? '<br>⭐ Always waits at ' + esc(spot.place) + ' until caught!' : '') + '</div>' +
+      '<div class="dd-hab"><b>🏞️ Lives in:</b><br>' + habs + (spot ? '<br>⭐ Always waits at ' + esc(spot.place) + ' until caught!' : '') +
+      (joiner ? '<br>🎤 Say hi to ' + esc(joiner.name) + ' on ' + esc(D.REGIONS[joiner.zone].name) + ' — she joins your team!' : '') + '</div>' +
       '<div class="dd-actions">';
     if (t) {
       html += s.partner === id ? '<span class="dex-partner on big">★ Chuyu\'s Partner</span>' : '<button class="big-btn" id="ddPartner">🤝 Make Partner</button>';
@@ -450,11 +457,11 @@ const UI = (() => {
       '<button class="big-btn blue" id="mHelp">❓ How to play</button>' +
       '<button class="big-btn red" id="mNew">🔄 New Adventure</button></div>' +
       '<div class="stats-box"><h4>📊 Chuyu\'s Adventure</h4><ul>' +
-      '<li>🐾 Critters caught: <b>' + Object.keys(s.team).length + '/20</b></li>' +
+      '<li>🐾 Critters caught: <b>' + Object.keys(s.team).length + '/' + D.SPECIES.length + '</b></li>' +
       '<li>🎁 Chests opened: <b>' + Game.openedChests() + '/' + World.chests.length + '</b></li>' +
       '<li>⚔️ Battles: <b>' + st.battles + '</b> · ⭐ Level-ups: <b>' + st.levelUps + '</b></li>' +
       '<li>👣 Steps: <b>' + U.fmt(st.steps) + '</b> · ⏱️ Play time: <b>' + fmtTime(st.playMs) + '</b></li>' +
-      '<li>🗺️ Lands visited: <b>' + D.MAIN_REGIONS.filter(z => s.visited[z]).length + '/8</b></li>' +
+      '<li>🗺️ Lands visited: <b>' + D.MAIN_REGIONS.filter(z => s.visited[z]).length + '/' + D.MAIN_REGIONS.length + '</b></li>' +
       '<li>💾 Last saved: <b id="mSavedAt">' + savedAgo(s.saved) + '</b></li></ul></div>';
     openModal('menu', '⚙️ Menu', html);
     $('mSound').addEventListener('click', () => { toggleMute(); closeModal(true); openMenu(); });
@@ -468,6 +475,7 @@ const UI = (() => {
       '<h4>🅰️ A button</h4><p>Talk, open, shake, catch! (Keys: Enter, Space or Z)</p>' +
       '<h4>🅱️ B button</h4><p>⚡ Roller-skate dash on/off! (Keys: B or X · hold Shift)</p>' +
       '<h4>🐾 Catching Critters</h4><p>Walk into a wild Critter or rustle through tall grass. In battle:<br>1️⃣ ⚡ Attack — makes them dizzy (never knocks them out!)<br>2️⃣ 🎯 Throw Capsule — catch them!<br>3️⃣ 🍓 Feed Treat — heals your Critter and +45% catch chance<br>4️⃣ 🔄 Switch / 🏃 Run</p>' +
+      '<h4>🎤 Honmoon Island</h4><p>Walk out of Sunshine Village\'s south gate and cross the Golden Honmoon Bridge! Say hi to Rumi, Mira and Zoey — they join your team. Tap the 🍜 Ramen Shop to heal, and find Gwi-Ma at the Demon Gate!</p>' +
       '<h4>🗺️ Map (M) · 📖 Dex (C) · 🎒 Bag (I)</h4><p>Teleport to any land, choose your partner, and shop for capsules. Your adventure saves automatically! 💾</p></div>';
     openModal('help', '❓ How to Play', html);
   }
@@ -507,21 +515,29 @@ const UI = (() => {
   /* ---------------- GOTCHA celebration ---------------- */
   function celebrate(info, onClose) {
     celebrating = { onClose, spId: info.sp.id };
+    const total = D.SPECIES.length;
     const pb = $('celePartner');
     const canPartner = Game.state && Game.state.partner !== info.sp.id && Game.state.team[info.sp.id];
     pb.classList.toggle('hidden', !canPartner);
     pb.textContent = '🐾 Make ' + info.sp.name + ' my partner!';
     $('celeImg').src = Art.portraitURL(info.sp.id);
     $('celeCard').style.setProperty('--c', info.sp.color);
-    $('celeName').textContent = 'Caught ' + info.sp.name + '! ' + info.sp.emoji;
+    const ct = document.querySelector('#celeCard .cele-title');
+    if (ct) ct.textContent = info.joined ? '🎤 NEW FRIEND! 🎤' : '✨ GOTCHA! ✨';
+    $('celeName').textContent = info.joined ? info.sp.name + ' joined your team! ' + info.sp.emoji : 'Caught ' + info.sp.name + '! ' + info.sp.emoji;
     const lines = [];
-    lines.push(info.isNew ? '📖 New CritterDex entry #' + String(info.sp.num).padStart(2, '0') + '!  (' + info.count + '/20 caught)' : '💞 ' + info.sp.name + ' is already your friend — friendship bonus EXP!');
-    lines.push('⭐ +' + info.gain + ' EXP for your whole team!');
-    lines.push('🪙 +' + info.gold + ' gold');
+    lines.push(info.isNew ? '📖 New CritterDex entry #' + String(info.sp.num).padStart(2, '0') + '!  (' + info.count + '/' + total + ' caught)' : '💞 ' + info.sp.name + ' is already your friend — friendship bonus EXP!');
+    if (info.joined) {
+      lines.push('⭐ ' + info.sp.name + ' joins at Lv ' + info.lv + ' with the move ' + info.sp.move + '!');
+      lines.push('💜 Battle demons together and make them your friends too!');
+    } else {
+      lines.push('⭐ +' + info.gain + ' EXP for your whole team!');
+      lines.push('🪙 +' + info.gold + ' gold');
+    }
     info.ups.forEach(([id, lv]) => lines.push('🎉 ' + D.SP[id].name + ' grew to Lv ' + lv + '!'));
-    const isMaster = info.count >= 20;
-    if (isMaster) lines.push('🏆 WOW! Chuyu caught ALL 20 Critters! CritterDex complete! 🏆');
-    const trophyHtml = isMaster ? '<div class="cele-trophy">🏆 Master Critter Trainer! Chuyu caught all 20 Critters! 🌈👑</div>' : '';
+    const isMaster = info.count >= total;
+    if (isMaster) lines.push('🏆 WOW! Chuyu caught ALL ' + total + ' Critters! CritterDex complete! 🏆');
+    const trophyHtml = isMaster ? '<div class="cele-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + ' Critters! 🌈👑</div>' : '';
     $('celeLines').innerHTML = trophyHtml + lines.map(l => '<li>' + esc(l) + '</li>').join('');
     $('celebrate').classList.remove('hidden');
     confettiBurst(isMaster ? 260 : 140);

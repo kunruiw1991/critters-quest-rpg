@@ -50,6 +50,14 @@ const Sound = (() => {
     title: { bpm: 116, lw: 'square', bw: 'triangle', drums: 'k.h.s.h.',
       lead: 'G4 C5 E5 G5 C6 . G5 E5 | F5 A5 C6 . B5 . G5 . | E5 G5 C6 E6 D6 . C6 A5 | B5 G5 A5 F5 G5 . . - | C6 . B5 A5 G5 . E5 . | F5 . E5 D5 E5 . C5 . | D5 E5 F5 G5 A5 B5 C6 D6 | C6 . G5 . C6 . . -',
       bass: 'C3 . G3 . C3 . G3 . | F3 . C3 . G3 . D3 . | C3 . G3 . A2 . E3 . | G2 . D3 . G2 . D3 . | A2 . E3 . E3 . B2 . | F3 . C3 . C3 . G2 . | D3 . A3 . G3 . D3 . | C3 . G2 . C3 . - -' },
+    /* Honmoon Island: an original bouncy K-pop style tune (Am - F - C - G). */
+    honmoon: { bpm: 120, lw: 'square', bw: 'triangle', drums: 'k.h.skh.',
+      lead: 'A4 . C5 E5 A5 . G5 E5 | F5 . E5 C5 D5 . C5 A4 | C5 . E5 G5 C6 . B5 G5 | B5 . A5 G5 D5 . . - | E5 E5 A5 . G5 E5 C5 . | F5 F5 A5 . C6 . A5 F5 | G5 . E5 G5 C6 . D6 E6 | D6 . B5 . G5 . . -',
+      bass: 'A2 . A3 . A2 . A3 . | F2 . F3 . F2 . F3 . | C3 . C4 . C3 . C4 . | G2 . G3 . G2 . D3 . | A2 . E3 . A2 . E3 . | F2 . C3 . F2 . C3 . | C3 . G3 . C3 . G3 . | G2 . D3 . G2 . - -' },
+    /* Gwi-Ma, the demon king: an exciting (but not scary) boss battle tune. */
+    boss: { bpm: 144, lw: 'square', bw: 'square', drums: 'khshkhsh', bassVol: 0.07,
+      lead: 'E5 . G5 E5 B5 . A5 G5 | F#5 . E5 D5 E5 . . - | E5 . G5 B5 E6 . D6 B5 | C6 . B5 A5 B5 . . - | G5 G5 A5 B5 C6 . B5 A5 | F#5 F#5 G5 A5 B5 . A5 G5 | E5 F#5 G5 A5 B5 C6 D6 D#6 | E6 . B5 . E5 . . -',
+      bass: 'E2 E3 E2 E3 E2 E3 E2 E3 | D2 D3 D2 D3 D2 D3 D2 D3 | C2 C3 C2 C3 C2 C3 C2 C3 | B1 B2 B1 B2 B1 B2 B1 B2 | C2 C3 C2 C3 C2 C3 C2 C3 | D2 D3 D2 D3 D2 D3 D2 D3 | A1 A2 A1 A2 B1 B2 B1 B2 | E2 E3 E2 E3 E2 E3 E2 E3' },
   };
   for (const k in TRACKS) {
     const t = TRACKS[k];
@@ -197,6 +205,10 @@ const Sound = (() => {
         else if (ty === 'heart') { tone(n, 660, 0.15, 'sine', 0.12); tone(n + 0.15, 880, 0.25, 'sine', 0.12); }
         else if (ty === 'water' || ty === 'ice') { for (let k = 0; k < 6; k++) tone(n + k * 0.05, 400 + Math.random() * 600, 0.06, 'sine', 0.1, null, 1200); }
         else if (ty === 'leaf' || ty === 'fruit') { noise(n, 0.4, 0.2, 1600, 'bandpass'); tone(n, 330, 0.2, 'triangle', 0.1, null, 660); }
+        else if (ty === 'golden') { tone(n, 392, 0.3, 'square', 0.05, null, 784); [784, 988, 1175, 1568, 1976].forEach((f, k) => tone(n + k * 0.045, f, 0.16, 'triangle', 0.1)); }
+        else if (ty === 'pop') { for (let k = 0; k < 5; k++) tone(n + k * 0.06, 600 + k * 180, 0.07, 'square', 0.08, null, 1400); }
+        else if (ty === 'demon') { tone(n, 110, 0.45, 'sawtooth', 0.08, null, 55); noise(n, 0.4, 0.18, 600, 'lowpass'); }
+        else if (ty === 'spirit') { noise(n, 0.25, 0.12, 2400); tone(n, 523, 0.12, 'triangle', 0.1); tone(n + 0.1, 784, 0.18, 'triangle', 0.1); }
         else { tone(n, 220, 0.4, 'sawtooth', 0.07, null, 1200); noise(n, 0.3, 0.12, 2000); }
         break;
       }

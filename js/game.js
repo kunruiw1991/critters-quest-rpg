@@ -8,7 +8,7 @@ const Game = (() => {
   const SAVE_KEY = 'critterQuestRPG_v1';
   const DV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
-  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6 };
+  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9 };
 
   let canvas, ctx, dpr = 1, zoom = 1, viewW = 0, viewH = 0;
   const cam = { x: 0, y: 0 };
@@ -36,6 +36,7 @@ const Game = (() => {
       pos: { x: World.start.x, y: World.start.y, dir: 'down' },
       chests: {}, trees: {}, gifts: {}, visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
+      news: { honmoon: true },
     };
   }
   function validate(s) {
@@ -56,6 +57,7 @@ const Game = (() => {
       seen: Object.assign({}, s.seen || {}), inv: Object.assign(base.inv, s.inv || {}),
       chests: Object.assign({}, s.chests || {}), trees: Object.assign({}, s.trees || {}), gifts: Object.assign({}, s.gifts || {}),
       visited: Object.assign({ 1: true }, s.visited || {}), dash: !!s.dash, stats: Object.assign(base.stats, s.stats || {}),
+      news: Object.assign({}, s.news || {}),
     });
     ids.forEach(id => { out.seen[id] = true; });
     ['gold', 'berry', 'rainbow', 'master'].forEach(k => { out.inv[k] = Math.max(0, Math.floor(Number(out.inv[k]) || 0)); });
@@ -616,9 +618,10 @@ const Game = (() => {
         let best = null, bd = Infinity;
         for (const [x, y] of targetTiles({ obj: o })) { if (World.inb(x, y) && World.walkable(x, y) && World.reach[World.I(x, y)]) { const d = Math.abs(x - player.x) + Math.abs(y - player.y); if (d < bd) { bd = d; best = { x, y }; } } }
         state.lastHeal = best || { x: player.x, y: player.y };
-        Sound.sfx('heal');
+        if (o.kind === 'ramen') { Sound.sfx('munch'); setTimeout(() => Sound.sfx('heal'), 420); } else Sound.sfx('heal');
         for (let k = 0; k < 8; k++) addFx('heart', fx0 - 30 + rng() * 60, fy0 - rng() * 30);
-        UI.toast('💖 ' + (o.name || 'Healing Fountain') + ': all your Critters are full of energy!');
+        if (o.kind === 'ramen') { addFx('text', fx0, o.y * TS - 10, '🍜 Slurp slurp!'); UI.toast('🍜 Slurp slurp! Yummy Honmoon ramen — all your Critters are full of energy! 💖'); }
+        else UI.toast('💖 ' + (o.name || 'Healing Fountain') + ': all your Critters are full of energy!');
         UI.updateHUD();
         save('heal');
         return true;
@@ -668,8 +671,29 @@ const Game = (() => {
         UI.toast('🎁 ' + n.name + ' gave you ' + msgs.join(' · ') + '!');
         save('gift');
       }
+      if (n.join && D.SP[n.join] && !state.team[n.join]) joinTeam(n);
       if (n.shop) UI.openBag('shop');
     });
+  }
+  /* HUNTR/X heroes join Chuyu's team after the chat (no capsule needed) and leave their spot. */
+  function joinTeam(n) {
+    const sp = D.SP[n.join];
+    const lv = n.joinLv || 15;
+    state.team[sp.id] = { lv, exp: 0, hp: D.maxHp(sp, lv), caught: Date.now() };
+    state.seen[sp.id] = true;
+    state.gifts[n.id] = true;
+    state.stats.caught++;
+    addFx('burst', n.x * TS + 24, n.y * TS + 6, sp.color);
+    addFx('levelup', n.x * TS + 24, n.y * TS + 6);
+    World.hideNPC(n);
+    Sound.sfx('gotcha');
+    UI.updateHUD();
+    save('join');
+    mode = 'modal';
+    UI.celebrate({ sp, lv, isNew: true, joined: true, gain: 0, gold: 0, ups: [], count: Object.keys(state.team).length }, () => { if (mode === 'modal' && !UI.modalOpen) mode = 'play'; });
+  }
+  function hideJoinedHeroes() {
+    for (const n of World.npcs) if (n.join && state && state.team[n.join]) World.hideNPC(n);
   }
   function openedChests() { return state && state.chests ? Object.keys(state.chests).length : 0; }
 
@@ -790,9 +814,9 @@ const Game = (() => {
     for (const o of World.berryTrees) if (o.shakeT > 0) o.shakeT -= dt;
     // ambient particles
     const z = curZone;
-    const want = z === 7 ? 'snow' : z === 8 ? 'firefly' : z === 4 ? 'sparkle' : z === 2 ? 'leaf' : z === 6 ? 'dust' : z === 3 ? 'bubble' : null;
+    const want = z === 7 ? 'snow' : z === 8 ? 'firefly' : z === 4 ? 'sparkle' : z === 2 ? 'leaf' : z === 6 ? 'dust' : z === 3 ? 'bubble' : z === 10 ? 'petal' : null;
     if (want && parts.length < 46 && rng() < dt * 22) {
-      parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20, vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' ? 25 + rng() * 15 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
+      parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' || want === 'petal' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20 + (want === 'petal' ? 14 : 0), vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' || want === 'petal' ? 22 + rng() * 16 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
     }
     for (let k = parts.length - 1; k >= 0; k--) {
       const p = parts[k];
@@ -846,7 +870,7 @@ const Game = (() => {
       if (follower.show) list.push({ k: follower.py + 45, f: true });
       list.push({ k: player.py + 47, p: true });
     }
-    for (const n of World.npcs) if (inView(n.x * TS, n.y * TS)) list.push({ k: n.y * TS + 46, n });
+    for (const n of World.npcs) if (!n.hidden && inView(n.x * TS, n.y * TS)) list.push({ k: n.y * TS + 46, n });
     list.sort((a, b) => a.k - b.k);
     for (const it of list) {
       if (it.o) drawObject(it.o);
@@ -946,8 +970,8 @@ const Game = (() => {
     ctx.translate(n.x * TS + 24, n.y * TS + 44);
     Art.drawPerson(ctx, n.look, dir, 0, { moving: false, bob: 0 });
     ctx.restore();
-    const hasGift = n.gift && !(state && state.gifts[n.id]);
-    const icon = hasGift ? '🎁' : n.shop ? '🛒' : '💬';
+    const hasGift = (n.gift && !(state && state.gifts[n.id])) || (n.join && state && !state.team[n.join]);
+    const icon = n.join && hasGift ? '🎤' : hasGift ? '🎁' : n.shop ? '🛒' : '💬';
     if (hasGift || near || n.shop) Art.bubble(ctx, n.x * TS + 24, n.y * TS - 6 + Math.sin(time * 3) * 2, icon, 0.95);
   }
   function drawFx() {
@@ -1007,6 +1031,12 @@ const Game = (() => {
       else if (p.type === 'leaf') { ctx.fillStyle = p.ph > 3 ? '#ff9ccf' : '#7cc35a'; ctx.beginPath(); ctx.ellipse(p.x, p.y, 3.4, 1.8, p.t * 2, 0, Math.PI * 2); ctx.fill(); }
       else if (p.type === 'dust') { ctx.fillStyle = 'rgba(255,230,170,.8)'; ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2); ctx.fill(); }
       else if (p.type === 'bubble') { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x, p.y, 2.6, 0, Math.PI * 2); ctx.stroke(); }
+      else if (p.type === 'petal') {
+        ctx.fillStyle = p.ph > 4.5 ? '#ffe08a' : p.ph > 2 ? '#ffb7d5' : '#ff8fc4';
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.t * 2.4 + p.ph);
+        if (p.ph > 4.5) { h.sparkle(ctx, 0, 0, 2.6); } else { ctx.beginPath(); ctx.ellipse(0, 0, 3.6, 2, 0, 0, Math.PI * 2); ctx.fill(); }
+        ctx.restore();
+      }
     }
     ctx.globalAlpha = 1;
   }
@@ -1139,6 +1169,7 @@ const Game = (() => {
   /* ---------------- boot ---------------- */
   function startWith(s, isNew) {
     state = s;
+    hideJoinedHeroes();
     document.body.classList.remove('at-title', 'in-battle');
     document.getElementById('title').classList.add('hidden');
     player.x = s.pos.x; player.y = s.pos.y; player.dir = s.pos.dir || 'down';
@@ -1163,6 +1194,16 @@ const Game = (() => {
         sp.name + ' will follow you everywhere you go. 🐾',
         'Tap anywhere to walk, or use the ▲▼◄► pad. Rustle through tall grass and walk into wild Critters to meet them!',
         'Come visit me at the Critter Lab ➡ for a present! Now go explore Rainbow Island! 🌈',
+      ]);
+    } else if (!s.news || !s.news.honmoon) {
+      // One-time announcement for adventures saved before Honmoon Island existed.
+      s.news = Object.assign({}, s.news, { honmoon: true });
+      save('auto-quiet');
+      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
+        'Welcome back, Chuyu! I have BIG news! 🎤✨',
+        'A golden bridge appeared south of Sunshine Village. It leads to a brand-new place: Honmoon Island!',
+        'The K-Pop Demon Hunters — Rumi, Mira and Zoey — are there, and silly demons like Derpy Tiger, Sussie and the Saja Boys are hopping all around!',
+        'Walk out of the village\'s south gate ⬇, or open the 🗺️ World Map and tap Honmoon to teleport. Have fun! 🌟',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');

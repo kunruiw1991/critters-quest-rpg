@@ -1,10 +1,12 @@
 'use strict';
 /* ==========================================================================
- * World: deterministic 120x90 Rainbow Island generator + connectivity audit.
+ * World: deterministic Rainbow Island generator (120x90) + Honmoon Island
+ * (rows 90..117, KPop Demon Hunters) + connectivity audit.
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const W = D.MAP_W, H = D.MAP_H, N = W * H;
+  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || D.MAP_H, N = W * H;
+  const HZ = 10; // Honmoon Island zone id
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
   const T_NAMES = Object.keys(T);
   const WALK = new Uint8Array([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]);
@@ -12,7 +14,7 @@ const World = (() => {
   [T.SAND, T.GRASS, T.TALL, T.FLOWERS, T.SNOW].forEach(t => { SOLID[t] = 1; });
   const WATERLIKE = new Uint8Array(15);
   [T.DEEP, T.SHALLOW, T.STONES, T.BRIDGE_H, T.BRIDGE_V].forEach(t => { WATERLIKE[t] = 1; });
-  const DEC = { NONE: 0, SHELL: 1, STARFISH: 2, PEBBLE: 3, MUSH: 4, LILY: 5, FLOWER_P: 6, FLOWER_Y: 7, FLOWER_B: 8, SPARKLE: 9, SHARD: 10, TUFT: 11, CRACK: 12, CLOVER: 13, FLOWER_W: 14 };
+  const DEC = { NONE: 0, SHELL: 1, STARFISH: 2, PEBBLE: 3, MUSH: 4, LILY: 5, FLOWER_P: 6, FLOWER_Y: 7, FLOWER_B: 8, SPARKLE: 9, SHARD: 10, TUFT: 11, CRACK: 12, CLOVER: 13, FLOWER_W: 14, PETAL: 15, NOTE: 16 };
   const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
   const KIND = {
@@ -26,6 +28,9 @@ const World = (() => {
     rod: { block: 1 }, pyramid: { block: 1, act: 'sign' }, pillar: { block: 1, rm: 1 }, snowman: { block: 1, act: 'sign' },
     icecrystal: { block: 1 }, castle: { block: 1, act: 'sign' }, altar: { block: 1, act: 'sign' }, lighthouse: { block: 1, act: 'sign' },
     umbrella: { block: 1, rm: 1 }, sandcastle: { block: 1, act: 'sign' }, trampoline: { block: 0, act: 'bounce' },
+    // Honmoon Island (KPop Demon Hunters)
+    stage: { block: 1, act: 'sign' }, seoultower: { block: 1, act: 'sign' }, ramen: { block: 1, act: 'heal' },
+    hanok: { block: 1, act: 'sign' }, demongate: { block: 1, act: 'sign' },
   };
 
   const ground = new Uint8Array(N), zone = new Uint8Array(N), decal = new Uint8Array(N);
@@ -49,6 +54,7 @@ const World = (() => {
     return Math.hypot(dx, dy);
   }
   function zoneOf(x, y) {
+    if (y >= H0) return HZ; // Honmoon Island fills the southern extension
     if (x >= 49 && x <= 71 && y >= 61 && y <= 81) return 1; // the fenced village is exact
     const jx = x + (U.vnoise(x * 0.17, y * 0.17, 5) - 0.5) * 5;
     const jy = y + (U.vnoise(x * 0.17 + 40, y * 0.17 + 40, 6) - 0.5) * 5;
@@ -59,8 +65,15 @@ const World = (() => {
     }
     return best;
   }
+  /* Honmoon Island outline (only used for y >= H0): a rounded rectangle in the southern sea. */
+  const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H - 1 };
   function coastVal(x, y) {
-    const d = Math.min(x, W - 1 - x, y, H - 1 - y);
+    if (y >= H0) {
+      const d = Math.min(x - HON.x0, HON.x1 - x, y - HON.y0, HON.y1 - y);
+      return d + (U.fbm(x * 0.09, y * 0.09, 11) - 0.5) * 4;
+    }
+    // Rainbow Island keeps its original coastline (computed against its original 90-row height).
+    const d = Math.min(x, W - 1 - x, y, H0 - 1 - y);
     return d + (U.fbm(x * 0.09, y * 0.09, 11) - 0.5) * 6;
   }
   function ellipse(cx, cy, rx, ry, fn) {
@@ -87,9 +100,10 @@ const World = (() => {
           if (z === 3 && x < 77 + U.vnoise(x * 0.2, y * 0.2, 9) * 3) g = T.GRASS;
           ground[i] = g;
           if (z !== 1) {
-            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57 }[z];
+            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6 }[z];
             if (U.fbm(x * 0.13, y * 0.13, 100 + z) > thr) ground[i] = T.TALL;
             else if (z === 4 && U.fbm(x * 0.11, y * 0.11, 300) > 0.6) ground[i] = T.FLOWERS;
+            else if (z === HZ && U.fbm(x * 0.12, y * 0.12, 310) > 0.64) ground[i] = T.FLOWERS;
             if (z === 8 && y >= 21 && y <= 31 && (x <= 55 || x >= 64) && y % 2 === 0 && U.vnoise(x * 0.18, y * 0.18, 77) > 0.25) ground[i] = T.TALL;
           }
         }
@@ -103,8 +117,8 @@ const World = (() => {
       const yc = 55 + Math.round(Math.sin(x * 0.21) * 1.3);
       for (let k = 0; k < 2; k++) if (isLand(x, yc + k) || ground[I(x, yc + k)] === T.SHALLOW) setT(x, yc + k, T.DEEP);
     }
-    // Orchard stream down to the south sea
-    for (let y = 56; y < H; y++) {
+    // Orchard stream down to the south sea (stops at Rainbow Island's original shore)
+    for (let y = 56; y < H0; y++) {
       const xc = 35 + Math.round(Math.sin(y * 0.3) * 1.5);
       for (let k = 0; k < 2; k++) if (isLand(xc + k, y)) setT(xc + k, y, T.DEEP);
     }
@@ -348,7 +362,7 @@ const World = (() => {
     for (let y = 62; y <= 80; y++) { fence(49, y); fence(71, y); }
     for (const [x, y] of [[58, 63], [61, 63], [55, 72], [64, 71], [58, 79], [61, 79], [50, 72], [70, 72]]) placeNear('lamp', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
     for (const [x, y] of [[56, 75], [63, 75], [63, 66], [50, 65], [55, 65], [69, 64]]) placeNear('flowerbed', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
-    placeNear('mailbox', 50, 69, 1, 1, { text: "📬 Chuyu's mailbox: \"Dear Chuyu, go catch all 20 Critters! Love, Professor Bubba\"" }, { radius: 1, ignoreClear: true, safe: true });
+    placeNear('mailbox', 50, 69, 1, 1, { text: "📬 Chuyu's mailbox: \"Dear Chuyu, go catch all 32 Critters — and cross the golden bridge south of the village to meet the K-Pop Demon Hunters! Love, Professor Bubba\"" }, { radius: 1, ignoreClear: true, safe: true });
     berryTree(55, 79, 'apple'); berryTree(67, 79, 'apple');
 
     /* ===== 9. Rainbow Crossroads ===== */
@@ -438,9 +452,9 @@ const World = (() => {
     for (let x = 45; x <= 73; x++) { const i = I(x, 32); if (!road[i] && objAt[i] < 0 && SOLID[ground[i]] && Math.abs(x - 59.5) > 2) addObj('hedge', x, 32, 1, 1); }
     berryTree(48, 24, 'moon'); berryTree(70, 24, 'moon');
 
-    /* ===== NPCs, special spots, signs ===== */
-    D.NPCS.forEach((def, k) => placeNPC(def, k));
-    D.SPECIAL_SPOTS.forEach(addSpecial);
+    /* ===== NPCs, special spots, signs (Honmoon Island ones are added by buildHonmoon) ===== */
+    D.NPCS.forEach((def, k) => { if (def.zone !== HZ) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone !== HZ) addSpecial(s); });
     const SIGNS = [
       [57, 63, "🏡 Sunshine Village — Chuyu's hometown!  ⬆ Crossroads Park · ⬅ Apple Orchard · ➡ Coral Lagoon"],
       [62, 47, '🌳 Rainbow Crossroads —  ⬆ Moon Castle · ⬅ Crystal Meadow · ➡ Windmill Ridge · ⬇ Sunshine Village'],
@@ -456,10 +470,12 @@ const World = (() => {
   }
 
   function scatter() {
-    for (let y = 1; y < H - 1; y++) {
+    // Rainbow Island only (rows < H0): Honmoon Island is scattered later with its own RNG stream.
+    for (let y = 1; y < Math.min(H, H0 + 1) - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const i = I(x, y);
         if (road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+        if (zone[i] === HZ) continue;
         const z = zone[i], g = ground[i], r = rng();
         let kind = null, variant = null;
         if (z === 1) { if (r < 0.03) { kind = 'tree'; variant = 'oak'; } }
@@ -531,7 +547,7 @@ const World = (() => {
     bfs(start.x, start.y);
     const COUNTS = { 1: 2, 2: 6, 3: 4, 4: 5, 5: 5, 6: 7, 7: 5, 8: 4, 9: 2 };
     const cands = {};
-    for (let y = 2; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+    for (let y = 2; y < Math.min(H, H0) - 2; y++) for (let x = 2; x < W - 2; x++) {
       const i = I(x, y);
       if (!reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
       let blocked = 0;
@@ -555,9 +571,11 @@ const World = (() => {
   }
 
   function decals() {
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    // Rainbow Island only (rows < H0); Honmoon Island decals are placed by buildHonmoon().
+    for (let y = 0; y < Math.min(H, H0); y++) for (let x = 0; x < W; x++) {
       const i = I(x, y);
       if (objAt[i] >= 0 && objects[objAt[i]].block) continue;
+      if (zone[i] === HZ) continue;
       const z = zone[i], g = ground[i], r = rng();
       let d = 0;
       if (g === T.SAND && z === 3) d = r < 0.035 ? DEC.SHELL : r < 0.06 ? DEC.STARFISH : 0;
@@ -581,6 +599,108 @@ const World = (() => {
     }
   }
 
+  /* ---------------- 10. Honmoon Island (KPop Demon Hunters) ----------------
+   * Built AFTER the original island is finished, with its own RNG stream, so every chest,
+   * tree and decal on Rainbow Island stays exactly where it was (old saves keep working). */
+  function buildHonmoon() {
+    const r2 = U.mulberry32(20261023);
+    const inHon = (x, y) => inb(x, y) && zone[I(x, y)] === HZ;
+    // Honmoon Plaza (the bridge lands here) and the concert floor in front of the Golden Stage
+    for (let y = 97; y <= 104; y++) for (let x = 53; x <= 66; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 99; y <= 104; y++) for (let x = 71; x <= 85; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    // Golden Honmoon Bridge: straight south from Sunshine Village's south gate (fence gap at x 59-60, y 81)
+    for (let y = 81; y <= 98; y++) for (let x = 59; x <= 60; x++) {
+      const i = I(x, y);
+      if (objAt[i] >= 0 && objects[objAt[i]].rm) removeObj(objects[objAt[i]]);
+    }
+    roadSeg(59, 81, 59, 97, 0);
+    // Main street across the island + two little trails
+    roadSeg(25, 105, 95, 105, 0);
+    trail([[34, 105], [34, 101]]);   // up Namsan hill to N Seoul Tower
+    trail([[90, 105], [90, 102]]);   // to the Demon Gate
+    // Landmarks
+    landmark('stage', 73, 96, 10, 3, { name: 'Golden Honmoon Stage', text: '🎤 The Golden Honmoon Stage! When HUNTR/X sing here, a golden shield called the Honmoon glows over the whole island and keeps everyone safe. ✨' }, { ground: T.FLOOR, fx: 78 });
+    landmark('seoultower', 33, 98, 2, 2, { name: 'N Seoul Tower', text: '🗼 N Seoul Tower! From the very top you can see all of Honmoon Island — and Rainbow Island far to the north!' }, { fx: 34 });
+    fountains[HZ] = landmark('ramen', 67, 101, 4, 3, { name: 'Ramen Shop' }, { fx: 68 });
+    landmark('hanok', 47, 101, 4, 3, { name: "Celine's Hanok", text: "🏯 Celine's Hanok. This is where Celine trained Rumi, Mira and Zoey to be demon hunters. It smells like warm barley tea. 🍵" }, { fx: 48 });
+    landmark('demongate', 88, 98, 4, 3, { name: 'Demon Gate', text: '👹 The Demon Gate! Purple flames flicker inside... Gwi-Ma the demon king is waiting nearby. Bring a 🍓 berry and your bravest friends!' }, { fx: 90 });
+    waypoints[HZ] = landmark('waypoint', 56, 98, 1, 1, { region: HZ }, { ground: T.PLAZA });
+    // Plaza centerpiece + corner decorations
+    landmark('fountain', 59, 100, 2, 2, { style: HZ, name: 'Golden Honmoon Fountain' }, { ground: T.PLAZA });
+    for (const [x, y] of [[53, 97], [66, 97]]) placeNear('lantern', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
+    for (const [x, y] of [[53, 100], [66, 100], [53, 103], [64, 98]]) placeNear('flowerbed', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
+    // Lanterns along the main street and around the concert floor
+    for (const [x, y] of [[29, 104], [41, 104], [52, 107], [67, 107], [70, 99], [86, 99], [86, 107], [94, 104]]) placeNear('lantern', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
+    // Cherry blossoms framing the hill, the plaza and the stage
+    for (const [x, y] of [[30, 99], [37, 97], [39, 102], [44, 99], [52, 99], [67, 97], [87, 96], [70, 108], [46, 108], [58, 109]]) placeNear('tree', x, y, 1, 1, { variant: 'blossom' }, { radius: 1, safe: true });
+    berryTree(43, 107, 'plum'); berryTree(79, 108, 'plum');
+    // Heroes, friends and the two special Critter spots
+    D.NPCS.forEach((def, k) => { if (def.zone === HZ) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone === HZ) addSpecial(s); });
+    for (const [x, y, text] of [
+      [62, 97, '🎤 Welcome to Honmoon Island! ⬅ N Seoul Tower · ➡ Golden Honmoon Stage & Demon Gate · ⬆ Golden Bridge to Sunshine Village'],
+      [87, 104, '👹 ⬆ Demon Gate — Gwi-Ma waits here! Be brave!'],
+    ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
+    // A sign inside Sunshine Village pointing to the new bridge
+    placeNear('sign', 62, 80, 1, 1, { text: '⬇ Golden Honmoon Bridge → 🎤 Honmoon Island! Meet the K-Pop Demon Hunters!' }, { radius: 2, ignoreClear: true, anyWalk: true, safe: true });
+    // Scatter blossom trees, bushes and rocks (separate RNG stream)
+    for (let y = H0; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = I(x, y);
+      if (zone[i] !== HZ || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      const r = r2(), hill = x < 44;
+      let kind = null, variant = null;
+      if (r < (hill ? 0.1 : 0.045)) { kind = 'tree'; variant = 'blossom'; }
+      else if (r < (hill ? 0.12 : 0.06)) kind = 'bush';
+      else if (r < (hill ? 0.125 : 0.066)) kind = 'rock';
+      if (!kind || !safeToBlock(x, y)) continue;
+      addObj(kind, x, y, 1, 1, { variant: variant || (r2() * 3) | 0 });
+    }
+    // Treasure chests: one special chest on Namsan hill + 5 hidden ones
+    {
+      const [x, y] = [36, 96];
+      const i = I(x, y);
+      if (objAt[i] >= 0) removeObj(objects[objAt[i]]);
+      road[i] = 0;
+      if (!WALK[ground[i]] || ground[i] === T.SHALLOW) ground[i] = T.GRASS;
+      chests.push(addObj('chest', x, y, 1, 1, { loot: { master: 1, gold: 60 }, where: 'Namsan Hill', special: true }));
+      clearRect(x - 1, y - 1, 3, 3); ensureWalk(x, y + 1, true);
+    }
+    bfs(start.x, start.y);
+    const list = [];
+    for (let y = H0; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+      const i = I(x, y);
+      if (zone[i] !== HZ || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      let blocked = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && !isOpen(x + dx, y + dy)) blocked++;
+      if (blocked >= 2) list.push([x, y, blocked]);
+    }
+    for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(r2() * (k + 1)); const tmp = list[k]; list[k] = list[j]; list[j] = tmp; }
+    list.sort((a, b) => b[2] - a[2] + (r2() - 0.5) * 3);
+    let placed = 0;
+    for (const [x, y] of list) {
+      if (placed >= 5) break;
+      if (chests.some(c => Math.abs(c.x - x) + Math.abs(c.y - y) < 7)) continue;
+      if (objAt[I(x, y)] >= 0 || !safeToBlock(x, y)) continue;
+      const kind = U.weighted(r2, D.CHEST_LOOT);
+      const loot = kind === 'gold' ? { gold: 30 + 5 * U.randInt(r2, 0, 14) } : kind === 'berry' ? { berry: U.randInt(r2, 3, 6) } : kind === 'rainbow' ? { rainbow: U.randInt(r2, 1, 3) } : { master: 1 };
+      chests.push(addObj('chest', x, y, 1, 1, { loot }));
+      placed++;
+    }
+    // Decals: blossom petals, golden music notes, flowers and sparkles
+    for (let y = H0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = I(x, y);
+      if (!inHon(x, y) || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      const g = ground[i], r = r2();
+      let d = 0;
+      if (g === T.GRASS) d = r < 0.03 ? DEC.FLOWER_P : r < 0.07 ? DEC.PETAL : r < 0.085 ? DEC.NOTE : r < 0.1 ? DEC.FLOWER_W : r < 0.11 ? DEC.SPARKLE : 0;
+      else if (g === T.PATH) d = r < 0.08 ? DEC.PETAL : 0;
+      else if (g === T.PLAZA) d = r < 0.06 ? DEC.PETAL : r < 0.1 ? DEC.NOTE : 0;
+      else if (g === T.FLOOR) d = r < 0.05 ? DEC.NOTE : 0;
+      else if (g === T.SAND) d = r < 0.03 ? DEC.SHELL : r < 0.05 ? DEC.STARFISH : 0;
+      decal[i] = d;
+    }
+  }
+
   /* ---------------- connectivity repair ---------------- */
   function rectNeighbors(x, y, w, h) {
     const out = [];
@@ -595,7 +715,7 @@ const World = (() => {
       if (o.kind === 'trampoline') list.push({ label: 'trampoline@' + o.x + ',' + o.y, tiles: [[o.x, o.y]] });
       else list.push({ label: o.kind + '@' + o.x + ',' + o.y, tiles: rectNeighbors(o.x, o.y, o.w, o.h) });
     }
-    for (const n of npcs) list.push({ label: 'npc:' + n.id, tiles: rectNeighbors(n.x, n.y, 1, 1) });
+    for (const n of npcs) if (!n.hidden) list.push({ label: 'npc:' + n.id, tiles: rectNeighbors(n.x, n.y, 1, 1) });
     for (const s of specials) list.push({ label: 'spot:' + s.sp, tiles: [[s.x, s.y]] });
     return list;
   }
@@ -681,7 +801,7 @@ const World = (() => {
 
   function computeSpawns() {
     spawnTiles = {};
-    for (let z = 1; z <= 9; z++) spawnTiles[z] = [];
+    for (let z = 1; z <= HZ; z++) spawnTiles[z] = [];
     for (let i = 0; i < N; i++) {
       if (!reach[i] || road[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0) continue;
       const g = ground[i];
@@ -702,6 +822,7 @@ const World = (() => {
     scatter();
     placeChests();
     decals();
+    if (H > H0) buildHonmoon();
     repairs = repair();
     bfs(start.x, start.y);
     computeEdges();
@@ -711,6 +832,13 @@ const World = (() => {
   /* ---------------- queries ---------------- */
   function objectAt(x, y) { if (!inb(x, y)) return null; const o = objAt[I(x, y)]; return o >= 0 ? objects[o] : null; }
   function npcAtTile(x, y) { if (!inb(x, y)) return null; const n = npcAt[I(x, y)]; return n >= 0 ? npcs[n] : null; }
+  /* A hero who joined the team leaves her spot (frees the tile for walking). */
+  function hideNPC(n) {
+    if (!n || n.hidden) return;
+    n.hidden = true;
+    const i = I(n.x, n.y);
+    if (npcAt[i] >= 0 && npcs[npcAt[i]] === n) npcAt[i] = -1;
+  }
   function walkable(x, y) { return isOpen(x, y); }
   function groundAt(x, y) { return inb(x, y) ? ground[I(x, y)] : T.DEEP; }
   function zoneAt(x, y) { return inb(x, y) ? zone[I(x, y)] : 0; }
@@ -726,7 +854,7 @@ const World = (() => {
       if (reach[i]) zoneReach[z] = (zoneReach[z] || 0) + 1;
       if (ground[i] === T.TALL && reach[i]) tall[z] = (tall[z] || 0) + 1;
     }
-    for (let z = 1; z <= 9; z++) spawn[z] = (spawnTiles[z] || []).length;
+    for (let z = 1; z <= HZ; z++) spawn[z] = (spawnTiles[z] || []).length;
     let reachable = 0, walk = 0;
     for (let i = 0; i < N; i++) { if (reach[i]) reachable++; if (WALK[ground[i]]) walk++; }
     return {
@@ -739,11 +867,11 @@ const World = (() => {
   }
 
   return {
-    W, H, N, T, T_NAMES, WALK, SOLID, DEC, KIND, I, inb,
+    W, H, H0, N, T, T_NAMES, WALK, SOLID, DEC, KIND, I, inb,
     ground, zone, decal, road, edge, objAt, anchorAt, npcAt, reach, front,
     get objects() { return objects; }, get npcs() { return npcs; }, get specials() { return specials; },
     get chests() { return chests; }, get berryTrees() { return berryTrees; }, get waypoints() { return waypoints; },
     get fountains() { return fountains; }, get spawnTiles() { return spawnTiles; },
-    start, generate, audit, objectAt, npcAtTile, walkable, groundAt, zoneAt, isOpen,
+    start, generate, audit, objectAt, npcAtTile, hideNPC, walkable, groundAt, zoneAt, isOpen,
   };
 })();

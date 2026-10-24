@@ -61,9 +61,10 @@ const Battle = (() => {
     closeSub(true);
     setEnabled(false);
     renderCards(true);
-    Sound.music('battle', true);
+    Sound.music(sp.id === 'gwima' ? 'boss' : 'battle', true);
     const rare = sp.rarity === 'rare' || sp.rarity === 'legendary';
-    say((rare ? '✨ WOW! ' : '') + 'A wild ' + sp.name + ' ' + sp.emoji + ' appeared!' + (rare ? ' (' + D.RARITY[sp.rarity].label + ')' : ''));
+    say(sp.id === 'gwima' ? '👹 WHOA! Gwi-Ma the demon king appeared! Let\'s turn that grumpy grin into a happy one! 💜'
+      : (rare ? '✨ WOW! ' : '') + 'A wild ' + sp.name + ' ' + sp.emoji + ' appeared!' + (rare ? ' (' + D.RARITY[sp.rarity].label + ')' : ''));
     (async () => {
       await tween(0.55, k => { st.wild.scale = U.easeOutBack(k); st.mine.scale = U.easeOutBack(k); });
       if (rare) burst(wildPos().x, wildPos().y, 'stars', '#ffd23b', '#ffffff', 22);
@@ -474,7 +475,7 @@ const Battle = (() => {
   /* ---------------- effects ---------------- */
   function spawnPart(fx, x, y, c1, c2, burstMode) {
     const a = Math.random() * Math.PI * 2, sp = burstMode ? 80 + Math.random() * 160 : 20 + Math.random() * 40;
-    const typeMap = { beam: 'spark', stars: 'star', zap: 'spark', swirl: 'dot', hearts: 'heart', bubbles: 'bubble', leaves: 'leaf', petals: 'petal', apples: 'apple', snow: 'snow', galaxy: 'star', spark: 'spark' };
+    const typeMap = { beam: 'spark', stars: 'star', zap: 'spark', swirl: 'dot', hearts: 'heart', bubbles: 'bubble', leaves: 'leaf', petals: 'petal', apples: 'apple', snow: 'snow', galaxy: 'star', spark: 'spark', notes: 'note', flames: 'flame' };
     const type = typeMap[fx] || 'spark';
     parts.push({ type, x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (burstMode ? 40 : 10), g: burstMode ? 120 : 0, t: 0, life: 0.6 + Math.random() * 0.5, size: 4 + Math.random() * 6, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 8, color: fx === 'swirl' ? 'hsl(' + ((Math.random() * 360) | 0) + ',95%,65%)' : (Math.random() < 0.5 ? c1 : c2) });
   }
@@ -512,6 +513,23 @@ const Battle = (() => {
       case 'snow': ctx.lineWidth = 2; for (let k = 0; k < 3; k++) { ctx.rotate(Math.PI / 3); ctx.beginPath(); ctx.moveTo(-s, 0); ctx.lineTo(s, 0); ctx.stroke(); } break;
       case 'dot': ctx.beginPath(); ctx.arc(0, 0, s * 0.7, 0, 7); ctx.fill(); break;
       case 'confetti': ctx.fillRect(-s / 2, -s / 4, s, s / 2); break;
+      case 'note': {
+        // a little eighth note: tilted oval head + stem + flag (drawn upright regardless of spin)
+        ctx.rotate(-p.rot + Math.sin(p.t * 6) * 0.25);
+        ctx.beginPath(); ctx.ellipse(-s * 0.25, s * 0.45, s * 0.42, s * 0.3, -0.45, 0, 7); ctx.fill();
+        ctx.lineWidth = Math.max(1.5, s * 0.16); ctx.beginPath(); ctx.moveTo(s * 0.12, s * 0.42); ctx.lineTo(s * 0.12, -s * 0.75); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(s * 0.12, -s * 0.75); ctx.quadraticCurveTo(s * 0.7, -s * 0.5, s * 0.55, -s * 0.05); ctx.stroke();
+        break;
+      }
+      case 'flame': {
+        ctx.rotate(-p.rot);
+        const fl = 1 + Math.sin(p.t * 18 + p.size) * 0.12;
+        ctx.beginPath(); ctx.moveTo(0, -s * 1.1 * fl);
+        ctx.quadraticCurveTo(s * 0.75, -s * 0.2, s * 0.45, s * 0.45); ctx.quadraticCurveTo(0, s * 0.8, -s * 0.45, s * 0.45);
+        ctx.quadraticCurveTo(-s * 0.75, -s * 0.2, 0, -s * 1.1 * fl); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(0, s * 0.2, s * 0.18, s * 0.28, 0, 0, 7); ctx.fill();
+        break;
+      }
       default: h.sparkle(ctx, 0, 0, s); break;
     }
     ctx.restore();
@@ -534,6 +552,23 @@ const Battle = (() => {
       ctx.stroke();
     } else if (e.fx === 'swirl' || e.fx === 'galaxy') {
       for (let k = 0; k < 6; k++) { const a = time * 12 + k; ctx.fillStyle = 'hsl(' + (k * 60) + ',95%,65%)'; ctx.beginPath(); ctx.arc(e.hx + Math.cos(a) * 18, e.hy + Math.sin(a) * 18, 6, 0, 7); ctx.fill(); }
+    } else if (e.fx === 'notes') {
+      // a glowing golden ribbon of sound with notes riding on it
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(255,214,90,.35)'; ctx.lineWidth = 16;
+      ctx.beginPath();
+      for (let k = 0; k <= 16; k++) { const t = k / 16, x = U.lerp(e.from.x, e.hx, t), y = U.lerp(e.from.y, e.hy, t) + Math.sin(t * 12 + time * 14) * 10; if (k) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
+      ctx.stroke();
+      ctx.strokeStyle = e.c2; ctx.lineWidth = 4; ctx.stroke();
+      ctx.fillStyle = e.c1; ctx.shadowColor = e.c1; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(e.hx, e.hy, 11, 0, 7); ctx.fill();
+    } else if (e.fx === 'flames') {
+      ctx.shadowColor = e.c1; ctx.shadowBlur = 18;
+      for (let k = 0; k < 5; k++) {
+        const a = time * 9 + k * 1.26, rr = 10 + 6 * Math.sin(time * 13 + k);
+        ctx.fillStyle = k % 2 ? e.c2 : e.c1; ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.arc(e.hx + Math.cos(a) * 12, e.hy + Math.sin(a) * 9, rr * 0.7, 0, 7); ctx.fill();
+      }
     } else {
       ctx.fillStyle = e.c1; ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.arc(e.hx, e.hy, 16, 0, 7); ctx.fill();
     }
@@ -564,7 +599,7 @@ const Battle = (() => {
   function draw() {
     if (!st) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    Art.battleBackdrop(ctx, W, H, st.zone, time);
+    Art.battleBackdrop(ctx, W, H, st.zone, time, { boss: st.wild.sp.id === 'gwima' });
     const wp = wildPos(), mp = minePos();
     platform(wp.x, wp.y + wp.r * 0.95, wp.r * 1.55, wp.r * 0.38);
     platform(mp.x, mp.y + mp.r * 0.95, mp.r * 1.6, mp.r * 0.4);
