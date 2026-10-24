@@ -25,6 +25,12 @@ const Art = (() => {
     9: { g: '#88cd64', gd: '#6fb84f', gl: '#a2dd7d', t1: '#479a3b', t2: '#36852f', t3: '#5fb24a', p: '#d6bc8b', pd: '#b99f6f', pl: '#e8d3aa', sand: '#f1dfa0', sandd: '#ddc785', tree: '#47a446', treed: '#2f7f33', treel: '#73c962' },
     // Honmoon Island: mint-teal lawns, lightstick tall grass, lavender city cobbles, plum concert floor.
     10: { g: '#86d9bd', gd: '#68c4a5', gl: '#aaeed6', t1: '#ff5fa8', t2: '#a46bff', t3: '#ffcf3a', p: '#cbbcf0', pd: '#9d8cd3', pl: '#e6dcfd', sand: '#f7e4d0', sandd: '#e8cbb0', tree: '#3fb08e', treed: '#2a8c70', treel: '#72d4b0', floor: '#4b2a63', floord: '#3d2152', plaza: '#f8dfd0', plazad: '#e6c0b0', plazal: '#fff1e8' },
+    // Zone 11 (Derpy's Minhwa Sanctum & Bathhouse Valley): celadon-jade grass, blue-and-gold minhwa tall grass, warm hanji-paper stone paths.
+    11: { g: '#7fd4b8', gd: '#5eb89c', gl: '#a8eed7', t1: '#3f8fe0', t2: '#ffc93c', t3: '#56c2a6', p: '#efe2c8', pd: '#cfbda0', pl: '#fbf3e4', sand: '#f5e4be', sandd: '#dfc99e', tree: '#3b9b78', treed: '#267357', treel: '#6cd1aa', plaza: '#f5e6cf', plazad: '#dcc5a4', plazal: '#fff6e8' },
+    // Zone 12 (Nightmare Critters Carnival & Twilight Hollow): twilight-violet grass, neon carnival tall grass, purple cobbles, dark midway floor.
+    12: { g: '#78b894', gd: '#5c9c78', gl: '#9ad4b2', t1: '#c76bff', t2: '#ff5ca8', t3: '#45d1f5', p: '#c7b5ea', pd: '#9d88c9', pl: '#e3d7fa', sand: '#e8d8ee', sandd: '#cbb6d6', tree: '#5a6fb8', treed: '#3e4f94', treel: '#8598e0', floor: '#3d2358', floord: '#2d1842', plaza: '#e6d6f5', plazad: '#c6b0de', plazal: '#f6edff' },
+    // Zone 13 (Kanto Classics Bay & Pallet Meadow): classic bright Kanto emerald grass, Viridian tall grass, warm Pallet cobbles.
+    13: { g: '#7ed968', gd: '#61be4c', gl: '#a1eb8e', t1: '#3fa34d', t2: '#2d853a', t3: '#68cc5c', p: '#e8d6b3', pd: '#c9b38b', pl: '#f7ecd4', sand: '#f7e5a6', sandd: '#e3cc84', tree: '#42a846', treed: '#2b8030', treel: '#70cf68', plaza: '#f2e8d5', plazad: '#d6c6aa', plazal: '#fffaf0' },
   };
   const GREY_CLIFF = { cliff: '#a3a39b', cliffd: '#76766e', cliffl: '#cfcfc6' };
 
@@ -330,7 +336,8 @@ const Art = (() => {
     c.quadraticCurveTo(x + s * 1.35, y - s * 1.45, x + s * 0.68, y - s * 1.6); c.closePath(); c.fill();
   }
   function floorTile(c, z, v, plaza) {
-    if (z === 10) return plaza ? honmoonPlaza(c, v) : stageFloor(c, v);
+    if (z === 10 || z === 11) return plaza ? honmoonPlaza(c, v) : stageFloor(c, v);
+    if (z === 12 && !plaza) return stageFloor(c, v);
     if (plaza) {
       c.fillStyle = '#eadfc6'; c.fillRect(0, 0, 48, 48);
       c.strokeStyle = '#d4c3a2'; c.lineWidth = 1.5;
@@ -680,6 +687,7 @@ const Art = (() => {
     return {
       1: ['#e8e2d6', '#c9c0ae', '#ff7aa8'], 2: ['#b9c9a0', '#8fa673', '#7fd36a'], 3: ['#ffd9e4', '#f2a7bd', '#ff8fab'], 4: ['#f6dcff', '#d9b6f2', '#ff9ad5'],
       5: ['#c9ccd3', '#a2a6b0', '#7fb8ff'], 6: ['#efc58a', '#cf9d5c', '#ffb347'], 8: ['#d9d2f5', '#aaa0d8', '#c58bff'], 10: ['#fff1c9', '#e8c46a', '#ffd23b'],
+      12: ['#e9d6ff', '#bfa3e6', '#ff5ca8'],
     }[style] || ['#e8e2d6', '#c9c0ae', '#ff7aa8'];
   }
   function drawFountain(c, o) {
@@ -1552,8 +1560,251 @@ const Art = (() => {
     ramen: { box: [-12, -96, 216, 250], draw: drawRamen, anim: animRamen },
     hanok: { box: [-30, -54, 252, 208], draw: drawHanok },
     demongate: { box: [-24, -92, 240, 246], draw: drawDemonGate, anim: animDemonGate },
+    // Southern Continent (Zones 11..13)
+    tigerpavilion: { box: [-20, -64, 232, 216], draw: drawTigerPavilion },
+    flowerpot: { box: [-8, -16, 64, 68], draw: drawFlowerpot },
+    bathhouse: { box: [-16, -64, 224, 216], draw: drawBathhouse, anim: animSteam },
+    hanclinic: { box: [-16, -60, 224, 212], draw: drawHanClinic },
+    sodapoptruck: { box: [-12, -48, 216, 152], draw: drawSodaPopTruck },
+    carnivaltent: { box: [-20, -88, 280, 288], draw: drawCarnivalTent },
+    cauldron: { box: [-12, -48, 168, 152], draw: drawCauldron, anim: animCauldron },
+    pokecenter: { box: [-16, -56, 224, 208], draw: drawPokeCenter },
+    oaklab: { box: [-16, -60, 272, 212], draw: drawOakLab },
+    mewshrine: { box: [-16, -64, 176, 168], draw: drawMewShrine, anim: animMewShrine },
+    volcano: { box: [-20, -72, 232, 224], draw: drawVolcano, anim: animVolcano },
   };
   OBJ.pyramid.draw = drawPyramid;
+
+  /* --- Southern Continent Landmark Drawers (Zones 11, 12, 13) --- */
+  function drawTigerPavilion(c) {
+    // Traditional Korean Minhwa Hojakdo Pavilion with blue tiger & magpie screen
+    shadow(c, 96, 138, 96, 14, 0.24);
+    c.fillStyle = '#c8bca6'; rr(c, 8, 96, 176, 44, 6); c.fill();
+    c.fillStyle = '#e5dac6'; rr(c, 12, 92, 168, 36, 5); c.fill();
+    // Wooden pillars
+    for (const px of [20, 68, 124, 164]) { c.fillStyle = '#8c3b2b'; c.fillRect(px, 24, 8, 76); }
+    // Hojakdo folding screen in center (cream hanji paper + blue tiger face + pine branch)
+    c.fillStyle = '#fdf6e2'; rr(c, 36, 30, 120, 64, 4); c.fill();
+    c.strokeStyle = '#b58d3d'; c.lineWidth = 2.5; rr(c, 36, 30, 120, 64, 4); c.stroke();
+    // Blue Derpy Tiger motif on screen
+    c.fillStyle = '#3f8fe0'; circ(c, 96, 62, 20); c.fill();
+    c.fillStyle = '#1b1b24'; circ(c, 82, 46, 6); c.fill(); circ(c, 110, 46, 6); c.fill();
+    c.fillStyle = '#ffd84d'; circ(c, 89, 58, 4.5); c.fill(); circ(c, 103, 58, 4.5); c.fill();
+    c.fillStyle = '#111'; circ(c, 90, 58, 2); c.fill(); circ(c, 102, 58, 2); c.fill();
+    c.fillStyle = '#ffffff'; rr(c, 86, 66, 20, 9, 4); c.fill();
+    // Curved dancheong tiled roof
+    c.fillStyle = '#2b3a4a';
+    c.beginPath(); c.moveTo(-12, 30); c.quadraticCurveTo(96, -24, 204, 30); c.lineTo(188, 38); c.quadraticCurveTo(96, -4, 4, 38); c.closePath(); c.fill();
+    c.fillStyle = '#48b89f'; c.fillRect(10, 26, 172, 6);
+    c.fillStyle = '#ff6b4a'; c.fillRect(16, 31, 160, 4);
+    // Golden tiger roof finial
+    c.fillStyle = '#ffc93c'; star(c, 96, -6, 10, 4.5, 5); c.fill();
+  }
+  function drawFlowerpot(c, upright) {
+    shadow(c, 24, 40, 14, 5, 0.22);
+    c.save();
+    if (!upright) {
+      // Knocked-over flowerpot on its side with spilled soil & sideways flower!
+      c.translate(22, 32); c.rotate(Math.PI * 0.46);
+      c.fillStyle = '#c85a32';
+      c.beginPath(); c.moveTo(-11, -10); c.lineTo(11, -10); c.lineTo(8, 12); c.lineTo(-8, 12); c.closePath(); c.fill();
+      c.fillStyle = '#e06d42'; rr(c, -13, -14, 26, 6, 2); c.fill();
+      c.fillStyle = '#4caf50'; c.fillRect(-1.5, -26, 3, 13);
+      c.fillStyle = '#ff6fa8'; for (let a = 0; a < 5; a++) { circ(c, Math.cos(a * 1.256) * 4.5, -28 + Math.sin(a * 1.256) * 4.5, 3.5); c.fill(); }
+      c.fillStyle = '#ffd84d'; circ(c, 0, -28, 2.2); c.fill();
+      c.restore();
+      // Little spilled dirt dots + question mark sparkle
+      c.fillStyle = '#6b4424'; circ(c, 38, 38, 3); c.fill(); circ(c, 43, 35, 2); c.fill();
+      return;
+    }
+    // Upright happy flowerpot with glowing blue tiger paw print!
+    c.fillStyle = '#c85a32';
+    c.beginPath(); c.moveTo(12, 22); c.lineTo(36, 22); c.lineTo(32, 42); c.lineTo(16, 42); c.closePath(); c.fill();
+    c.fillStyle = '#e06d42'; rr(c, 10, 17, 28, 6, 2.5); c.fill();
+    // Blue Derpy paw print on pot
+    c.fillStyle = '#3f8fe0'; circ(c, 24, 33, 3.2); c.fill();
+    for (const dx of [-3.5, 0, 3.5]) { circ(c, 24 + dx, 28.5, 1.4); c.fill(); }
+    // Stem, leaves & blooming flower
+    c.fillStyle = '#3da34d'; c.fillRect(22.5, 4, 3, 14);
+    leaf(c, 18, 15, 7, -4); leaf(c, 30, 15, 7, 4);
+    c.fillStyle = '#ff6fa8';
+    for (let a = 0; a < 5; a++) { circ(c, 24 + Math.cos(a * 1.256) * 5.2, 3 + Math.sin(a * 1.256) * 5.2, 4); c.fill(); }
+    c.fillStyle = '#ffd84d'; circ(c, 24, 3, 2.6); c.fill();
+    c.restore();
+  }
+  function drawBathhouse(c) {
+    // Jjimjilbang Korean Bathhouse with steaming aqua outdoor pool & yangmeori towel sign
+    shadow(c, 96, 138, 96, 12, 0.24);
+    c.fillStyle = '#f2e3c9'; rr(c, 8, 28, 176, 108, 10); c.fill();
+    c.fillStyle = '#3b4d6b';
+    c.beginPath(); c.moveTo(-8, 34); c.quadraticCurveTo(96, -18, 200, 34); c.lineTo(188, 42); c.quadraticCurveTo(96, 0, 4, 42); c.closePath(); c.fill();
+    // Outdoor aqua hot spring basin in front
+    c.fillStyle = '#7c8b99'; ell(c, 96, 104, 72, 26); c.fill();
+    c.fillStyle = '#45d1f5'; ell(c, 96, 102, 64, 21); c.fill();
+    c.fillStyle = '#9ff0ff'; ell(c, 82, 98, 32, 9); c.fill();
+    // Glowing ♨️ sign on roof
+    c.fillStyle = '#ff6fa8'; circ(c, 96, 18, 14); c.fill();
+    c.strokeStyle = '#ffffff'; c.lineWidth = 2; circ(c, 96, 18, 12); c.stroke();
+    c.fillStyle = '#ffffff'; ell(c, 84, 18, 5, 5); c.fill(); ell(c, 108, 18, 5, 5); c.fill(); // sheep-horn towel buns!
+  }
+  function drawHanClinic(c) {
+    // Healer Han's Traditional Herbal Tonic Clinic
+    shadow(c, 96, 138, 92, 12, 0.24);
+    c.fillStyle = '#f7efe0'; rr(c, 12, 32, 168, 102, 6); c.fill();
+    // Wooden apothecary drawer grid & sliding door
+    c.fillStyle = '#8c5830'; c.fillRect(12, 32, 168, 8); c.fillRect(12, 126, 168, 8);
+    c.fillStyle = '#5c381c'; rr(c, 74, 68, 44, 64, 4); c.fill();
+    c.fillStyle = '#fff5dc'; rr(c, 78, 72, 16, 56, 2); c.fill(); rr(c, 98, 72, 16, 56, 2); c.fill();
+    // Teal medicinal gourd sign
+    c.fillStyle = '#2d443e';
+    c.beginPath(); c.moveTo(-6, 36); c.quadraticCurveTo(96, -14, 198, 36); c.lineTo(186, 44); c.quadraticCurveTo(96, 4, 6, 44); c.closePath(); c.fill();
+    c.fillStyle = '#48b89f'; circ(c, 96, 16, 11); c.fill(); circ(c, 96, 4, 7); c.fill();
+    c.fillStyle = '#ffd84d'; circ(c, 96, 16, 4); c.fill();
+  }
+  function drawSodaPopTruck(c) {
+    // Saja Boys' Pastel Soda Pop Idol Refreshment Truck
+    shadow(c, 96, 90, 90, 10, 0.25);
+    // Truck body (pastel cyan + hot pink stripes)
+    c.fillStyle = '#45d1f5'; rr(c, 8, 8, 172, 76, 14); c.fill();
+    c.fillStyle = '#ff5ca8'; rr(c, 8, 52, 172, 24, 6); c.fill();
+    // Serving window & striped awning
+    c.fillStyle = '#2b2345'; rr(c, 28, 20, 96, 34, 5); c.fill();
+    for (let k = 0; k < 6; k++) {
+      c.fillStyle = k % 2 ? '#ffffff' : '#ff5ca8';
+      rr(c, 24 + k * 17, 14, 17, 10, 3); c.fill();
+    }
+    // Giant fizzy soda cup on roof
+    c.fillStyle = '#ffc93c'; rr(c, 82, -26, 28, 34, 4); c.fill();
+    c.fillStyle = '#ffffff'; rr(c, 79, -30, 34, 7, 3); c.fill();
+    c.strokeStyle = '#ff3d8b'; c.lineWidth = 4; c.beginPath(); c.moveTo(98, -30); c.lineTo(106, -44); c.stroke();
+    // Wheels
+    c.fillStyle = '#222'; circ(c, 42, 84, 13); c.fill(); circ(c, 144, 84, 13); c.fill();
+    c.fillStyle = '#ffd84d'; circ(c, 42, 84, 6); c.fill(); circ(c, 144, 84, 6); c.fill();
+  }
+  function drawCarnivalTent(c) {
+    // Nightmare Critters Striped Big-Top Carnival Tent
+    shadow(c, 120, 184, 114, 16, 0.26);
+    // Tent wall cylinder
+    for (let k = 0; k < 10; k++) {
+      c.fillStyle = k % 2 ? '#4b246b' : '#e03e6b';
+      c.fillRect(16 + k * 20.8, 78, 21, 104);
+    }
+    // Conical striped roof
+    for (let k = 0; k < 10; k++) {
+      c.fillStyle = k % 2 ? '#6b3596' : '#ff4f82';
+      c.beginPath();
+      c.moveTo(120, -42);
+      c.lineTo(8 + k * 22.4, 82);
+      c.lineTo(8 + (k + 1) * 22.4, 82);
+      c.closePath(); c.fill();
+    }
+    // Gold scallop trim & entrance curtains
+    c.fillStyle = '#ffd84d';
+    for (let k = 0; k < 11; k++) { circ(c, 14 + k * 21, 82, 11); c.fill(); }
+    c.fillStyle = '#1d112b'; rr(c, 92, 108, 56, 74, 24); c.fill();
+    c.fillStyle = '#ffc93c'; star(c, 120, -54, 14, 6, 5); c.fill();
+  }
+  function drawCauldron(c) {
+    // Simon Smoke's Bubbling Dragon Cauldron
+    shadow(c, 72, 90, 56, 10, 0.26);
+    c.fillStyle = '#4a3560'; ell(c, 72, 84, 52, 12); c.fill();
+    c.fillStyle = '#2b2438'; ell(c, 72, 54, 46, 34); c.fill();
+    c.fillStyle = '#3f3552'; ell(c, 72, 28, 48, 12); c.fill();
+    c.fillStyle = '#c74bff'; ell(c, 72, 28, 40, 9); c.fill();
+    c.fillStyle = '#ff8cf6'; ell(c, 64, 27, 22, 5); c.fill();
+    // Golden dragon handles
+    c.strokeStyle = '#ffc93c'; c.lineWidth = 4;
+    c.beginPath(); c.arc(24, 50, 10, 0.5, 5.8); c.stroke();
+    c.beginPath(); c.arc(120, 50, 10, 0.5, 5.8); c.stroke();
+  }
+  function animCauldron(c, o, t) {
+    const x = o.x * 48 + 72, y = o.y * 48 + 20;
+    for (let k = 0; k < 5; k++) {
+      const ph = (t * 0.45 + k / 5) % 1;
+      c.strokeStyle = 'rgba(215,120,255,' + (0.75 * (1 - ph)) + ')';
+      c.lineWidth = 2.5;
+      ell(c, x + Math.sin(t * 2 + k) * 10, y - ph * 54, 8 + ph * 16, 4 + ph * 7);
+      c.stroke();
+    }
+  }
+  function drawPokeCenter(c) {
+    // Classic Red-Roof Pokémon Center with PokéBall emblem!
+    shadow(c, 96, 138, 92, 12, 0.24);
+    c.fillStyle = '#f7f9fc'; rr(c, 10, 36, 172, 98, 10); c.fill();
+    c.fillStyle = '#d9e2ec'; c.fillRect(10, 122, 172, 12);
+    // Red rounded roof
+    c.fillStyle = '#e83e38'; rr(c, 4, 2, 184, 48, 18); c.fill();
+    c.fillStyle = '#ff6b63'; rr(c, 12, 8, 168, 16, 8); c.fill();
+    // Giant PokéBall emblem above sliding glass doors
+    c.fillStyle = '#ffffff'; circ(c, 96, 36, 20); c.fill();
+    c.fillStyle = '#e83e38'; c.beginPath(); c.arc(96, 36, 20, Math.PI, 0); c.closePath(); c.fill();
+    c.strokeStyle = '#2b2d38'; c.lineWidth = 3.5; circ(c, 96, 36, 20); c.stroke();
+    c.beginPath(); c.moveTo(76, 36); c.lineTo(116, 36); c.stroke();
+    c.fillStyle = '#ffffff'; circ(c, 96, 36, 6.5); c.fill(); c.stroke();
+    // Sliding cyan glass doors & windows
+    c.fillStyle = '#58c4f5'; rr(c, 74, 74, 44, 60, 5); c.fill();
+    c.fillStyle = '#a6e3ff'; rr(c, 24, 68, 34, 32, 5); c.fill(); rr(c, 134, 68, 34, 32, 5); c.fill();
+  }
+  function drawOakLab(c) {
+    // Professor Oak's Pallet Research Lab
+    shadow(c, 120, 138, 114, 12, 0.24);
+    c.fillStyle = '#f5efe2'; rr(c, 10, 34, 220, 100, 8); c.fill();
+    c.fillStyle = '#4a7bd6'; rr(c, 4, 4, 232, 40, 10); c.fill();
+    c.fillStyle = '#739ef0'; rr(c, 12, 10, 216, 12, 6); c.fill();
+    // Roof radar dish & PokéBall sign
+    c.fillStyle = '#d9e2ec'; ell(c, 188, -6, 18, 10); c.fill();
+    c.fillStyle = '#ff4d4d'; circ(c, 120, 24, 12); c.fill();
+    c.fillStyle = '#ffffff'; c.beginPath(); c.arc(120, 24, 12, 0, Math.PI); c.fill();
+    c.strokeStyle = '#222'; c.lineWidth = 2.5; circ(c, 120, 24, 12); c.stroke();
+    // Entrance & lab windows
+    c.fillStyle = '#7a4a26'; rr(c, 100, 74, 40, 60, 4); c.fill();
+    c.fillStyle = '#8fd8ff';
+    for (const wx of [26, 62, 152, 188]) { rr(c, wx, 64, 26, 34, 4); c.fill(); }
+  }
+  function drawMewShrine(c) {
+    // Ancient Cerulean Mew Shrine with floating pink crystal
+    shadow(c, 72, 90, 56, 10, 0.22);
+    c.fillStyle = '#d8d2f2'; rr(c, 16, 64, 112, 26, 6); c.fill();
+    c.fillStyle = '#eeeaff'; rr(c, 26, 52, 92, 18, 5); c.fill();
+    // Twin crystal pillars
+    for (const px of [32, 98]) {
+      c.fillStyle = '#b8aef0'; rr(c, px, 2, 14, 54, 4); c.fill();
+      c.fillStyle = '#ff94c8'; circ(c, px + 7, -2, 7); c.fill();
+    }
+    // Central Mew Psychic Crystal
+    c.fillStyle = '#ff94c8';
+    c.beginPath(); c.moveTo(72, -32); c.lineTo(90, 6); c.lineTo(72, 34); c.lineTo(54, 6); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.65)';
+    c.beginPath(); c.moveTo(72, -32); c.lineTo(82, 4); c.lineTo(72, 18); c.closePath(); c.fill();
+  }
+  function animMewShrine(c, o, t) {
+    const x = o.x * 48 + 72, y = o.y * 48 + 4;
+    for (let k = 0; k < 5; k++) {
+      const a = t * 1.4 + k * (PI2 / 5);
+      c.fillStyle = 'rgba(255,160,220,.75)';
+      circ(c, x + Math.cos(a) * 34, y + Math.sin(a) * 14, 4 + Math.sin(t * 3 + k) * 1.5); c.fill();
+    }
+  }
+  function drawVolcano(c) {
+    // Ember Volcano Peak where Charizard roosts
+    shadow(c, 96, 136, 92, 14, 0.25);
+    c.fillStyle = '#7a4430';
+    c.beginPath(); c.moveTo(4, 134); c.lineTo(52, -16); c.lineTo(140, -16); c.lineTo(188, 134); c.closePath(); c.fill();
+    c.fillStyle = '#9e5a3c';
+    c.beginPath(); c.moveTo(22, 134); c.lineTo(62, -12); c.lineTo(126, -12); c.lineTo(156, 134); c.closePath(); c.fill();
+    // Glowing lava crater rim
+    c.fillStyle = '#4a2418'; ell(c, 96, -14, 44, 14); c.fill();
+    c.fillStyle = '#ff5a1f'; ell(c, 96, -14, 34, 9); c.fill();
+    c.fillStyle = '#ffd84d'; ell(c, 96, -14, 20, 5); c.fill();
+  }
+  function animVolcano(c, o, t) {
+    const x = o.x * 48 + 96, y = o.y * 48 - 14;
+    for (let k = 0; k < 6; k++) {
+      const ph = (t * 0.5 + k / 6) % 1;
+      c.fillStyle = k % 2 ? '#ffd84d' : '#ff6b2b';
+      circ(c, x + Math.sin(t * 2.5 + k * 1.7) * 22, y - ph * 46, (1 - ph) * 4.5 + 1); c.fill();
+    }
+  }
 
   function fenceMask(o) {
     let m = 0;
@@ -1575,6 +1826,7 @@ const Art = (() => {
     c.scale(S, S); c.translate(-bx, -by);
     if (o.kind === 'fence') drawFence(c, mask);
     else if (o.kind === 'chest') drawChest(c, state === 'open');
+    else if (o.kind === 'flowerpot') drawFlowerpot(c, state === 'upright');
     else if (o.kind === 'berrytree') drawBerryTree(c, o, o.z, state !== 'empty');
     else def.draw(c, o);
     spr = { cv, bx, by };
@@ -1881,6 +2133,10 @@ const Art = (() => {
       case 'ninja': c.fillStyle = '#e8413b'; c.fillRect(-11, hy - 5, 22, 3.4); if (dir !== 'down') { c.fillRect(-10 * flip, hy - 4, 3 * -flip, 9); } break;
       case 'helmet': c.fillStyle = '#c0c6d6'; c.beginPath(); c.arc(0, hy - 2, 12, Math.PI, 0); c.fill(); c.fillStyle = '#e8413b'; c.fillRect(-2, hy - 20, 4, 8); break;
       case 'crown': c.fillStyle = '#ffd84d'; c.beginPath(); c.moveTo(-8, hy - 7); c.lineTo(-8, hy - 15); c.lineTo(-4, hy - 10); c.lineTo(0, hy - 17); c.lineTo(4, hy - 10); c.lineTo(8, hy - 15); c.lineTo(8, hy - 7); c.closePath(); c.fill(); c.fillStyle = '#ff5c8a'; circ(c, 0, hy - 10, 1.6); c.fill(); break;
+      case 'gat':
+        c.fillStyle = '#1b1b24'; ell(c, 0, hy - 7, 15, 3.6); c.fill();
+        rr(c, -6.5, hy - 19, 13, 12, 3); c.fill();
+        break;
       default: break;
     }
   }
@@ -1914,9 +2170,13 @@ const Art = (() => {
     sunny: '#f08a3c', huggy: '#2f6fd6', aurora: '#9ff4ff', luna: '#6b4fb8', mikey: '#3fa34d', jj: '#3b82f6',
     derpy: '#2f9bff', sussie: '#1e2233', imp: '#8a4dff', gwima: '#9b4dff', jinu: '#1b1b24', abby: '#1b1b24', mystery: '#1b1b24',
     romance: '#1b1b24', baby: '#1b1b24', rumi: '#8e4bff', mira: '#ff3d8b', zoey: '#1b1b24',
+    gatderpy: '#2b7de9', waterdemon: '#ffffff', flightdemon: '#2b3e6b', jeoseung: '#1b1b24',
+    baba: '#3b3b4f', icky: '#49b84c', rabie: '#ff5ca8', allister: '#3b9c4c', simon: '#e03e3e', poe: '#554296', touille: '#8c7b70', maggie: '#3a9fe8',
+    pikachu: '#f7d02c', bulbasaur: '#49a86b', charmander: '#ff7f32', squirtle: '#58b4f5', jigglypuff: '#ff9ecf', eevee: '#c88a4b',
+    psyduck: '#f5c842', meowth: '#f0d27f', gengar: '#7a52b8', snorlax: '#3b7a8c', charizard: '#ff6b2b', mew: '#ff94c8',
   };
   // accessories with a layer drawn OVER the portrait (hat brims, chin strings)
-  const FRONT_EARS = { gat: 1, magpie: 1, horns: 1 };
+  const FRONT_EARS = { gat: 1, gatderpy: 1, magpie: 1, horns: 1, towel: 1, cap: 1 };
   function gatHat(c, r, s, col, tilt, chin, y0) {
     // traditional Korean gat: translucent black horsehair brim + tall rounded crown (+ beaded chin string)
     c.save(); c.rotate(tilt);
@@ -1952,8 +2212,19 @@ const Art = (() => {
     c.lineWidth = r * 0.06; c.strokeStyle = dk;
     if (front) {
       if (sp.ears === 'gat') gatHat(c, r, 1, col, -0.12, true);
+      else if (sp.ears === 'gatderpy') gatHat(c, r, 0.72, '#1b1b24', 0.08, false, -r * 0.88);
       else if (sp.ears === 'magpie') gatHat(c, r, 0.5, '#1b1b24', 0.1, false, -r * 0.94);
       else if (sp.ears === 'horns') gatHat(c, r, 0.52, '#1b1b24', -0.08, false, -r * 0.93);
+      else if (sp.ears === 'towel') {
+        // Korean bathhouse sheep-horn towel (yangmeori)
+        c.fillStyle = '#ffffff'; c.strokeStyle = '#9bc4e2'; c.lineWidth = r * 0.05;
+        rr(c, -r * 0.75, -r * 1.08, r * 1.5, r * 0.34, r * 0.14); c.fill(); c.stroke();
+        for (const s of [-1, 1]) { circ(c, s * r * 0.82, -r * 0.88, r * 0.28); c.fill(); c.stroke(); }
+      } else if (sp.ears === 'cap') {
+        // Cabin-crew flight cap
+        c.fillStyle = '#243b6b'; c.strokeStyle = '#ffc93c'; c.lineWidth = r * 0.05;
+        c.beginPath(); c.moveTo(-r * 0.55, -r * 0.86); c.lineTo(0, -r * 1.22); c.lineTo(r * 0.55, -r * 0.86); c.closePath(); c.fill(); c.stroke();
+      }
       c.restore();
       return;
     }
@@ -2015,6 +2286,7 @@ const Art = (() => {
       case 'shell':
         c.fillStyle = col; c.beginPath(); c.arc(0, -r * 0.1, r * 1.12, Math.PI * 1.1, Math.PI * 1.9); c.lineTo(r * 0.3, -r * 0.7); c.fill();
         break;
+      case 'gatderpy':
       case 'tiger': {
         for (const s of [-1, 1]) {
           const er = r * 0.34;
@@ -2130,6 +2402,55 @@ const Art = (() => {
           c.fillStyle = '#2ec4b6'; c.beginPath(); c.ellipse(bx - s * br * 0.3, by + br * 0.85, br * 0.42, br * 0.22, s * 0.4, 0, PI2); c.fill();
           c.fillStyle = 'rgba(255,255,255,.5)'; circ(c, bx - s * br * 0.45, by + br * 0.8, br * 0.08); c.fill();
         }
+        break;
+      case 'sheep':
+        for (const s of [-1, 1]) { c.fillStyle = '#f0eef8'; circ(c, s * r * 0.65, -r * 0.78, r * 0.28); c.fill(); c.stroke(); }
+        c.fillStyle = '#ffffff'; circ(c, 0, -r * 0.96, r * 0.28); c.fill(); c.stroke();
+        break;
+      case 'frog':
+        for (const s of [-1, 1]) {
+          c.fillStyle = col; circ(c, s * r * 0.48, -r * 0.94, r * 0.26); c.fill(); c.stroke();
+          c.fillStyle = '#fff'; circ(c, s * r * 0.48, -r * 0.96, r * 0.14); c.fill();
+        }
+        break;
+      case 'gator':
+        for (let k = -2; k <= 2; k++) {
+          c.fillStyle = col;
+          c.beginPath(); c.moveTo(k * r * 0.25 - r * 0.12, -r * 0.88); c.lineTo(k * r * 0.25, -r * 1.18); c.lineTo(k * r * 0.25 + r * 0.12, -r * 0.88); c.closePath(); c.fill(); c.stroke();
+        }
+        break;
+      case 'dragon':
+        for (const s of [-1, 1]) {
+          c.save(); c.rotate(s * (0.18 + wig));
+          c.fillStyle = '#ffd84d'; c.beginPath(); c.moveTo(s * r * 0.32, -r * 0.85); c.lineTo(s * r * 0.68, -r * 1.45); c.lineTo(s * r * 0.78, -r * 0.72); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = col; c.beginPath(); c.moveTo(s * r * 0.82, -r * 0.2); c.lineTo(s * r * 1.55, -r * 0.55); c.lineTo(s * r * 1.35, r * 0.25); c.lineTo(s * r * 0.82, r * 0.2); c.closePath(); c.fill(); c.stroke();
+          c.restore();
+        }
+        break;
+      case 'crow':
+        c.fillStyle = col;
+        for (let k = -1; k <= 1; k++) { ell(c, k * r * 0.18, -r * 1.08, r * 0.1, r * 0.26); c.fill(); }
+        break;
+      case 'mouse':
+        for (const s of [-1, 1]) {
+          c.fillStyle = col; circ(c, s * r * 0.76, -r * 0.72, r * 0.36); c.fill(); c.stroke();
+          c.fillStyle = '#ffb3c6'; circ(c, s * r * 0.76, -r * 0.72, r * 0.2); c.fill();
+        }
+        break;
+      case 'fin':
+        c.fillStyle = col;
+        c.beginPath(); c.moveTo(-r * 0.22, -r * 0.9); c.quadraticCurveTo(0, -r * 1.55, r * 0.32, -r * 1.32); c.quadraticCurveTo(r * 0.18, -r * 1.0, r * 0.24, -r * 0.88); c.closePath(); c.fill(); c.stroke();
+        break;
+      case 'pika':
+        for (const s of [-1, 1]) {
+          c.save(); c.rotate(s * (0.28 + wig));
+          c.fillStyle = '#f7d02c'; ell(c, s * r * 0.42, -r * 1.24, r * 0.18, r * 0.56); c.fill(); c.stroke();
+          c.fillStyle = '#1b1b24'; ell(c, s * r * 0.42, -r * 1.62, r * 0.13, r * 0.2); c.fill();
+          c.restore();
+        }
+        break;
+      case 'bulb':
+        c.fillStyle = '#49a86b'; ell(c, 0, -r * 1.02, r * 0.48, r * 0.36); c.fill(); c.stroke();
         break;
       default: break;
     }
@@ -2309,7 +2630,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg?v=r12';
+      img.src = 'icons/' + icon + '.jpg?v=r13';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {
@@ -2375,6 +2696,16 @@ const Art = (() => {
         else if (ob.kind === 'ramen') col = [255, 98, 58];
         else if (ob.kind === 'hanok') col = [96, 104, 122];
         else if (ob.kind === 'demongate') col = [140, 77, 255];
+        else if (ob.kind === 'tigerpavilion') col = [63, 143, 224];
+        else if (ob.kind === 'bathhouse') col = [69, 209, 245];
+        else if (ob.kind === 'hanclinic') col = [72, 184, 159];
+        else if (ob.kind === 'sodapoptruck') col = [255, 92, 168];
+        else if (ob.kind === 'carnivaltent') col = [224, 62, 107];
+        else if (ob.kind === 'cauldron') col = [199, 75, 255];
+        else if (ob.kind === 'pokecenter') col = [232, 62, 56];
+        else if (ob.kind === 'oaklab') col = [74, 123, 214];
+        else if (ob.kind === 'mewshrine') col = [255, 148, 200];
+        else if (ob.kind === 'volcano') col = [255, 90, 31];
       }
       for (let yy = 0; yy < px; yy++) for (let xx = 0; xx < px; xx++) {
         const k = ((y * px + yy) * W * px + x * px + xx) * 4;
@@ -2390,6 +2721,9 @@ const Art = (() => {
     1: ['#9fe3ff', '#e6f9ff', '#8fd16a'], 2: ['#a8e6a3', '#e9ffe0', '#6fbf52'], 3: ['#7fd6ff', '#e0f8ff', '#f7e6a8'], 4: ['#ffd6f0', '#e8f2ff', '#b2e6a4'],
     5: ['#bfe6ff', '#f2fff0', '#a8cf60'], 6: ['#ffd38a', '#fff2d6', '#ecbb77'], 7: ['#b9d9ff', '#f3f9ff', '#eef6ff'], 8: ['#2b2f6b', '#7a6bc4', '#8fb0a6'], 9: ['#a8e8ff', '#effcff', '#88cd64'],
     10: ['#4a3896', '#ffaed3', '#a8e6cf'],
+    11: ['#5888c9', '#ffe8be', '#7fd4b8'],
+    12: ['#2e1b52', '#a855c9', '#78b894'],
+    13: ['#6cc8ff', '#e6f7ff', '#7ed968'],
   };
   // Seoul skyline for the Honmoon battle backdrop: [x, width, height] as fractions of w / h (built once)
   let SKYLINE = null;
@@ -2519,6 +2853,22 @@ const Art = (() => {
     else if (z === 7) { c.fillStyle = '#dbeeff'; c.beginPath(); c.moveTo(0, hz); c.lineTo(w * 0.15, hz - h * 0.22); c.lineTo(w * 0.32, hz); c.lineTo(w * 0.5, hz - h * 0.16); c.lineTo(w * 0.7, hz); c.closePath(); c.fill(); }
     else if (z === 3) { c.fillStyle = '#3fa9e8'; c.fillRect(0, hz - h * 0.06, w, h * 0.06); }
     else if (z === 5) { c.fillStyle = 'rgba(255,255,255,.9)'; const x = w * 0.12, y = hz - h * 0.2; c.fillRect(x - 3, y, 6, h * 0.2); c.save(); c.translate(x, y); c.rotate(t); for (let k = 0; k < 4; k++) { c.rotate(Math.PI / 2); c.fillRect(-2, 0, 4, h * 0.12); } c.restore(); }
+    else if (z === 11) {
+      // Minhwa pine mountains + golden Honmoon shimmer
+      c.fillStyle = '#3a6b7c'; c.beginPath(); c.moveTo(0, hz); c.quadraticCurveTo(w * 0.18, hz - h * 0.24, w * 0.38, hz); c.quadraticCurveTo(w * 0.65, hz - h * 0.18, w, hz); c.closePath(); c.fill();
+      honmoonArc(c, w * 0.5, hz + h * 0.04, w * 0.54, h * 0.38, t, false);
+    } else if (z === 12) {
+      // Carnival Big-Top silhouette & glowing purple smoke rings
+      c.fillStyle = '#4b246b'; c.beginPath(); c.moveTo(w * 0.06, hz); c.lineTo(w * 0.18, hz - h * 0.22); c.lineTo(w * 0.3, hz); c.closePath(); c.fill();
+      c.fillStyle = '#ffc93c'; star(c, w * 0.18, hz - h * 0.23, 8, 3.5, 5); c.fill();
+      c.strokeStyle = 'rgba(215,120,255,.55)'; c.lineWidth = 2.5;
+      for (let k = 0; k < 3; k++) { ell(c, w * (0.75 + k * 0.06), hz - h * (0.12 + k * 0.07), 16 + k * 6, 7 + k * 2); c.stroke(); }
+    } else if (z === 13) {
+      // Kanto Bay sea band + Ember Volcano silhouette on left
+      c.fillStyle = '#3fa9e8'; c.fillRect(0, hz - h * 0.05, w, h * 0.05);
+      c.fillStyle = '#8c4f36'; c.beginPath(); c.moveTo(w * 0.04, hz - h * 0.04); c.lineTo(w * 0.13, hz - h * 0.22); c.lineTo(w * 0.21, hz - h * 0.22); c.lineTo(w * 0.3, hz - h * 0.04); c.closePath(); c.fill();
+      c.fillStyle = '#ff6b2b'; ell(c, w * 0.17, hz - h * 0.22, w * 0.04, h * 0.015); c.fill();
+    }
     else { c.fillStyle = 'rgba(80,160,80,.35)'; ell(c, w * 0.2, hz, w * 0.3, h * 0.08); c.fill(); ell(c, w * 0.75, hz, w * 0.35, h * 0.1); c.fill(); }
     c.restore();
   }

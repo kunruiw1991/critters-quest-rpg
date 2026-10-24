@@ -58,6 +58,18 @@ const Sound = (() => {
     boss: { bpm: 144, lw: 'square', bw: 'square', drums: 'khshkhsh', bassVol: 0.07,
       lead: 'E5 . G5 E5 B5 . A5 G5 | F#5 . E5 D5 E5 . . - | E5 . G5 B5 E6 . D6 B5 | C6 . B5 A5 B5 . . - | G5 G5 A5 B5 C6 . B5 A5 | F#5 F#5 G5 A5 B5 . A5 G5 | E5 F#5 G5 A5 B5 C6 D6 D#6 | E6 . B5 . E5 . . -',
       bass: 'E2 E3 E2 E3 E2 E3 E2 E3 | D2 D3 D2 D3 D2 D3 D2 D3 | C2 C3 C2 C3 C2 C3 C2 C3 | B1 B2 B1 B2 B1 B2 B1 B2 | C2 C3 C2 C3 C2 C3 C2 C3 | D2 D3 D2 D3 D2 D3 D2 D3 | A1 A2 A1 A2 B1 B2 B1 B2 | E2 E3 E2 E3 E2 E3 E2 E3' },
+    /* Derpy's Minhwa Sanctum: playful Korean folk pentatonic melody (C-D-E-G-A). */
+    minhwa: { bpm: 108, lw: 'triangle', bw: 'triangle', drums: 'k..hk.s.',
+      lead: 'E5 . G5 A5 C6 . A5 G5 | E5 . D5 C5 D5 . . - | G5 . A5 C6 D6 . C6 A5 | G5 . E5 D5 C5 . . - | A4 C5 D5 E5 G5 . A5 G5 | E5 D5 C5 D5 E5 . G5 . | A5 G5 E5 D5 C5 . D5 E5 | C5 . G4 . C5 . . -',
+      bass: 'C3 . G3 . C3 . G3 . | G2 . D3 . G2 . D3 . | A2 . E3 . A2 . E3 . | C3 . G3 . C3 . G2 . | F2 . C3 . F2 . C3 . | C3 . G3 . C3 . G3 . | F2 . C3 . G2 . D3 . | C3 . G2 . C3 . - -' },
+    /* Nightmare Critters Carnival: bouncy spooky-cute calliope waltz-march. */
+    carnival: { bpm: 126, lw: 'square', bw: 'triangle', drums: 'k.hsk.hs',
+      lead: 'D5 . F5 A5 D6 . C#6 D6 | Bb5 . A5 G5 A5 . . - | G5 . Bb5 D6 C6 . Bb5 A5 | G5 . F5 E5 D5 . . - | A4 . D5 F5 A5 . G5 F5 | E5 . G5 Bb5 A5 . G5 F5 | D5 E5 F5 G5 A5 Bb5 C#6 . | D6 . A5 . D5 . . -',
+      bass: 'D2 . A2 . D2 . A2 . | Gm2 . D3 . A2 . E3 . | G2 . D3 . C3 . G3 . | F2 . C3 . D2 . A2 . | D2 . A2 . D2 . A2 . | A2 . E3 . A2 . E3 . | D2 . A2 . A2 . E3 . | D2 . A2 . D2 . - -'.replace('Gm2', 'G2') },
+    /* Kanto Classics Bay: nostalgic 8-bit Game Boy route adventure march. */
+    kanto: { bpm: 128, lw: 'square', bw: 'triangle', drums: 'k.h.s.h.',
+      lead: 'G4 . B4 D5 G5 . F#5 G5 | A5 . G5 E5 D5 . . - | C5 . E5 G5 B5 . A5 G5 | F#5 . G5 A5 D5 . . - | G5 . B5 D6 C6 . B5 A5 | G5 . E5 C5 D5 . B4 . | C5 D5 E5 F#5 G5 A5 B5 C6 | D6 . B5 . G5 . . -',
+      bass: 'G2 . D3 . G2 . D3 . | D3 . A3 . D3 . A2 . | C3 . G3 . C3 . G3 . | D3 . A3 . D3 . A2 . | G2 . D3 . F#2 . D3 . | E2 . B2 . G2 . D3 . | C3 . G3 . D3 . A3 . | G2 . D3 . G2 . - -' },
   };
   for (const k in TRACKS) {
     const t = TRACKS[k];

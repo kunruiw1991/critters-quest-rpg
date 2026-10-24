@@ -201,7 +201,7 @@ const UI = (() => {
     if (!minimap) minimap = Art.renderMinimap(6);
     const pct = (x, y) => 'left:' + ((x + 0.5) / World.W * 100).toFixed(2) + '%;top:' + ((y + 0.5) / World.H * 100).toFixed(2) + '%';
     let labels = '';
-    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105] };
+    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105], 11: [22, 136], 12: [60, 158], 13: [98, 136] };
     for (let z = 1; z < D.REGIONS.length; z++) {
       const reg = D.REGIONS[z], st = regionStats(z);
       if (!labelAt[z]) continue;
@@ -285,7 +285,7 @@ const UI = (() => {
     const s = Game.state;
     if (!s || Game.mode === 'battle') return;
     const caught = Object.keys(s.team).length, seen = D.SPECIES.filter(sp => s.seen[sp.id]).length, total = D.SPECIES.length;
-    let html = (caught >= total ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + '/' + total + ' Critters of Rainbow Island & Honmoon Island! 🌈👑</div>' : '') +
+    let html = (caught >= total ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + '/' + total + ' Critters across all 12 Lands! 🌈👑</div>' : '') +
       '<div class="dex-head"><span>📖 <b>' + caught + '/' + total + '</b> caught</span><span>👀 ' + seen + '/' + total + ' seen</span><span>⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b></span><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
     for (const sp of D.SPECIES) {
       const t = s.team[sp.id], seenIt = !!s.seen[sp.id];
@@ -475,7 +475,7 @@ const UI = (() => {
       '<h4>🅰️ A button</h4><p>Talk, open, shake, catch! (Keys: Enter, Space or Z)</p>' +
       '<h4>🅱️ B button</h4><p>⚡ Roller-skate dash on/off! (Keys: B or X · hold Shift)</p>' +
       '<h4>🐾 Catching Critters</h4><p>Walk into a wild Critter or rustle through tall grass. In battle:<br>1️⃣ ⚡ Attack — makes them dizzy (never knocks them out!)<br>2️⃣ 🎯 Throw Capsule — catch them!<br>3️⃣ 🍓 Feed Treat — heals your Critter and +45% catch chance<br>4️⃣ 🔄 Switch / 🏃 Run</p>' +
-      '<h4>🎤 Honmoon Island</h4><p>Walk out of Sunshine Village\'s south gate and cross the Golden Honmoon Bridge! Say hi to Rumi, Mira and Zoey — they join your team. Tap the 🍜 Ramen Shop to heal, and find Gwi-Ma at the Demon Gate!</p>' +
+      '<h4>🎤 Honmoon Island & Southern Continent</h4><p>Walk south from Sunshine Village to Honmoon Island (Rumi, Mira & Zoey join your team, plus the 🍜 Ramen Shop & Gwi-Ma!), then cross the 3 southern bridges to:<br>• 🐯 <b>Derpy\'s Minhwa Sanctum</b> — pat knocked-over flowerpots 🪴 upright, steam at the ♨️ Jjimjilbang Bathhouse, and find Gat-Hat Derpy!<br>• 🎪 <b>Nightmare Critters Carnival</b> — meet all 8 Nightmare Critters (Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Simon Smoke, Poe, Touille & Maggie Mako)!<br>• ⚡ <b>Kanto Classics Bay</b> — visit Professor Oak\'s Lab & the ❤️ Pokémon Center and catch 12 Original Gen-1 Pokémon (Pikachu, Bulbasaur, Charmander, Squirtle, Jigglypuff, Eevee, Psyduck, Meowth, Gengar, Snorlax, Charizard & Mew)!</p>' +
       '<h4>🗺️ Map (M) · 📖 Dex (C) · 🎒 Bag (I)</h4><p>Teleport to any land, choose your partner, and shop for capsules. Your adventure saves automatically! 💾</p></div>';
     openModal('help', '❓ How to Play', html);
   }

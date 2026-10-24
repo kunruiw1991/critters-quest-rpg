@@ -5,8 +5,9 @@
 const CQData = (() => {
   const TILE = 48;
   const MAP_W = 120;
-  const MAP_H = 118;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island (KPop Demon Hunters)
+  const MAP_H = 174;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13)
   const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay exactly the same)
+  const MAP_H1 = 118;  // height of Rainbow + Honmoon Islands (Honmoon layout & RNG stay 100% intact)
   const MAP_VERSION = 1;
 
   /* Elemental "types" are pure flavor: they pick the attack visual + colors. */
@@ -138,6 +139,81 @@ const CQData = (() => {
     { id: 'gwima', name: 'Gwi-Ma', emoji: '👹', icon: 'gwima', type: 'demon', rarity: 'legendary', color: '#9b4dff', ears: 'flame',
       move: 'Violet Flame Chomp', bubbles: ['👹', 'CHOMP!', '🔥', '💜'], hpB: 5, atkB: 4,
       desc: 'The demon king: a giant grinning mouth of purple flames! Even he calms down when HUNTR/X sing the Golden song.' },
+    /* ---- 4 More Demon Hunter Friends & Spirits (Zone 11: Derpy's Minhwa Sanctum & Bathhouse Valley) ---- */
+    { id: 'gatderpy', name: 'Gat-Hat Derpy', emoji: '🎩', icon: 'gatderpy', type: 'spirit', rarity: 'rare', color: '#2b7de9', ears: 'gatderpy',
+      move: 'Flowerpot Boop', bubbles: ['🎩', '🪴', 'Purr~', '🐯'], hpB: 4, atkB: 3,
+      desc: 'Derpy Tiger wearing Sussie\'s black gat hat! Whenever he sees a knocked-over flowerpot, he carefully pats it upright.' },
+    { id: 'waterdemon', name: 'Water Demon', emoji: '💧', icon: 'waterdemon', type: 'water', rarity: 'common', color: '#45d1f5', ears: 'towel',
+      move: 'Sauna Bubble Splash', bubbles: ['💧', '🫧', 'Splash!', '♨️'], hpB: 2, atkB: 2,
+      desc: 'A bubbly bathhouse water demon wearing a sheep-horn sauna towel! It loves warm steam and splashing in the jjimjilbang.' },
+    { id: 'flightdemon', name: 'Flight Dokkaebi', emoji: '✈️', icon: 'flightdemon', type: 'demon', rarity: 'uncommon', color: '#ff6f61', ears: 'cap',
+      move: 'Snack Cart Zoom', bubbles: ['✈️', '🧃', 'Beep beep!', '🥨'], hpB: 2, atkB: 3,
+      desc: 'A cheerful one-eyed cabin-crew dokkaebi from the tour jet! It zooms down the aisle handing out juice and pretzels.' },
+    { id: 'jeoseung', name: 'Jeoseung Saja', emoji: '🏮', icon: 'jeoseung', type: 'demon', rarity: 'uncommon', color: '#5c4bd8', ears: 'gat',
+      move: 'Lantern Soul Wave', bubbles: ['🏮', '✨', 'Hush~', '🌙'], hpB: 2, atkB: 3,
+      desc: 'A gentle Joseon spirit guide in a tall beaded gat hat who lights up dark forest trails with a warm paper lantern.' },
+    /* ---- 8 Official Nightmare Critters (Zone 12: Nightmare Critters Carnival & Twilight Hollow) ---- */
+    { id: 'baba', name: 'Baba Chops', emoji: '🐑', icon: 'baba', type: 'moon', rarity: 'common', color: '#4b4b5e', ears: 'sheep',
+      move: 'Baa-Baa Bounce', bubbles: ['🐑', 'Baa~', '💀', '🌙'], hpB: 2, atkB: 2,
+      desc: 'A fluffy black sheep who acts cool and aloof, though she secretly loves bouncing on carnival trampolines with her friends.' },
+    { id: 'icky', name: 'Icky Licky', emoji: '🐸', icon: 'icky', type: 'water', rarity: 'common', color: '#49b84c', ears: 'frog',
+      move: 'Sticky Tongue Boop', bubbles: ['🐸', 'Ribbit!', '😛', '🏆'], hpB: 1, atkB: 3,
+      desc: 'A sporty poison-dart frog who challenges everyone to hopping races and always cheers when you do your best!' },
+    { id: 'rabie', name: 'Rabie Baby', emoji: '🦇', icon: 'rabie', type: 'pop', rarity: 'uncommon', color: '#ff5ca8', ears: 'bat',
+      move: 'Gossip Echo Squeak', bubbles: ['🦇', 'Ooh!', '💬', '💖'], hpB: 1, atkB: 3,
+      desc: 'A chatty pink-and-white bat who knows every secret rumor in the hollow and loves telling dramatic bedtime stories!' },
+    { id: 'allister', name: 'Allister Gator', emoji: '🐊', icon: 'allister', type: 'leaf', rarity: 'uncommon', color: '#3b9c4c', ears: 'gator',
+      move: 'Swamp Tail Splash', bubbles: ['🐊', 'Yawn~', '🌊', '😴'], hpB: 4, atkB: 1,
+      desc: 'The chillest green alligator around! He floats lazily in warm puddles and waves his tail to say hello.' },
+    { id: 'simon', name: 'Simon Smoke', emoji: '🐉', icon: 'simon', type: 'demon', rarity: 'rare', color: '#e03e3e', ears: 'dragon',
+      move: 'Dragon Smoke Ring', bubbles: ['🐉', '💨', 'Roar!', '🔥'], hpB: 3, atkB: 4,
+      desc: 'A flashy red dragon who puffs sparkly purple smoke rings and loves showing off his high-flying loop-de-loops!' },
+    { id: 'poe', name: 'Poe', emoji: '🐦‍⬛', icon: 'poe', type: 'thunder', rarity: 'uncommon', color: '#6b55b8', ears: 'crow',
+      move: 'Stormcloud Gust', bubbles: ['🐦‍⬛', '⛈️', 'Caw~', '🎸'], hpB: 2, atkB: 3,
+      desc: 'A poetic raven who perches on spooky lanterns, strums acoustic tunes, and watches the twilight clouds roll by.' },
+    { id: 'touille', name: 'Touille', emoji: '🐀', icon: 'touille', type: 'fruit', rarity: 'common', color: '#8c7b70', ears: 'mouse',
+      move: 'Cheese Wheel Roll', bubbles: ['🐀', '🧀', 'Squeak!', '😋'], hpB: 3, atkB: 1,
+      desc: 'A giggly little rat who will happily chat for hours and share every last crumb of his favorite snack!' },
+    { id: 'maggie', name: 'Maggie Mako', emoji: '🦈', icon: 'maggie', type: 'water', rarity: 'uncommon', color: '#3a9fe8', ears: 'fin',
+      move: 'Candy Fin Splash', bubbles: ['🦈', '🍭', 'Chomp!', '🧁'], hpB: 3, atkB: 2,
+      desc: 'A blue mako shark with the biggest sweet tooth in the world! She trades cupcakes and cotton candy at the carnival.' },
+    /* ---- 12 Iconic Original First-Generation Pokémon (Zone 13: Kanto Classics Bay & Pallet Meadow) ---- */
+    { id: 'pikachu', name: 'Pikachu', emoji: '⚡', icon: 'pikachu', type: 'thunder', rarity: 'common', color: '#f7d02c', ears: 'pika',
+      move: 'Thunderbolt', bubbles: ['⚡', 'Pika Pika!', '💛', '✨'], hpB: 1, atkB: 3,
+      desc: 'Everyone\'s favorite electric mouse Pokémon! Its rosy cheeks sparkle whenever it is excited to meet a new friend.' },
+    { id: 'bulbasaur', name: 'Bulbasaur', emoji: '🌱', icon: 'bulbasaur', type: 'leaf', rarity: 'common', color: '#5dbe6e', ears: 'bulb',
+      move: 'Vine Whip', bubbles: ['🌱', 'Bulba!', '🍃', '☀️'], hpB: 3, atkB: 2,
+      desc: 'A gentle grass Pokémon with a big green plant bulb on its back that grows brighter in warm sunshine!' },
+    { id: 'charmander', name: 'Charmander', emoji: '🔥', icon: 'charmander', type: 'sun', rarity: 'common', color: '#ff7f32', ears: 'flame',
+      move: 'Flamethrower', bubbles: ['🔥', 'Char!', '🧡', '✨'], hpB: 1, atkB: 3,
+      desc: 'A cheerful orange lizard Pokémon whose tail tip flickers with a warm, happy flame wherever it goes!' },
+    { id: 'squirtle', name: 'Squirtle', emoji: '💦', icon: 'squirtle', type: 'water', rarity: 'common', color: '#58b4f5', ears: 'shell',
+      move: 'Bubble Beam', bubbles: ['💦', 'Squirtle!', '🫧', '🐢'], hpB: 3, atkB: 2,
+      desc: 'A cool little turtle Pokémon who surfs across Kanto Bay and blows shimmering rainbow bubbles!' },
+    { id: 'jigglypuff', name: 'Jigglypuff', emoji: '🎤', icon: 'jigglypuff', type: 'pop', rarity: 'common', color: '#ff9ecf', ears: 'cat',
+      move: 'Sing Lullaby', bubbles: ['🎤', 'Jiggly~♪', '💤', '🎶'], hpB: 4, atkB: 1,
+      desc: 'A round pink balloon Pokémon who loves singing cozy lullabies into its microphone until everyone nods off!' },
+    { id: 'eevee', name: 'Eevee', emoji: '🌟', icon: 'eevee', type: 'star', rarity: 'uncommon', color: '#c88a4b', ears: 'fox',
+      move: 'Swift Star', bubbles: ['🌟', 'Vee!', '🦊', '✨'], hpB: 2, atkB: 2,
+      desc: 'A fluffy brown Pokémon with a cream collar and boundless curiosity — it can grow up in so many amazing ways!' },
+    { id: 'psyduck', name: 'Psyduck', emoji: '🦆', icon: 'psyduck', type: 'water', rarity: 'common', color: '#f5c842', ears: 'comb',
+      move: 'Headache Wave', bubbles: ['🦆', 'Psy-ai-ai?', '💫', '💦'], hpB: 3, atkB: 2,
+      desc: 'A delightfully bewildered yellow duck Pokémon who holds its head and accidentally unleashes sparkly psychic waves!' },
+    { id: 'meowth', name: 'Meowth', emoji: '🪙', icon: 'meowth', type: 'golden', rarity: 'uncommon', color: '#f0d27f', ears: 'cat',
+      move: 'Pay Day', bubbles: ['🪙', 'Meowth!', '✨', '😸'], hpB: 1, atkB: 3,
+      desc: 'A sassy cream cat Pokémon with a shiny golden charm on its forehead who loves collecting sparkling coins!' },
+    { id: 'gengar', name: 'Gengar', emoji: '👻', icon: 'gengar', type: 'moon', rarity: 'uncommon', color: '#7a52b8', ears: 'bat',
+      move: 'Shadow Grin', bubbles: ['👻', 'Hehehe!', '🌙', '💜'], hpB: 2, atkB: 3,
+      desc: 'A round purple shadow Pokémon with a giant toothy grin who loves playing harmless peek-a-boo pranks!' },
+    { id: 'snorlax', name: 'Snorlax', emoji: '😴', icon: 'snorlax', type: 'fruit', rarity: 'rare', color: '#3b7a8c', ears: 'bear',
+      move: 'Belly Flop Snore', bubbles: ['😴', 'Zzz...', '🍎', '💤'], hpB: 5, atkB: 3,
+      desc: 'A giant, huggable sleepyhead who naps right across footbridges and wakes up only for a mountain of berries!' },
+    { id: 'charizard', name: 'Charizard', emoji: '🐉', icon: 'charizard', type: 'sun', rarity: 'rare', color: '#ff6b2b', ears: 'dragon',
+      move: 'Fire Blast', bubbles: ['🐉', 'ROAR!', '🔥', '☀️'], hpB: 3, atkB: 4,
+      desc: 'A noble orange fire-dragon Pokémon who soars high above Ember Volcano Peak on mighty teal wings!' },
+    { id: 'mew', name: 'Mew', emoji: '✨', icon: 'mew', type: 'galaxy', rarity: 'legendary', color: '#ff94c8', ears: 'cat',
+      move: 'Psychic Bubble', bubbles: ['✨', 'Mew~!', '🫧', '🌌'], hpB: 5, atkB: 4,
+      desc: 'The mythical pink Mirage Pokémon of Kanto! It floats inside a glowing psychic bubble and giggles with pure joy.' },
   ];
   SPECIES.forEach((s, i) => { s.num = i + 1; s.rate = RARITY[s.rarity].rate; });
   const SP = {};
@@ -167,12 +243,21 @@ const CQData = (() => {
     { id: 10, key: 'honmoon', name: 'Honmoon Island (K-Pop Demon Hunters)', short: 'Honmoon', emoji: '🎤', rect: [22, 92, 97, 113], lv: [9, 13],
       color: '#ff6fb5', music: 'honmoon', isNew: true,
       table: [['derpy', 18], ['sussie', 16], ['imp', 16], ['baby', 12], ['abby', 12], ['mystery', 10], ['romance', 10], ['jinu', 6]] },
+    { id: 11, key: 'sanctum', name: "Derpy's Minhwa Sanctum & Bathhouse Valley", short: 'Sanctum', emoji: '🐯', rect: [8, 122, 42, 167], lv: [11, 15],
+      color: '#4fa3ff', music: 'minhwa', isNew: true,
+      table: [['derpy', 24], ['sussie', 18], ['waterdemon', 22], ['flightdemon', 16], ['jeoseung', 14], ['gatderpy', 6]] },
+    { id: 12, key: 'nightmare', name: 'Nightmare Critters Carnival & Twilight Hollow', short: 'Carnival', emoji: '🎪', rect: [45, 122, 75, 167], lv: [13, 17],
+      color: '#c76bff', music: 'carnival', isNew: true,
+      table: [['baba', 16], ['icky', 15], ['touille', 15], ['rabie', 13], ['allister', 12], ['poe', 11], ['maggie', 12], ['simon', 6]] },
+    { id: 13, key: 'kanto', name: 'Kanto Classics Bay & Pallet Meadow', short: 'Kanto Bay', emoji: '⚡', rect: [78, 122, 114, 167], lv: [14, 20],
+      color: '#ff5a5a', music: 'kanto', isNew: true,
+      table: [['pikachu', 15], ['bulbasaur', 13], ['charmander', 13], ['squirtle', 13], ['jigglypuff', 11], ['psyduck', 10], ['eevee', 9], ['meowth', 8], ['gengar', 8]] },
   ];
-  /* The official lands (fast-travel destinations); Crossroads is a bonus park. Honmoon Island (10) is reached over
-     the Golden Honmoon Bridge south of Sunshine Village. */
-  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10];
+  /* The official lands (fast-travel destinations); Crossroads is a bonus park. Honmoon Island (10) and the Southern Continent (11..13)
+     are reached over the golden bridges south of Sunshine Village and Honmoon Island. */
+  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13];
 
-  /* Where each rare / legendary always waits (until caught) — so 20/20 is always possible. */
+  /* Where each rare / legendary always waits (until caught) — so 100% CritterDex completion is always possible. */
   const SPECIAL_SPOTS = [
     { sp: 'prism', zone: 4, at: [15, 38], lv: 11, place: 'the Unicorn Gazebo' },
     { sp: 'thunderbolt', zone: 5, at: [107, 50], lv: 12, place: 'the Lightning Shrine' },
@@ -182,6 +267,11 @@ const CQData = (() => {
     { sp: 'solar', zone: 8, at: [53, 18], lv: 20, place: 'the Sun Altar' },
     { sp: 'jinu', zone: 10, at: [37, 100], lv: 15, place: 'the N Seoul Tower lookout' },
     { sp: 'gwima', zone: 10, at: [92, 103], lv: 22, place: 'the Demon Gate' },
+    { sp: 'gatderpy', zone: 11, at: [22, 132], lv: 17, place: "Derpy's Tiger Pavilion" },
+    { sp: 'simon', zone: 12, at: [60, 131], lv: 19, place: 'the Dragon Smoke Cauldron' },
+    { sp: 'snorlax', zone: 13, at: [80, 144], lv: 20, place: 'the Snorlax Footbridge' },
+    { sp: 'charizard', zone: 13, at: [106, 130], lv: 22, place: 'Ember Volcano Peak' },
+    { sp: 'mew', zone: 13, at: [104, 158], lv: 25, place: 'the Cerulean Mew Shrine' },
   ];
 
   const ITEMS = {
@@ -197,8 +287,8 @@ const CQData = (() => {
       lines: ['Good morning, Chuyu! 🌞 Did you sleep well?', 'If your Critters get sleepy, splash them at a 💖 Healing Fountain — or come home for a nap!', 'Here, take some snacks for your adventure! I love you! 💕'],
       gift: { berry: 5 }, after: ['Be careful and have fun, sweetie! Come home any time for a nap. 🏡'] },
     { id: 'prof', name: 'Professor Bubba', zone: 1, at: [63, 69], look: { skin: '#f5cfa5', hair: '#d9d9d9', hairStyle: 'short', shirt: '#ffffff', pants: '#5a7bd6', hat: 'elephant', coat: true, glasses: true },
-      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Thirty-two different Critters live on Rainbow Island and Honmoon Island!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
-      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the golden bridge south of the village to meet the K-Pop Demon Hunters! 🎤'] },
+      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Fifty-six different Critters live across Rainbow Island, Honmoon Island, and the Southern Lands!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
+      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the bridges south of Honmoon Island to explore Derpy\'s Sanctum, Nightmare Carnival, and Kanto Classics Bay! 🐯🎪⚡'] },
     { id: 'shopkeeper', name: 'Shopkeeper Penny', zone: 1, at: [54, 76], look: { skin: '#e8b48a', hair: '#2b2b2b', hairStyle: 'ponytail', shirt: '#2fb39a', pants: '#3c4a6b', hat: 'none', apron: '#fff3c4' },
       lines: ['Welcome to the Capsule & Berry Shop! 🛒'], shop: true },
     { id: 'timmy', name: 'Timmy', zone: 1, at: [57, 74], look: { skin: '#ffe0c2', hair: '#e8b84a', hairStyle: 'spiky', shirt: '#ffb020', pants: '#3b6fd6', hat: 'none' },
@@ -258,6 +348,34 @@ const CQData = (() => {
       look: { skin: '#f2c9a0', hair: '#3a2a1a', hairStyle: 'short', shirt: '#ff7a45', pants: '#3b3b4f', hat: 'none', glasses: true, headset: true },
       lines: ['Whoa, a VIP guest! I\'m Bobby, HUNTR/X\'s manager! 📋🎤', 'The Golden Honmoon Stage is right here — the girls give the best concerts!', 'Here\'s a little backstage bonus for you! 🎁'],
       gift: { gold: 120, berry: 3 }, after: ['Showtime soon! Don\'t forget to say hi to Rumi! 🌟'] },
+    /* ---- Zone 11: Derpy's Minhwa Sanctum & Bathhouse Valley ---- */
+    { id: 'healerhan', name: 'Healer Han', zone: 11, at: [28, 149],
+      look: { skin: '#f3cfa6', hair: '#4a4a4a', hairStyle: 'short', shirt: '#4da89b', pants: '#2f3e55', hat: 'none', coat: true, glasses: true },
+      lines: ['Welcome to my Tonic Clinic, Chuyu! 🍵🌿', 'Rumi, Mira and Zoey always stop by here for throat tonics before a big concert — and Derpy Tiger loves napping by the door!', 'If you see any knocked-over flowerpots 🪴 around the valley, tap them! Derpy Tiger always pats them upright for a lucky reward!', 'Here, take these herbal berry tonics and Rainbow Capsules!'],
+      gift: { berry: 5, rainbow: 2 }, after: ['The Jjimjilbang Bathhouse Springs ♨️ just west of here will heal your whole team!'] },
+    { id: 'jiho', name: 'Minhwa Painter Ji-ho', zone: 11, at: [18, 135],
+      look: { skin: '#f4d1ae', hair: '#23232e', hairStyle: 'bun', shirt: '#3f8fe0', pants: '#2b2d42', hat: 'gat' },
+      lines: ['Annyeong! I paint traditional Korean tiger & magpie folk art — Hojakdo! 🎨🐯🐦', 'Look up at Derpy\'s Tiger Pavilion: ✨ Gat-Hat Derpy is wearing Sussie\'s hat and guarding his favorite flowerpot!', 'And check out the Soda Pop Idol Truck down south — those Saja Boys left fizzy drinks everywhere! 🥤'] },
+    /* ---- Zone 12: Nightmare Critters Carnival & Twilight Hollow ---- */
+    { id: 'ringmaster', name: 'Ringleader Harper', zone: 12, at: [55, 136],
+      look: { skin: '#ffe0cc', hair: '#a84cff', hairStyle: 'pigtails', shirt: '#e03e6b', pants: '#2b2345', hat: 'crown' },
+      lines: ['Step right up to the Nightmare Critters Carnival! 🎪✨', 'Don\'t let their spooky names fool you — Baba Chops 🐑, Icky Licky 🐸, Rabie Baby 🦇, Allister Gator 🐊, Poe 🐦‍⬛, Touille 🐀 and Maggie Mako 🦈 just want to play carnival games!', 'Up at the glowing cauldron, ✨ Simon Smoke 🐉 is blowing sparkly dragon smoke rings!', 'Take this carnival prize pack! 🎟️'],
+      gift: { rainbow: 2, gold: 100 }, after: ['Try the purple bounce pads around the carnival tent — BOING! 🎪'] },
+    /* ---- Zone 13: Kanto Classics Bay & Pallet Meadow (Original Gen 1 Pokémon) ---- */
+    { id: 'profoak', name: 'Professor Oak', zone: 13, at: [90, 136],
+      look: { skin: '#f2caa0', hair: '#8c7f75', hairStyle: 'short', shirt: '#e85d5d', pants: '#4a5568', hat: 'none', coat: true },
+      lines: ['Hello there, Chuyu! Welcome to the world of classic Kanto Pokémon! 🔴✨', 'Here in Kanto Classics Bay, Pikachu ⚡, Bulbasaur 🌱, Charmander 🔥, Squirtle 💦, Jigglypuff 🎤, Eevee 🌟, Psyduck 🦆, Meowth 🪙 and Gengar 👻 roam free!', 'Even rare friends like Snorlax 😴, Charizard 🐉, and the mythical Mew ✨ have been spotted at special landmarks!', 'Take these capsules from my Pallet Lab to help complete your CritterDex!'],
+      gift: { rainbow: 3, master: 1 }, after: ['Stop by the red-roof Pokémon Center ❤️ anytime to heal your team!'] },
+    { id: 'ash', name: 'Ash', zone: 13, at: [84, 143],
+      look: { skin: '#f2c69d', hair: '#1d1d24', hairStyle: 'spiky', shirt: '#2b6fd6', pants: '#4a6b8a', hat: 'cap2' },
+      lines: ['Awesome to meet you, Chuyu! I\'m training with Pikachu, Bulbasaur, Charmander and Squirtle! ⚡🌱🔥💦', 'Look at the footbridge just west of here — a giant ✨ Snorlax 😴 is fast asleep right beside the bridge!'] },
+    { id: 'misty', name: 'Misty', zone: 13, at: [98, 156],
+      look: { skin: '#ffd6b5', hair: '#ff7f2a', hairStyle: 'ponytail', shirt: '#ffe14d', pants: '#3b82f6', hat: 'none' },
+      lines: ['Welcome to Cerulean Cape! 🌊 Water Pokémon like Squirtle and Psyduck love swimming in this bay.', 'See the glowing crystal island across the stepping stones? The mythical 👑 Mew ✨ floats right beside the Cerulean Shrine!'] },
+    { id: 'brock', name: 'Brock', zone: 13, at: [101, 132],
+      look: { skin: '#d99b6c', hair: '#3b2416', hairStyle: 'spiky', shirt: '#5c8a3a', pants: '#8a6d4b', hat: 'none' },
+      lines: ['Hey there! Up on Ember Volcano Peak 🔥, a mighty ✨ Charizard 🐉 is warming its wings!', 'I cooked up a batch of sweet berry snacks for your team — take them! 🍓'],
+      gift: { berry: 5 }, after: ['A well-fed Critter is a happy Critter! 🍓'] },
   ];
 
   /* Chest contents are decided by world generation; these are the reward tiers. */
@@ -270,13 +388,15 @@ const CQData = (() => {
     'Tip: Feed a 🍓 berry before throwing a capsule: +45% catch chance!',
     'Tip: Attacks never knock a wild Critter out — they just get dizzy 🎯 and easier to catch!',
     'Tip: Press B for ⚡ roller-skate dash!',
-    'Tip: The 🗺️ Map can teleport you to any land in one tap!',
+    'Tip: The 🗺️ Map can teleport you to any of the 12 lands in one tap!',
     'Tip: Cross the Golden Honmoon Bridge south of Sunshine Village to meet the K-Pop Demon Hunters! 🎤',
+    'Tip: Tap knocked-over flowerpots 🪴 in Derpy\'s Sanctum to pat them upright like Derpy Tiger!',
+    'Tip: Visit Nightmare Carnival 🎪 and Kanto Classics Bay ⚡ in the far south to catch Nightmare Critters & Gen 1 Pokémon!',
   ];
 
   function maxHp(sp, lv) { return Math.round(18 + lv * 4 + sp.hpB * lv * 0.5); }
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
 })();

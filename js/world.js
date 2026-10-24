@@ -5,8 +5,9 @@
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || D.MAP_H, N = W * H;
+  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, N = W * H;
   const HZ = 10; // Honmoon Island zone id
+  const MAX_Z = 13; // Highest zone id (Zones 11..13 on the Southern Continent)
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
   const T_NAMES = Object.keys(T);
   const WALK = new Uint8Array([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]);
@@ -31,6 +32,12 @@ const World = (() => {
     // Honmoon Island (KPop Demon Hunters)
     stage: { block: 1, act: 'sign' }, seoultower: { block: 1, act: 'sign' }, ramen: { block: 1, act: 'heal' },
     hanok: { block: 1, act: 'sign' }, demongate: { block: 1, act: 'sign' },
+    // Southern Continent (Zones 11..13: Minhwa Sanctum, Nightmare Carnival, Kanto Classics Bay)
+    tigerpavilion: { block: 1, act: 'sign' }, flowerpot: { block: 1, act: 'flowerpot' },
+    bathhouse: { block: 1, act: 'heal' }, hanclinic: { block: 1, act: 'sign' }, sodapoptruck: { block: 1, act: 'sign' },
+    carnivaltent: { block: 1, act: 'sign' }, cauldron: { block: 1, act: 'sign' },
+    pokecenter: { block: 1, act: 'heal' }, oaklab: { block: 1, act: 'sign' },
+    mewshrine: { block: 1, act: 'sign' }, volcano: { block: 1, act: 'sign' },
   };
 
   const ground = new Uint8Array(N), zone = new Uint8Array(N), decal = new Uint8Array(N);
@@ -54,7 +61,13 @@ const World = (() => {
     return Math.hypot(dx, dy);
   }
   function zoneOf(x, y) {
-    if (y >= H0) return HZ; // Honmoon Island fills the southern extension
+    if (y >= H1) {
+      const jx = x + (U.vnoise(x * 0.17, y * 0.17, 15) - 0.5) * 3;
+      if (jx < 44) return 11;
+      if (jx < 76) return 12;
+      return 13;
+    }
+    if (y >= H0) return HZ; // Honmoon Island fills rows 90..117
     if (x >= 49 && x <= 71 && y >= 61 && y <= 81) return 1; // the fenced village is exact
     const jx = x + (U.vnoise(x * 0.17, y * 0.17, 5) - 0.5) * 5;
     const jy = y + (U.vnoise(x * 0.17 + 40, y * 0.17 + 40, 6) - 0.5) * 5;
@@ -65,9 +78,14 @@ const World = (() => {
     }
     return best;
   }
-  /* Honmoon Island outline (only used for y >= H0): a rounded rectangle in the southern sea. */
-  const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H - 1 };
+  /* Honmoon Island outline (rows H0..H1-1) and Southern Continent outline (rows H1..H-1). */
+  const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H1 - 1 };
+  const SOUTH = { x0: 5, x1: 115, y0: H1 + 1, y1: H - 1 };
   function coastVal(x, y) {
+    if (y >= H1) {
+      const d = Math.min(x - SOUTH.x0, SOUTH.x1 - x, y - SOUTH.y0, SOUTH.y1 - y);
+      return d + (U.fbm(x * 0.09, y * 0.09, 21) - 0.5) * 4;
+    }
     if (y >= H0) {
       const d = Math.min(x - HON.x0, HON.x1 - x, y - HON.y0, HON.y1 - y);
       return d + (U.fbm(x * 0.09, y * 0.09, 11) - 0.5) * 4;
@@ -100,10 +118,10 @@ const World = (() => {
           if (z === 3 && x < 77 + U.vnoise(x * 0.2, y * 0.2, 9) * 3) g = T.GRASS;
           ground[i] = g;
           if (z !== 1) {
-            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6 }[z];
+            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58 }[z];
             if (U.fbm(x * 0.13, y * 0.13, 100 + z) > thr) ground[i] = T.TALL;
             else if (z === 4 && U.fbm(x * 0.11, y * 0.11, 300) > 0.6) ground[i] = T.FLOWERS;
-            else if (z === HZ && U.fbm(x * 0.12, y * 0.12, 310) > 0.64) ground[i] = T.FLOWERS;
+            else if (z >= HZ && U.fbm(x * 0.12, y * 0.12, 300 + z) > 0.64) ground[i] = T.FLOWERS;
             if (z === 8 && y >= 21 && y <= 31 && (x <= 55 || x >= 64) && y % 2 === 0 && U.vnoise(x * 0.18, y * 0.18, 77) > 0.25) ground[i] = T.TALL;
           }
         }
@@ -452,9 +470,9 @@ const World = (() => {
     for (let x = 45; x <= 73; x++) { const i = I(x, 32); if (!road[i] && objAt[i] < 0 && SOLID[ground[i]] && Math.abs(x - 59.5) > 2) addObj('hedge', x, 32, 1, 1); }
     berryTree(48, 24, 'moon'); berryTree(70, 24, 'moon');
 
-    /* ===== NPCs, special spots, signs (Honmoon Island ones are added by buildHonmoon) ===== */
-    D.NPCS.forEach((def, k) => { if (def.zone !== HZ) placeNPC(def, k); });
-    D.SPECIAL_SPOTS.forEach(s => { if (s.zone !== HZ) addSpecial(s); });
+    /* ===== NPCs, special spots, signs (Honmoon Island & Southern Continent ones are added in their own builders) ===== */
+    D.NPCS.forEach((def, k) => { if (def.zone < HZ) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone < HZ) addSpecial(s); });
     const SIGNS = [
       [57, 63, "🏡 Sunshine Village — Chuyu's hometown!  ⬆ Crossroads Park · ⬅ Apple Orchard · ➡ Coral Lagoon"],
       [62, 47, '🌳 Rainbow Crossroads —  ⬆ Moon Castle · ⬅ Crystal Meadow · ➡ Windmill Ridge · ⬇ Sunshine Village'],
@@ -644,7 +662,7 @@ const World = (() => {
     // A sign inside Sunshine Village pointing to the new bridge
     placeNear('sign', 62, 80, 1, 1, { text: '⬇ Golden Honmoon Bridge → 🎤 Honmoon Island! Meet the K-Pop Demon Hunters!' }, { radius: 2, ignoreClear: true, anyWalk: true, safe: true });
     // Scatter blossom trees, bushes and rocks (separate RNG stream)
-    for (let y = H0; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    for (let y = H0; y < H1 - 1; y++) for (let x = 1; x < W - 1; x++) {
       const i = I(x, y);
       if (zone[i] !== HZ || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
       const r = r2(), hill = x < 44;
@@ -667,7 +685,7 @@ const World = (() => {
     }
     bfs(start.x, start.y);
     const list = [];
-    for (let y = H0; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+    for (let y = H0; y < H1 - 2; y++) for (let x = 2; x < W - 2; x++) {
       const i = I(x, y);
       if (zone[i] !== HZ || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
       let blocked = 0;
@@ -687,7 +705,7 @@ const World = (() => {
       placed++;
     }
     // Decals: blossom petals, golden music notes, flowers and sparkles
-    for (let y = H0; y < H; y++) for (let x = 0; x < W; x++) {
+    for (let y = H0; y < H1; y++) for (let x = 0; x < W; x++) {
       const i = I(x, y);
       if (!inHon(x, y) || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
       const g = ground[i], r = r2();
@@ -697,6 +715,180 @@ const World = (() => {
       else if (g === T.PLAZA) d = r < 0.06 ? DEC.PETAL : r < 0.1 ? DEC.NOTE : 0;
       else if (g === T.FLOOR) d = r < 0.05 ? DEC.NOTE : 0;
       else if (g === T.SAND) d = r < 0.03 ? DEC.SHELL : r < 0.05 ? DEC.STARFISH : 0;
+      decal[i] = d;
+    }
+  }
+
+  /* ---------------- Zones 11..13: Southern Continent Expansion ----------------
+   * Built AFTER Honmoon Island with its own RNG stream (r3 = U.mulberry32(20261024)),
+   * so all 50 existing chests on Rainbow Island & Honmoon Island remain untouched! */
+  function buildSouthContinent() {
+    const r3 = U.mulberry32(20261024);
+
+    // 1. River separating Zone 12 (Nightmare Carnival) and Zone 13 (Kanto Classics Bay)
+    for (let y = H1; y < H; y++) {
+      const xc = 76 + Math.round(Math.sin(y * 0.22) * 0.8);
+      for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
+    }
+
+    // 2. Plazas & courtyards for the 3 Southern Lands
+    // Zone 11: Minhwa Pavilion Courtyard & Clinic Plaza
+    for (let y = 129; y <= 135; y++) for (let x = 19; x <= 27; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 146; y <= 151; y++) for (let x = 16; x <= 32; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Zone 12: Nightmare Carnival Midway Floor
+    for (let y = 131; y <= 141; y++) for (let x = 52; x <= 67; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    // Allister Gator's Swamp Pond (shallow duckie-float pond in Zone 12)
+    ellipse(52, 155, 4.5, 2.8, (x, y) => setT(x, y, T.SHALLOW));
+    // Zone 13: Pallet Town Square & Cerulean Mew Shrine Lagoon
+    for (let y = 132; y <= 140; y++) for (let x = 82; x <= 95; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 128; y <= 133; y++) for (let x = 102; x <= 109; x++) { const i = I(x, y); ground[i] = T.SAND; clear[i] = 1; }
+    ellipse(104, 158, 7.2, 4.6, (x, y, d) => setT(x, y, d < 0.42 ? T.FLOWERS : d < 0.72 ? T.DEEP : T.SHALLOW));
+
+    // 3. Three Bridges from Honmoon Island (y = 105..125) + Grand Southern Highway (y = 144)
+    for (const bx of [34, 59, 90]) {
+      for (let y = 105; y <= 126; y++) for (let x = bx; x <= bx + 1; x++) {
+        const i = I(x, y);
+        if (objAt[i] >= 0 && objects[objAt[i]].rm) removeObj(objects[objAt[i]]);
+      }
+      roadSeg(bx, 105, bx, 144, 0);
+    }
+    // East-West Grand Southern Highway connecting Zone 11 <-> Zone 12 <-> Snorlax Footbridge <-> Zone 13
+    roadSeg(15, 144, 105, 144, 0);
+    // Local trails in Zones 11, 12, 13
+    trail([[34, 132], [23, 132]]);   // to Derpy's Tiger Pavilion
+    trail([[24, 144], [24, 157], [34, 157]]); // to Bathhouse, Clinic & Soda Pop Truck
+    trail([[60, 144], [60, 159]]);   // down to Carnival Pier
+    trail([[91, 135], [105, 131]]);  // up to Ember Volcano Peak
+    trail([[96, 144], [96, 158]]);   // down to Cerulean Bay
+    // Coral stepping stones across Cerulean Lagoon to Mew Shrine Island
+    for (let x = 96; x <= 104; x++) if (ground[I(x, 158)] === T.DEEP || ground[I(x, 158)] === T.SHALLOW) { setT(x, 158, T.STONES); clear[I(x, 158)] = 1; }
+    for (let y = 152; y <= 160; y++) for (let x = 102; x <= 106; x++) if (ground[I(x, y)] === T.FLOWERS || ground[I(x, y)] === T.GRASS) clear[I(x, y)] = 1;
+
+    // 4. Zone 11 Landmarks (Derpy's Minhwa Sanctum & Bathhouse Valley)
+    landmark('tigerpavilion', 21, 126, 4, 3, { name: "Derpy's Tiger Pavilion", text: "🐯 Derpy's Minhwa Tiger Pavilion! Painted pine screens of the goofy blue tiger and the gat-hat magpie glow with warm spirit magic." }, { ground: T.PLAZA, fx: 22 });
+    fountains[11] = landmark('bathhouse', 17, 145, 4, 3, { name: 'Jjimjilbang Bathhouse' }, { ground: T.PLAZA, fx: 19 });
+    landmark('hanclinic', 27, 145, 4, 3, { name: "Healer Han's Tonic Clinic", text: "🍵 Healer Han's Tonic Clinic! Shelves of sweet jujube & berry tonics keep HUNTR/X's voices golden — and Derpy Tiger loves napping on the rug!" }, { ground: T.PLAZA, fx: 28 });
+    landmark('sodapoptruck', 32, 155, 4, 2, { name: 'Soda Pop Idol Truck', text: '🥤 The Saja Boys\' pastel Soda Pop Truck! Fizzy berry sodas and neon banners sparkle in the sunshine. 🎶' }, { fx: 33 });
+    waypoints[11] = landmark('waypoint', 31, 141, 1, 1, { region: 11 }, { front: true, ring: true });
+    // Interactive Knocked-Over Flowerpots (Derpy Tiger's signature flowerpot gag!)
+    for (const [x, y] of [[25, 133], [15, 141], [31, 138], [20, 154], [37, 152]]) {
+      placeNear('flowerpot', x, y, 1, 1, { upright: false }, { radius: 2, ignoreClear: true, anyWalk: true, safe: true, front: true });
+    }
+    berryTree(14, 134, 'plum'); berryTree(38, 156, 'plum');
+
+    // 5. Zone 12 Landmarks (Nightmare Critters Carnival & Twilight Hollow)
+    landmark('carnivaltent', 53, 126, 5, 4, { name: 'Nightmare Critters Carnival Tent', text: '🎪 The Nightmare Critters Big-Top Tent! Inside, Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Poe, Touille and Maggie Mako play music and share cotton candy!' }, { ground: T.FLOOR, fx: 55 });
+    landmark('cauldron', 62, 128, 3, 2, { name: 'Dragon Smoke Cauldron', text: '🐉 The Dragon Smoke Cauldron! Sparkly violet smoke rings float into the sky where Simon Smoke practices his loop-de-loops!' }, { ground: T.FLOOR, fx: 63 });
+    fountains[12] = landmark('fountain', 59, 135, 2, 2, { style: 12, name: 'Sweet-Tooth Carnival Fountain' }, { ground: T.FLOOR });
+    waypoints[12] = landmark('waypoint', 64, 135, 1, 1, { region: 12 }, { ground: T.FLOOR });
+    for (const [x, y] of [[50, 139], [70, 139], [60, 152]]) {
+      ensureWalk(x, y, true);
+      if (objAt[I(x, y)] < 0) addObj('trampoline', x, y, 1, 1);
+    }
+    for (const [x, y] of [[52, 131], [67, 131], [52, 141], [67, 141], [58, 149], [62, 149]]) {
+      placeNear('lantern', x, y, 1, 1, {}, { radius: 1, ignoreClear: true, anyWalk: true, safe: true });
+    }
+    berryTree(48, 132, 'moon'); berryTree(71, 154, 'moon');
+
+    // 6. Zone 13 Landmarks (Kanto Classics Bay & Pallet Meadow — Gen 1 Pokémon)
+    landmark('oaklab', 88, 128, 5, 3, { name: "Professor Oak's Pallet Lab", text: "🔬 Professor Oak's Pokémon Research Lab! PokéBalls, Kanto maps, and starter notes on Bulbasaur, Charmander, Squirtle & Pikachu fill the tables." }, { ground: T.PLAZA, fx: 90 });
+    fountains[13] = landmark('pokecenter', 82, 134, 4, 3, { name: 'Pokémon Center' }, { ground: T.PLAZA, fx: 84 });
+    landmark('volcano', 104, 125, 4, 3, { name: 'Ember Volcano Peak', text: '🔥 Ember Volcano Peak! Warm embers glow along the crater rim where Charizard spreads its mighty wings!' }, { ground: T.SAND, fx: 106 });
+    landmark('mewshrine', 103, 154, 3, 2, { name: 'Cerulean Mew Shrine', text: '✨ The ancient Cerulean Mew Shrine! Pink psychic bubbles drift gently around the crystal monument.' }, { ground: T.FLOWERS, fx: 104 });
+    waypoints[13] = landmark('waypoint', 94, 138, 1, 1, { region: 13 }, { ground: T.PLAZA });
+    berryTree(83, 154, 'apple'); berryTree(109, 142, 'gold');
+
+    // 7. NPCs, Special Critter Spots, and Signs for Zones 11..13
+    D.NPCS.forEach((def, k) => { if (def.zone > HZ) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone > HZ) addSpecial(s); });
+    for (const [x, y, text] of [
+      [34, 108, "⬇ Minhwa Tiger Bridge → 🐯 Derpy's Minhwa Sanctum & Bathhouse Valley"],
+      [61, 108, '⬇ Twilight Carnival Bridge → 🎪 Nightmare Critters Carnival & Twilight Hollow'],
+      [92, 108, '⬇ Vermilion Sea Bridge → ⚡ Kanto Classics Bay & Pallet Meadow (Gen 1 Pokémon!)'],
+      [32, 143, "🐯 Derpy's Minhwa Sanctum — ⬆ Tiger Pavilion · ⬇ Jjimjilbang Bathhouse & Healer Han's Clinic · ➡ Nightmare Carnival"],
+      [58, 143, '🎪 Nightmare Critters Carnival — ⬆ Big-Top Tent & Dragon Cauldron · ⬅ Minhwa Sanctum · ➡ Snorlax Footbridge to Kanto Bay'],
+      [79, 143, '😴 Snorlax Footbridge — Watch out for a sleepy Snorlax napping by the bridge!'],
+      [89, 143, "⚡ Kanto Classics Bay — ⬆ Pallet Lab & Pokémon Center · ↗ Ember Volcano Peak · ↘ Cerulean Mew Shrine"],
+    ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
+
+    // 8. Scatter trees, bushes & rocks across Zones 11..13
+    for (let y = H1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = I(x, y);
+      const z = zone[i];
+      if (z <= HZ || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      const r = r3();
+      let kind = null, variant = null;
+      if (z === 11) {
+        if (r < 0.045) { kind = 'tree'; variant = r < 0.025 ? 'pine' : 'blossom'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.068) kind = 'rock';
+      } else if (z === 12) {
+        if (r < 0.045) { kind = 'tree'; variant = r < 0.03 ? 'moon' : 'crystal'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.07) kind = 'rock';
+      } else if (z === 13) {
+        if (r < 0.045) { kind = 'tree'; variant = ground[i] === T.SAND ? 'palm' : 'oak'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.07) kind = 'rock';
+      }
+      if (!kind || !safeToBlock(x, y)) continue;
+      addObj(kind, x, y, 1, 1, { variant: variant || (r3() * 3) | 0 });
+    }
+
+    // 9. Treasure chests: 1 special Master Star chest + 5 hidden chests per new zone (18 new chests total)
+    for (const [x, y, where] of [
+      [14, 128, 'Minhwa Pine Bluff'],
+      [60, 160, 'Twilight Carnival Pier'],
+      [108, 158, 'Cerulean Shrine Island'],
+    ]) {
+      const i = I(x, y);
+      if (objAt[i] >= 0) removeObj(objects[objAt[i]]);
+      road[i] = 0;
+      if (!WALK[ground[i]] || ground[i] === T.SHALLOW) ground[i] = T.GRASS;
+      chests.push(addObj('chest', x, y, 1, 1, { loot: { master: 1, gold: 80 }, where, special: true }));
+      clearRect(x - 1, y - 1, 3, 3); ensureWalk(x, y + 1, true);
+    }
+    bfs(start.x, start.y);
+    for (const z of [11, 12, 13]) {
+      const list = [];
+      for (let y = H1 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+        const i = I(x, y);
+        if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+        let blocked = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && !isOpen(x + dx, y + dy)) blocked++;
+        if (blocked >= 2) list.push([x, y, blocked]);
+      }
+      for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(r3() * (k + 1)); const tmp = list[k]; list[k] = list[j]; list[j] = tmp; }
+      list.sort((a, b) => b[2] - a[2] + (r3() - 0.5) * 3);
+      let placed = 0;
+      for (const [x, y] of list) {
+        if (placed >= 5) break;
+        if (chests.some(c => Math.abs(c.x - x) + Math.abs(c.y - y) < 7)) continue;
+        if (objAt[I(x, y)] >= 0 || !safeToBlock(x, y)) continue;
+        const kind = U.weighted(r3, D.CHEST_LOOT);
+        const loot = kind === 'gold' ? { gold: 35 + 5 * U.randInt(r3, 0, 14) } : kind === 'berry' ? { berry: U.randInt(r3, 3, 6) } : kind === 'rainbow' ? { rainbow: U.randInt(r3, 1, 3) } : { master: 1 };
+        chests.push(addObj('chest', x, y, 1, 1, { loot }));
+        placed++;
+      }
+    }
+
+    // 10. Decals across Zones 11..13
+    for (let y = H1; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = I(x, y);
+      if (zone[i] <= HZ || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      const z = zone[i], g = ground[i], r = r3();
+      let d = 0;
+      if (z === 11) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.PETAL : r < 0.07 ? DEC.FLOWER_B : r < 0.09 ? DEC.SPARKLE : 0;
+        else if (g === T.PLAZA || g === T.PATH) d = r < 0.06 ? DEC.PETAL : 0;
+      } else if (z === 12) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.SHARD : r < 0.07 ? DEC.FLOWER_P : r < 0.09 ? DEC.MUSH : 0;
+        else if (g === T.FLOOR) d = r < 0.06 ? DEC.SPARKLE : r < 0.09 ? DEC.NOTE : 0;
+        else if (g === T.SHALLOW) d = r < 0.2 ? DEC.LILY : 0;
+      } else if (z === 13) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.FLOWER_Y : r < 0.07 ? DEC.FLOWER_W : r < 0.09 ? DEC.CLOVER : 0;
+        else if (g === T.SAND) d = r < 0.04 ? DEC.SHELL : r < 0.06 ? DEC.STARFISH : 0;
+      }
       decal[i] = d;
     }
   }
@@ -801,7 +993,7 @@ const World = (() => {
 
   function computeSpawns() {
     spawnTiles = {};
-    for (let z = 1; z <= HZ; z++) spawnTiles[z] = [];
+    for (let z = 1; z <= MAX_Z; z++) spawnTiles[z] = [];
     for (let i = 0; i < N; i++) {
       if (!reach[i] || road[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0) continue;
       const g = ground[i];
@@ -823,6 +1015,7 @@ const World = (() => {
     placeChests();
     decals();
     if (H > H0) buildHonmoon();
+    if (H > H1) buildSouthContinent();
     repairs = repair();
     bfs(start.x, start.y);
     computeEdges();
@@ -854,7 +1047,7 @@ const World = (() => {
       if (reach[i]) zoneReach[z] = (zoneReach[z] || 0) + 1;
       if (ground[i] === T.TALL && reach[i]) tall[z] = (tall[z] || 0) + 1;
     }
-    for (let z = 1; z <= HZ; z++) spawn[z] = (spawnTiles[z] || []).length;
+    for (let z = 1; z <= MAX_Z; z++) spawn[z] = (spawnTiles[z] || []).length;
     let reachable = 0, walk = 0;
     for (let i = 0; i < N; i++) { if (reach[i]) reachable++; if (WALK[ground[i]]) walk++; }
     return {

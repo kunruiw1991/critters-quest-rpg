@@ -8,7 +8,7 @@ const Game = (() => {
   const SAVE_KEY = 'critterQuestRPG_v1';
   const DV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
-  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9 };
+  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10 };
 
   let canvas, ctx, dpr = 1, zoom = 1, viewW = 0, viewH = 0;
   const cam = { x: 0, y: 0 };
@@ -34,9 +34,9 @@ const Game = (() => {
       seen: { [starter]: true },
       inv: { gold: 100, berry: 5, rainbow: 2, master: 0 },
       pos: { x: World.start.x, y: World.start.y, dir: 'down' },
-      chests: {}, trees: {}, gifts: {}, visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
+      chests: {}, trees: {}, gifts: {}, pots: {}, visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
-      news: { honmoon: true },
+      news: { honmoon: true, southlands: true },
     };
   }
   function validate(s) {
@@ -55,7 +55,7 @@ const Game = (() => {
       created: s.created || Date.now(), starter: D.SP[s.starter] ? s.starter : ids[0],
       partner: team[s.partner] ? s.partner : ids[0], team,
       seen: Object.assign({}, s.seen || {}), inv: Object.assign(base.inv, s.inv || {}),
-      chests: Object.assign({}, s.chests || {}), trees: Object.assign({}, s.trees || {}), gifts: Object.assign({}, s.gifts || {}),
+      chests: Object.assign({}, s.chests || {}), trees: Object.assign({}, s.trees || {}), gifts: Object.assign({}, s.gifts || {}), pots: Object.assign({}, s.pots || {}),
       visited: Object.assign({ 1: true }, s.visited || {}), dash: !!s.dash, stats: Object.assign(base.stats, s.stats || {}),
       news: Object.assign({}, s.news || {}),
     });
@@ -66,7 +66,7 @@ const Game = (() => {
       if (Number.isInteger(s.pos.fx) && Number.isInteger(s.pos.fy)) { out.pos.fx = s.pos.fx; out.pos.fy = s.pos.fy; out.pos.fdir = DV[s.pos.fdir] ? s.pos.fdir : 'down'; }
       if (s.lastHeal && World.inb(s.lastHeal.x | 0, s.lastHeal.y | 0) && World.walkable(s.lastHeal.x | 0, s.lastHeal.y | 0)) out.lastHeal = { x: s.lastHeal.x | 0, y: s.lastHeal.y | 0 };
     } else if (s.mapV !== D.MAP_VERSION) {
-      out.chests = {}; out.trees = {};
+      out.chests = {}; out.trees = {}; out.pots = {};
     }
     return out;
   }
@@ -574,6 +574,7 @@ const Game = (() => {
   }
   function chestOpen(o) { return !!(state && state.chests[o.key]); }
   function treeReady(o) { const t = state && state.trees[o.key]; return !t || (Date.now() - t) / 1000 >= TREE_REGROW; }
+  function potUpright(o) { return !!(state && state.pots && state.pots[o.key]); }
   function doorX(o) { return o.kind === 'lab' ? o.x + 2 : o.x + 1; }
   function useObject(o) {
     if (o.act === 'door' && !(player.y === o.y + o.h && player.dir === 'up' && Math.abs(player.x - doorX(o)) <= 1)) {
@@ -612,6 +613,25 @@ const Game = (() => {
         save('tree');
         return true;
       }
+      case 'flowerpot': {
+        if (potUpright(o)) {
+          o.shakeT = 0.35;
+          Sound.sfx('talk');
+          addFx('heart', o.x * TS + 24, o.y * TS + 6);
+          UI.toast('🪴 This flowerpot is standing tall and happy! Derpy Tiger purrs with pride! 🐯💙');
+          return true;
+        }
+        state.pots[o.key] = Date.now();
+        o.shakeT = 0.65;
+        const msgs = giveItems({ berry: 2, gold: 25 });
+        Sound.sfx('chest'); setTimeout(() => Sound.sfx('coin'), 360);
+        addFx('burst', o.x * TS + 24, o.y * TS + 16, '#4fb3ff');
+        addFx('heart', o.x * TS + 24, o.y * TS + 4);
+        addFx('text', o.x * TS + 24, o.y * TS - 8, '🐯🐾 Upright!  ' + msgs.join('  '));
+        UI.toast('🐯🐾 Boop! Derpy Tiger patted the knocked-over flowerpot upright! ' + msgs.join(' · '));
+        save('pot');
+        return true;
+      }
       case 'heal': {
         healAll();
         const fx0 = o.x * TS + o.w * 24, fy0 = o.y * TS + o.h * 24;
@@ -621,6 +641,8 @@ const Game = (() => {
         if (o.kind === 'ramen') { Sound.sfx('munch'); setTimeout(() => Sound.sfx('heal'), 420); } else Sound.sfx('heal');
         for (let k = 0; k < 8; k++) addFx('heart', fx0 - 30 + rng() * 60, fy0 - rng() * 30);
         if (o.kind === 'ramen') { addFx('text', fx0, o.y * TS - 10, '🍜 Slurp slurp!'); UI.toast('🍜 Slurp slurp! Yummy Honmoon ramen — all your Critters are full of energy! 💖'); }
+        else if (o.kind === 'bathhouse') { addFx('text', fx0, o.y * TS - 10, '♨️ Ahh~'); UI.toast('♨️ Jjimjilbang Bathhouse: warm herbal steam healed all your Critters! 💖'); }
+        else if (o.kind === 'pokecenter') { addFx('text', fx0, o.y * TS - 10, '❤️ Ding-ding-ding!'); UI.toast('❤️ Ding-ding-ding-ding-ding! Welcome to the Pokémon Center — your team is fighting fit!'); }
         else UI.toast('💖 ' + (o.name || 'Healing Fountain') + ': all your Critters are full of energy!');
         UI.updateHUD();
         save('heal');
@@ -811,10 +833,10 @@ const Game = (() => {
   }
   function updateFx(dt) {
     for (let k = fx.length - 1; k >= 0; k--) { fx[k].t += dt; if (fx[k].t >= fx[k].life) fx.splice(k, 1); }
-    for (const o of World.berryTrees) if (o.shakeT > 0) o.shakeT -= dt;
+    for (const o of World.objects) if (o.shakeT > 0) o.shakeT -= dt;
     // ambient particles
     const z = curZone;
-    const want = z === 7 ? 'snow' : z === 8 ? 'firefly' : z === 4 ? 'sparkle' : z === 2 ? 'leaf' : z === 6 ? 'dust' : z === 3 ? 'bubble' : z === 10 ? 'petal' : null;
+    const want = z === 7 ? 'snow' : (z === 8 || z === 12) ? 'firefly' : z === 4 ? 'sparkle' : (z === 2 || z === 13) ? 'leaf' : z === 6 ? 'dust' : z === 3 ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
     if (want && parts.length < 46 && rng() < dt * 22) {
       parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' || want === 'petal' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20 + (want === 'petal' ? 14 : 0), vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' || want === 'petal' ? 22 + rng() * 16 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
     }
@@ -888,6 +910,7 @@ const Game = (() => {
     let st = '';
     if (o.kind === 'chest') st = chestOpen(o) ? 'open' : 'closed';
     else if (o.kind === 'berrytree') st = treeReady(o) ? 'ready' : 'empty';
+    else if (o.kind === 'flowerpot') st = potUpright(o) ? 'upright' : 'tipped';
     const spr = Art.objSprite(o, st);
     if (spr) {
       const x = o.x * TS + spr.bx, y = o.y * TS + spr.by, w = spr.cv.width / Art.S, h = spr.cv.height / Art.S;
@@ -1197,13 +1220,22 @@ const Game = (() => {
       ]);
     } else if (!s.news || !s.news.honmoon) {
       // One-time announcement for adventures saved before Honmoon Island existed.
-      s.news = Object.assign({}, s.news, { honmoon: true });
+      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true });
       save('auto-quiet');
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! I have BIG news! 🎤✨',
-        'A golden bridge appeared south of Sunshine Village. It leads to a brand-new place: Honmoon Island!',
-        'The K-Pop Demon Hunters — Rumi, Mira and Zoey — are there, and silly demons like Derpy Tiger, Sussie and the Saja Boys are hopping all around!',
-        'Walk out of the village\'s south gate ⬇, or open the 🗺️ World Map and tap Honmoon to teleport. Have fun! 🌟',
+        'Welcome back, Chuyu! I have HUGE news! 🎤🐯⚡',
+        'Golden bridges now connect Rainbow Island to Honmoon Island AND three brand-new Southern Lands!',
+        'Meet the K-Pop Demon Hunters on Honmoon Island, pat knocked-over flowerpots upright in Derpy\'s Minhwa Sanctum 🐯, visit all 8 Nightmare Critters at the Carnival 🎪, and catch 12 Original Gen-1 Pokémon in Kanto Classics Bay ⚡!',
+        'Open the 🗺️ World Map and tap any land to teleport. Have fun catching all 56 Critters! 🌟',
+      ]);
+    } else if (!s.news.southlands) {
+      s.news = Object.assign({}, s.news, { southlands: true });
+      save('auto-quiet');
+      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
+        'Welcome back, Chuyu! Three brand-new lands just opened south of Honmoon Island! 🐯🎪⚡',
+        '1️⃣ Derpy\'s Minhwa Sanctum 🐯 — right knocked-over flowerpots, relax at the Jjimjilbang Bathhouse, and meet Gat-Hat Derpy, Water Demon, Flight Dokkaebi & Jeoseung Saja!',
+        '2️⃣ Nightmare Critters Carnival 🎪 — meet Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Simon Smoke, Poe, Touille & Maggie Mako!',
+        '3️⃣ Kanto Classics Bay ⚡ — visit Professor Oak\'s Lab & the Pokémon Center and catch Pikachu, Bulbasaur, Charmander, Squirtle, Jigglypuff, Eevee, Psyduck, Meowth, Gengar, Snorlax, Charizard & Mew!',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');
@@ -1244,7 +1276,7 @@ const Game = (() => {
     pressA, pressB, toggleDash, onBattleEnd, beginBattle, member, maxHpOf, partnerSp, openedChests,
     get state() { return state; }, get mode() { return mode; }, set mode(m) { mode = m; }, get player() { return player; }, get wilds() { return wilds; },
     get time() { return time; }, get cam() { return cam; }, get zone() { return curZone; }, get follower() { return follower; },
-    treeReady, chestOpen,
+    treeReady, chestOpen, potUpright,
     screenOf(tx, ty) { const r = canvas.getBoundingClientRect(); return [r.left + ((tx * TS + 24 - cam.x) * Art.S) / (canvas.width / r.width), r.top + ((ty * TS + 24 - cam.y) * Art.S) / (canvas.height / r.height)]; },
     pickStarter(id) { if (mode !== 'title' || !D.SP[id]) return false; UI.pickStarter(id); return true; },
   };
