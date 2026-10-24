@@ -31,6 +31,12 @@ const Art = (() => {
     12: { g: '#78b894', gd: '#5c9c78', gl: '#9ad4b2', t1: '#c76bff', t2: '#ff5ca8', t3: '#45d1f5', p: '#c7b5ea', pd: '#9d88c9', pl: '#e3d7fa', sand: '#e8d8ee', sandd: '#cbb6d6', tree: '#5a6fb8', treed: '#3e4f94', treel: '#8598e0', floor: '#3d2358', floord: '#2d1842', plaza: '#e6d6f5', plazad: '#c6b0de', plazal: '#f6edff' },
     // Zone 13 (Kanto Classics Bay & Pallet Meadow): classic bright Kanto emerald grass, Viridian tall grass, warm Pallet cobbles.
     13: { g: '#7ed968', gd: '#61be4c', gl: '#a1eb8e', t1: '#3fa34d', t2: '#2d853a', t3: '#68cc5c', p: '#e8d6b3', pd: '#c9b38b', pl: '#f7ecd4', sand: '#f7e5a6', sandd: '#e3cc84', tree: '#42a846', treed: '#2b8030', treel: '#70cf68', plaza: '#f2e8d5', plazad: '#d6c6aa', plazal: '#fffaf0' },
+    // Zone 14 (Johto Bell-Tower Groves & Ecruteak Lake — Gen 2): golden-autumn meadow grass, amber/crimson maple tall grass, warm Ecruteak flagstones.
+    14: { g: '#a3d165', gd: '#85b548', gl: '#c2e887', t1: '#f59e0b', t2: '#e85d3f', t3: '#84cc16', p: '#ecd9bd', pd: '#cbb494', pl: '#faf0e1', sand: '#f5e2ad', sandd: '#dec68a', tree: '#d97724', treed: '#a85214', treel: '#f5a642', plaza: '#f6ead6', plazad: '#d9c6a8', plazal: '#fff8ec' },
+    // Zone 15 (Hoenn Sky-Pillar Tropics & Sootopolis Lagoon — Gen 3): vibrant tropical emerald grass, cyan-hibiscus tall grass, coral sand.
+    15: { g: '#68d68b', gd: '#4cb870', gl: '#92ebae', t1: '#10b981', t2: '#38bdf8', t3: '#f472b6', p: '#e6d8b5', pd: '#c4b48c', pl: '#f7efda', sand: '#faeaad', sandd: '#e6d18a', tree: '#2ea866', treed: '#1e7d49', treel: '#5cd692', plaza: '#e8f5ee', plazad: '#c2ded0', plazal: '#f7fcf9' },
+    // Zone 16 (Sinnoh Spear-Pillar Peaks & Twinleaf Glade — Gen 4): crisp alpine meadow grass, celestial indigo-and-gold tall grass, white marble Hall of Origin floor.
+    16: { g: '#7dc9a6', gd: '#5ead8a', gl: '#a3e2c4', t1: '#6366f1', t2: '#facc15', t3: '#60a5fa', p: '#dce3f0', pd: '#b8c3d8', pl: '#f0f4fc', sand: '#e8eef7', sandd: '#cbd5e6', tree: '#3b7a6b', treed: '#27594d', treel: '#5ca391', floor: '#e8ecf7', floord: '#c7d0e6', plaza: '#eef2fa', plazad: '#cdd6e8', plazal: '#ffffff' },
   };
   const GREY_CLIFF = { cliff: '#a3a39b', cliffd: '#76766e', cliffl: '#cfcfc6' };
 
@@ -1572,6 +1578,14 @@ const Art = (() => {
     oaklab: { box: [-16, -60, 272, 212], draw: drawOakLab },
     mewshrine: { box: [-16, -64, 176, 168], draw: drawMewShrine, anim: animMewShrine },
     volcano: { box: [-20, -72, 232, 224], draw: drawVolcano, anim: animVolcano },
+    // Grand Pokémon Continent (Zones 14..16: Johto Gen 2, Hoenn Gen 3, Sinnoh Gen 4)
+    belltower: { box: [-20, -110, 232, 260], draw: drawBellTower, anim: animBellTower },
+    lugiaroost: { box: [-16, -64, 176, 168], draw: drawLugiaRoost, anim: animLugiaRoost },
+    apricornshop: { box: [-16, -56, 224, 208], draw: drawApricornShop },
+    skypillar: { box: [-20, -120, 232, 270], draw: drawSkyPillar, anim: animSkyPillar },
+    secretbase: { box: [-16, -68, 224, 220], draw: drawSecretBase },
+    spearpillar: { box: [-20, -96, 280, 248], draw: drawSpearPillar, anim: animSpearPillar },
+    rowanlab: { box: [-16, -60, 272, 212], draw: drawRowanLab },
   };
   OBJ.pyramid.draw = drawPyramid;
 
@@ -1804,6 +1818,181 @@ const Art = (() => {
       c.fillStyle = k % 2 ? '#ffd84d' : '#ff6b2b';
       circ(c, x + Math.sin(t * 2.5 + k * 1.7) * 22, y - ph * 46, (1 - ph) * 4.5 + 1); c.fill();
     }
+  }
+
+  /* --- Grand Pokémon Continent Landmark Drawers (Zones 14 Johto, 15 Hoenn, 16 Sinnoh) --- */
+  function drawBellTower(c) {
+    // Ecruteak 3-tier golden-roofed Bell Tower pagoda in Johto
+    shadow(c, 96, 138, 92, 14, 0.25);
+    c.fillStyle = '#d6c6ad'; rr(c, 12, 104, 168, 36, 6); c.fill();
+    const tiers = [
+      [24, 52, 144, 54, -8, 200, 56],
+      [38, 4, 116, 50, 10, 182, 8],
+      [54, -40, 84, 46, 28, 164, -36],
+    ];
+    for (const [wx, wy, ww, wh, rL, rR, ry] of tiers) {
+      c.fillStyle = '#7a3022'; rr(c, wx, wy, ww, wh, 4); c.fill();
+      c.fillStyle = '#fdf4dc'; rr(c, wx + 8, wy + 6, ww - 16, wh - 10, 3); c.fill();
+      c.fillStyle = '#c2410c'; c.fillRect(wx + ww / 2 - 8, wy + 10, 16, wh - 12);
+      // Curved golden-bronze pagoda roof
+      c.fillStyle = '#292524';
+      c.beginPath(); c.moveTo(rL, ry + 6); c.quadraticCurveTo(96, ry - 26, rR, ry + 6); c.lineTo(rR - 12, ry + 14); c.quadraticCurveTo(96, ry - 8, rL + 12, ry + 14); c.closePath(); c.fill();
+      c.fillStyle = '#f59e0b';
+      c.beginPath(); c.moveTo(rL + 6, ry + 5); c.quadraticCurveTo(96, ry - 22, rR - 6, ry + 5); c.lineTo(rR - 16, ry + 10); c.quadraticCurveTo(96, ry - 10, rL + 16, ry + 10); c.closePath(); c.fill();
+    }
+    // Golden spire & sacred bell finial
+    c.fillStyle = '#fbbf24'; c.fillRect(93, -86, 6, 46);
+    circ(c, 96, -88, 9); c.fill();
+    star(c, 96, -100, 10, 4.5, 5); c.fill();
+  }
+  function animBellTower(c, o, t) {
+    const x = o.x * 48 + 96, y = o.y * 48 - 40;
+    for (let k = 0; k < 5; k++) {
+      const ph = (t * 0.35 + k / 5) % 1;
+      c.fillStyle = k % 2 ? '#fbbf24' : '#f97316';
+      c.globalAlpha = 0.85 * (1 - ph);
+      circ(c, x + Math.sin(t * 2 + k * 1.4) * 58, y + ph * 140, 3.5); c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+  function drawLugiaRoost(c) {
+    // Whirl Island Tidal Roost with silver wing arches
+    shadow(c, 72, 90, 62, 11, 0.24);
+    c.fillStyle = '#38bdf8'; ell(c, 72, 74, 58, 20); c.fill();
+    c.fillStyle = '#bae6fd'; ell(c, 72, 72, 46, 15); c.fill();
+    c.fillStyle = '#cbd5e1'; rr(c, 22, 54, 100, 22, 8); c.fill();
+    // Twin silver Lugia wing pillars
+    for (const s of [-1, 1]) {
+      c.save(); c.translate(72 + s * 34, 54);
+      c.fillStyle = '#e2e8f0';
+      c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(s * 28, -42, s * 10, -86); c.quadraticCurveTo(-s * 6, -54, -s * 8, 0); c.closePath(); c.fill();
+      c.fillStyle = '#60a5fa';
+      c.beginPath(); c.moveTo(s * 2, -12); c.quadraticCurveTo(s * 18, -42, s * 8, -72); c.quadraticCurveTo(0, -46, -s * 2, -12); c.closePath(); c.fill();
+      c.restore();
+    }
+    c.fillStyle = '#3b82f6'; circ(c, 72, 18, 13); c.fill();
+    c.fillStyle = '#eff6ff'; circ(c, 72, 18, 7); c.fill();
+  }
+  function animLugiaRoost(c, o, t) {
+    const x = o.x * 48 + 72, y = o.y * 48 + 18;
+    c.save();
+    c.strokeStyle = 'rgba(147,197,253,' + (0.45 + 0.3 * Math.sin(t * 3)) + ')';
+    c.lineWidth = 2.5;
+    circ(c, x, y, 16 + Math.sin(t * 2.5) * 5); c.stroke();
+    c.restore();
+  }
+  function drawApricornShop(c) {
+    // Kurt's Azalea Apricorn Workshop
+    shadow(c, 96, 138, 92, 12, 0.24);
+    c.fillStyle = '#fef3c7'; rr(c, 12, 36, 168, 98, 8); c.fill();
+    c.fillStyle = '#92400e'; c.fillRect(12, 36, 168, 8); c.fillRect(12, 126, 168, 8);
+    // Warm wooden roof
+    c.fillStyle = '#b45309'; rr(c, 4, 6, 184, 38, 12); c.fill();
+    c.fillStyle = '#d97706'; rr(c, 12, 12, 168, 14, 6); c.fill();
+    // Giant golden-red Apricorn emblem on roof
+    c.fillStyle = '#ef4444'; circ(c, 96, 22, 16); c.fill();
+    c.fillStyle = '#f59e0b'; c.beginPath(); c.arc(96, 22, 16, Math.PI, 0); c.fill();
+    c.fillStyle = '#22c55e'; ell(c, 96, 5, 9, 4); c.fill();
+    c.strokeStyle = '#451a03'; c.lineWidth = 2.5; circ(c, 96, 22, 16); c.stroke();
+    // Door & Apricorn display windows
+    c.fillStyle = '#78350f'; rr(c, 76, 74, 40, 60, 4); c.fill();
+    c.fillStyle = '#fde68a'; rr(c, 24, 68, 38, 34, 4); c.fill(); rr(c, 130, 68, 38, 34, 4); c.fill();
+    // Colorful Apricorns in window
+    [['#ef4444', 34], ['#3b82f6', 44], ['#10b981', 54], ['#f59e0b', 140], ['#ec4899', 150], ['#8b5cf6', 160]].forEach(([col, ax]) => {
+      c.fillStyle = col; circ(c, ax, 88, 4.5); c.fill();
+    });
+  }
+  function drawSkyPillar(c) {
+    // Hoenn Ancient Emerald Sky Pillar where Rayquaza coils
+    shadow(c, 96, 138, 90, 14, 0.25);
+    c.fillStyle = '#6ee7b7'; ell(c, 96, 126, 82, 18); c.fill();
+    // Tall tiered emerald-jade stone tower
+    c.fillStyle = '#065f46'; rr(c, 34, 52, 124, 78, 8); c.fill();
+    c.fillStyle = '#047857'; rr(c, 44, -8, 104, 66, 8); c.fill();
+    c.fillStyle = '#059669'; rr(c, 54, -64, 84, 62, 8); c.fill();
+    // Glowing golden-emerald Rayquaza Delta runes on the tower
+    c.strokeStyle = '#fde047'; c.lineWidth = 3;
+    c.beginPath(); c.moveTo(96, -50); c.lineTo(72, -16); c.lineTo(120, -16); c.closePath(); c.stroke();
+    c.beginPath(); c.arc(96, 24, 18, 0, PI2); c.stroke();
+    // Jade dragon altar crown
+    c.fillStyle = '#10b981'; ell(c, 96, -66, 48, 12); c.fill();
+    c.fillStyle = '#fef08a'; star(c, 96, -84, 14, 6, 5); c.fill();
+  }
+  function animSkyPillar(c, o, t) {
+    const x = o.x * 48 + 96, y = o.y * 48 - 66;
+    c.save();
+    for (let k = 0; k < 5; k++) {
+      const a = t * 1.6 + k * (PI2 / 5);
+      c.fillStyle = k % 2 ? '#fde047' : '#34d399';
+      circ(c, x + Math.cos(a) * 42, y + Math.sin(a) * 14, 4); c.fill();
+    }
+    c.restore();
+  }
+  function drawSecretBase(c) {
+    // Hoenn Tropical Secret Base Treehouse
+    shadow(c, 96, 138, 92, 13, 0.24);
+    // Giant Banyan trunks
+    c.fillStyle = '#78350f'; c.fillRect(30, 56, 26, 80); c.fillRect(136, 56, 26, 80);
+    // Lush tropical canopy
+    c.fillStyle = '#15803d'; ell(c, 96, 20, 96, 46); c.fill();
+    c.fillStyle = '#22c55e'; ell(c, 64, 14, 58, 32); c.fill(); ell(c, 128, 14, 58, 32); c.fill();
+    // Cozy wooden treehouse cabin nestled in the branches
+    c.fillStyle = '#d97706'; rr(c, 24, 34, 144, 68, 10); c.fill();
+    c.fillStyle = '#fef3c7'; rr(c, 32, 42, 128, 52, 6); c.fill();
+    c.fillStyle = '#10b981'; rr(c, 18, 22, 156, 18, 8); c.fill();
+    // Rope ladder & starter doll windows
+    c.strokeStyle = '#92400e'; c.lineWidth = 3;
+    c.beginPath(); c.moveTo(84, 94); c.lineTo(84, 136); c.moveTo(108, 94); c.lineTo(108, 136); c.stroke();
+    for (let y = 100; y <= 132; y += 8) { c.beginPath(); c.moveTo(84, y); c.lineTo(108, y); c.stroke(); }
+    // Cute Treecko, Torchic & Mudkip plushies in the window!
+    c.fillStyle = '#4ade80'; circ(c, 52, 68, 8); c.fill();
+    c.fillStyle = '#fb923c'; circ(c, 96, 68, 8); c.fill();
+    c.fillStyle = '#38bdf8'; circ(c, 140, 68, 8); c.fill();
+  }
+  function drawSpearPillar(c) {
+    // Sinnoh Spear Pillar Marble Temple & Golden Hall of Origin Arch
+    shadow(c, 120, 138, 114, 14, 0.25);
+    c.fillStyle = '#cbd5e1'; rr(c, 8, 98, 224, 40, 8); c.fill();
+    c.fillStyle = '#f8fafc'; rr(c, 14, 92, 212, 36, 6); c.fill();
+    // Four fluted marble columns
+    for (const px of [24, 66, 154, 196]) {
+      c.fillStyle = '#e2e8f0'; rr(c, px, 4, 20, 92, 4); c.fill();
+      c.fillStyle = '#f8fafc'; rr(c, px + 3, 4, 14, 92, 2); c.fill();
+      c.fillStyle = '#fbbf24'; rr(c, px - 2, 0, 24, 8, 2); c.fill(); rr(c, px - 2, 90, 24, 8, 2); c.fill();
+    }
+    // Golden Arceus Wheel / Celestial Arch in the center
+    c.strokeStyle = '#f59e0b'; c.lineWidth = 7;
+    circ(c, 120, 32, 38); c.stroke();
+    c.strokeStyle = '#fef08a'; c.lineWidth = 2.5;
+    circ(c, 120, 32, 38); c.stroke();
+    for (let k = 0; k < 8; k++) {
+      const a = k * (Math.PI / 4);
+      c.fillStyle = '#fbbf24';
+      star(c, 120 + Math.cos(a) * 44, 32 + Math.sin(a) * 44, 7, 3, 4, a); c.fill();
+    }
+    c.fillStyle = '#fef08a'; star(c, 120, 32, 18, 7, 5); c.fill();
+  }
+  function animSpearPillar(c, o, t) {
+    const x = o.x * 48 + 120, y = o.y * 48 + 32;
+    c.save();
+    c.strokeStyle = 'rgba(253,224,71,' + (0.45 + 0.35 * Math.sin(t * 2.8)) + ')';
+    c.lineWidth = 3;
+    circ(c, x, y, 46 + Math.sin(t * 2) * 4); c.stroke();
+    c.restore();
+  }
+  function drawRowanLab(c) {
+    // Professor Rowan's Sandgem Evolution Research Lab (Sinnoh)
+    shadow(c, 120, 138, 114, 12, 0.24);
+    c.fillStyle = '#f1f5f9'; rr(c, 10, 34, 220, 100, 8); c.fill();
+    c.fillStyle = '#3730a3'; rr(c, 4, 4, 232, 40, 10); c.fill();
+    c.fillStyle = '#6366f1'; rr(c, 12, 10, 216, 12, 6); c.fill();
+    // Golden Sinnoh Myth Emblem on Roof
+    c.fillStyle = '#fbbf24'; circ(c, 120, 24, 13); c.fill();
+    c.fillStyle = '#eef2ff'; star(c, 120, 24, 9, 4, 4); c.fill();
+    // Entrance & lab windows
+    c.fillStyle = '#1e1b4b'; rr(c, 100, 74, 40, 60, 4); c.fill();
+    c.fillStyle = '#93c5fd';
+    for (const wx of [26, 62, 152, 188]) { rr(c, wx, 64, 26, 34, 4); c.fill(); }
   }
 
   function fenceMask(o) {
@@ -2630,7 +2819,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg?v=r13';
+      img.src = 'icons/' + icon + '.jpg?v=r14';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {
@@ -2703,9 +2892,12 @@ const Art = (() => {
         else if (ob.kind === 'carnivaltent') col = [224, 62, 107];
         else if (ob.kind === 'cauldron') col = [199, 75, 255];
         else if (ob.kind === 'pokecenter') col = [232, 62, 56];
-        else if (ob.kind === 'oaklab') col = [74, 123, 214];
-        else if (ob.kind === 'mewshrine') col = [255, 148, 200];
+        else if (ob.kind === 'oaklab' || ob.kind === 'rowanlab') col = [74, 123, 214];
+        else if (ob.kind === 'mewshrine' || ob.kind === 'lugiaroost') col = [147, 197, 253];
         else if (ob.kind === 'volcano') col = [255, 90, 31];
+        else if (ob.kind === 'belltower' || ob.kind === 'apricornshop') col = [245, 158, 11];
+        else if (ob.kind === 'skypillar' || ob.kind === 'secretbase') col = [16, 185, 129];
+        else if (ob.kind === 'spearpillar') col = [250, 204, 21];
       }
       for (let yy = 0; yy < px; yy++) for (let xx = 0; xx < px; xx++) {
         const k = ((y * px + yy) * W * px + x * px + xx) * 4;
@@ -2724,6 +2916,9 @@ const Art = (() => {
     11: ['#5888c9', '#ffe8be', '#7fd4b8'],
     12: ['#2e1b52', '#a855c9', '#78b894'],
     13: ['#6cc8ff', '#e6f7ff', '#7ed968'],
+    14: ['#f59e0b', '#fef3c7', '#a3d165'],
+    15: ['#38bdf8', '#d1fae5', '#68d68b'],
+    16: ['#312e81', '#818cf8', '#7dc9a6'],
   };
   // Seoul skyline for the Honmoon battle backdrop: [x, width, height] as fractions of w / h (built once)
   let SKYLINE = null;
@@ -2868,6 +3063,25 @@ const Art = (() => {
       c.fillStyle = '#3fa9e8'; c.fillRect(0, hz - h * 0.05, w, h * 0.05);
       c.fillStyle = '#8c4f36'; c.beginPath(); c.moveTo(w * 0.04, hz - h * 0.04); c.lineTo(w * 0.13, hz - h * 0.22); c.lineTo(w * 0.21, hz - h * 0.22); c.lineTo(w * 0.3, hz - h * 0.04); c.closePath(); c.fill();
       c.fillStyle = '#ff6b2b'; ell(c, w * 0.17, hz - h * 0.22, w * 0.04, h * 0.015); c.fill();
+    } else if (z === 14) {
+      // Johto Ecruteak Bell Tower silhouette + golden autumn sky
+      c.fillStyle = '#92400e';
+      for (let k = 0; k < 3; k++) {
+        const tw = w * (0.12 - k * 0.025), ty = hz - h * (0.07 + k * 0.065);
+        c.fillRect(w * 0.16 - tw / 2, ty, tw, h * 0.065);
+        c.fillStyle = '#f59e0b';
+        c.beginPath(); c.moveTo(w * 0.16 - tw * 0.7, ty + 4); c.quadraticCurveTo(w * 0.16, ty - h * 0.03, w * 0.16 + tw * 0.7, ty + 4); c.closePath(); c.fill();
+        c.fillStyle = '#92400e';
+      }
+    } else if (z === 15) {
+      // Hoenn tropical ocean + emerald Sky Pillar spire
+      c.fillStyle = '#0ea5e9'; c.fillRect(0, hz - h * 0.05, w, h * 0.05);
+      c.fillStyle = '#047857'; c.fillRect(w * 0.13, hz - h * 0.26, w * 0.06, h * 0.22);
+      c.fillStyle = '#fde047'; star(c, w * 0.16, hz - h * 0.28, 9, 4, 5); c.fill();
+    } else if (z === 16) {
+      // Sinnoh Mount Coronet & Spear Pillar golden wheel
+      c.fillStyle = '#4338ca'; c.beginPath(); c.moveTo(0, hz); c.lineTo(w * 0.18, hz - h * 0.25); c.lineTo(w * 0.38, hz); c.closePath(); c.fill();
+      c.strokeStyle = '#fbbf24'; c.lineWidth = 3; circ(c, w * 0.18, hz - h * 0.28, h * 0.06); c.stroke();
     }
     else { c.fillStyle = 'rgba(80,160,80,.35)'; ell(c, w * 0.2, hz, w * 0.3, h * 0.08); c.fill(); ell(c, w * 0.75, hz, w * 0.35, h * 0.1); c.fill(); }
     c.restore();

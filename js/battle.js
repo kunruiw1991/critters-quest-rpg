@@ -61,10 +61,14 @@ const Battle = (() => {
     closeSub(true);
     setEnabled(false);
     renderCards(true);
-    Sound.music((sp.id === 'gwima' || sp.id === 'mew') ? 'boss' : 'battle', true);
+    const isBoss = sp.id === 'gwima' || sp.id === 'mew' || sp.id === 'lugia' || sp.id === 'rayquaza' || sp.id === 'arceus';
+    Sound.music(isBoss ? 'boss' : 'battle', true);
     const rare = sp.rarity === 'rare' || sp.rarity === 'legendary';
     say(sp.id === 'gwima' ? '👹 WHOA! Gwi-Ma the demon king appeared! Let\'s turn that grumpy grin into a happy one! 💜'
       : sp.id === 'mew' ? '✨ WHOA! Legendary Pokémon Mew floated down in a glowing psychic bubble! Mew~♪ 💖'
+      : sp.id === 'lugia' ? '🌊 WHOA! Legendary Pokémon Lugia soared up from the Whirl Islands with a silver aeroblast! 🪶✨'
+      : sp.id === 'rayquaza' ? '🐉 WHOA! Legendary Pokémon Rayquaza descended from the ozone layer above Sky Pillar! 💚⚡'
+      : sp.id === 'arceus' ? '👑 WHOA! Mythical Pokémon Arceus shone with a golden halo of a thousand stars at Spear Pillar! ✨🌟'
       : (rare ? '✨ WOW! ' : '') + 'A wild ' + sp.name + ' ' + sp.emoji + ' appeared!' + (rare ? ' (' + D.RARITY[sp.rarity].label + ')' : ''));
     (async () => {
       await tween(0.55, k => { st.wild.scale = U.easeOutBack(k); st.mine.scale = U.easeOutBack(k); });

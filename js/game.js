@@ -8,7 +8,7 @@ const Game = (() => {
   const SAVE_KEY = 'critterQuestRPG_v1';
   const DV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
-  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10 };
+  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9 };
 
   let canvas, ctx, dpr = 1, zoom = 1, viewW = 0, viewH = 0;
   const cam = { x: 0, y: 0 };
@@ -36,7 +36,7 @@ const Game = (() => {
       pos: { x: World.start.x, y: World.start.y, dir: 'down' },
       chests: {}, trees: {}, gifts: {}, pots: {}, visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
-      news: { honmoon: true, southlands: true },
+      news: { honmoon: true, southlands: true, gen234: true },
     };
   }
   function validate(s) {
@@ -836,7 +836,7 @@ const Game = (() => {
     for (const o of World.objects) if (o.shakeT > 0) o.shakeT -= dt;
     // ambient particles
     const z = curZone;
-    const want = z === 7 ? 'snow' : (z === 8 || z === 12) ? 'firefly' : z === 4 ? 'sparkle' : (z === 2 || z === 13) ? 'leaf' : z === 6 ? 'dust' : z === 3 ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
+    const want = z === 7 ? 'snow' : (z === 8 || z === 12) ? 'firefly' : (z === 4 || z === 16) ? 'sparkle' : (z === 2 || z === 13 || z === 14) ? 'leaf' : z === 6 ? 'dust' : (z === 3 || z === 15) ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
     if (want && parts.length < 46 && rng() < dt * 22) {
       parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' || want === 'petal' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20 + (want === 'petal' ? 14 : 0), vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' || want === 'petal' ? 22 + rng() * 16 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
     }
@@ -1220,22 +1220,30 @@ const Game = (() => {
       ]);
     } else if (!s.news || !s.news.honmoon) {
       // One-time announcement for adventures saved before Honmoon Island existed.
-      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true });
+      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true });
       save('auto-quiet');
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! I have HUGE news! 🎤🐯⚡',
-        'Golden bridges now connect Rainbow Island to Honmoon Island AND three brand-new Southern Lands!',
-        'Meet the K-Pop Demon Hunters on Honmoon Island, pat knocked-over flowerpots upright in Derpy\'s Minhwa Sanctum 🐯, visit all 8 Nightmare Critters at the Carnival 🎪, and catch 12 Original Gen-1 Pokémon in Kanto Classics Bay ⚡!',
-        'Open the 🗺️ World Map and tap any land to teleport. Have fun catching all 56 Critters! 🌟',
+        'Welcome back, Chuyu! I have HUGE news! 🎤🐯⚡👑',
+        'Golden bridges now connect Rainbow Island to Honmoon Island, the Southern Continent, AND the Grand Pokémon Continent!',
+        'Meet the K-Pop Demon Hunters, Derpy\'s Minhwa Sanctum 🐯, Nightmare Critters 🎪, Kanto Classics Bay ⚡ (Gen 1), Johto Bell-Tower Groves 🔔 (Gen 2), Hoenn Sky-Pillar Tropics 🌴 (Gen 3), and Sinnoh Spear-Pillar Peaks 👑 (Gen 4)!',
+        'Open the 🗺️ World Map and tap any of the 15 lands to teleport. Have fun catching all 80 Critters! 🌟',
       ]);
     } else if (!s.news.southlands) {
-      s.news = Object.assign({}, s.news, { southlands: true });
+      s.news = Object.assign({}, s.news, { southlands: true, gen234: true });
       save('auto-quiet');
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! Three brand-new lands just opened south of Honmoon Island! 🐯🎪⚡',
-        '1️⃣ Derpy\'s Minhwa Sanctum 🐯 — right knocked-over flowerpots, relax at the Jjimjilbang Bathhouse, and meet Gat-Hat Derpy, Water Demon, Flight Dokkaebi & Jeoseung Saja!',
-        '2️⃣ Nightmare Critters Carnival 🎪 — meet Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Simon Smoke, Poe, Touille & Maggie Mako!',
-        '3️⃣ Kanto Classics Bay ⚡ — visit Professor Oak\'s Lab & the Pokémon Center and catch Pikachu, Bulbasaur, Charmander, Squirtle, Jigglypuff, Eevee, Psyduck, Meowth, Gengar, Snorlax, Charizard & Mew!',
+        'Welcome back, Chuyu! Six brand-new lands just opened south of Honmoon Island! 🐯🎪⚡🔔🌴👑',
+        'Explore Derpy\'s Minhwa Sanctum 🐯, Nightmare Critters Carnival 🎪, and Kanto Classics Bay ⚡ (Gen 1) — plus three Grand Pokémon Regions for Generations 2, 3 & 4!',
+        'Catch Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Lugia in Johto 🔔; Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Rayquaza in Hoenn 🌴; and Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Arceus in Sinnoh 👑!',
+      ]);
+    } else if (!s.news.gen234) {
+      s.news = Object.assign({}, s.news, { gen234: true });
+      save('auto-quiet');
+      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
+        'Welcome back, Chuyu! A third huge map just opened south of the Southern Continent — the Grand Pokémon Continent! 🔔🌴👑',
+        '1️⃣ Johto Bell-Tower Groves 🔔 (Gen 2) — visit Ecruteak Bell Tower, Kurt\'s Apricorn Workshop & Whirl Island Roost to catch Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Legendary Lugia!',
+        '2️⃣ Hoenn Sky-Pillar Tropics 🌴 (Gen 3) — explore Sootopolis Lagoon, Secret Base Treehouse & Sky Pillar to catch Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Legendary Rayquaza!',
+        '3️⃣ Sinnoh Spear-Pillar Peaks 👑 (Gen 4) — visit Professor Rowan\'s Lab, Champion Cynthia & Spear Pillar Temple to catch Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Mythical Arceus!',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');

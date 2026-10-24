@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#2a1d52">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="description" content="Chuyu's Critter Quest: Rainbow Island RPG — a big 2D classic RPG where Chuyu explores 12 lands and catches 56 Critters: Smiling Critters, K-Pop Demon Hunters, Derpy's Minhwa Sanctum, all 8 Nightmare Critters, and 12 Original Gen-1 Pokémon!">
+<meta name="description" content="Chuyu's Critter Quest: Rainbow Island RPG — a big 2D classic RPG where Chuyu explores 15 lands and catches 80 Critters: Smiling Critters, K-Pop Demon Hunters, Derpy's Minhwa Sanctum, all 8 Nightmare Critters, and 36 Pokémon across Generations 1, 2, 3 & 4 (Kanto, Johto, Hoenn & Sinnoh)!">
 <title>Chuyu's Critter Quest: Rainbow Island RPG</title>
 <link rel="icon" href="icons/dogday.jpg">
-<link rel="stylesheet" href="css/style.css?v=r13">
+<link rel="stylesheet" href="css/style.css?v=r14">
 </head>
 <body class="at-title">
 <canvas id="world" aria-label="Rainbow Island world map"></canvas>
@@ -41,7 +41,7 @@
     </div>
     <div id="menuRow">
       <button id="mapBtn" class="menu-btn">🗺️ <span>World Map</span></button>
-      <button id="dexBtn" class="menu-btn">📖 <span>Dex</span> <b id="dexCount">1/56</b></button>
+      <button id="dexBtn" class="menu-btn">📖 <span>Dex</span> <b id="dexCount">1/80</b></button>
       <button id="bagBtn" class="menu-btn">🎒 <span>Shop / Bag</span></button>
     </div>
     <div id="abPad">
@@ -99,7 +99,7 @@
     </div>
     <p class="title-sub">Pick your very first Critter partner!</p>
     <div id="starters" class="starters"></div>
-    <p class="title-hint">🐾 The other two can still be caught in the wild! · 12 lands · 56 Critters · 68 treasure chests · 🎤🐯🎪⚡ K-Pop Demon Hunters, Derpy's Minhwa Sanctum, Nightmare Critters & Original Gen-1 Pokémon!</p>
+    <p class="title-hint">🐾 The other two can still be caught in the wild! · 15 lands · 80 Critters · 86 treasure chests · 🎤🐯🎪⚡🔔🌴👑 K-Pop Demon Hunters, Derpy's Minhwa Sanctum, Nightmare Critters & Generations 1–4 Pokémon (Kanto, Johto, Hoenn & Sinnoh)!</p>
   </div>
 </div>
 
@@ -117,14 +117,14 @@
 <div id="flash"></div>
 <canvas id="fx"></canvas>
 
-<script src="js/data.js?v=r13"></script>
-<script src="js/util.js?v=r13"></script>
-<script src="js/world.js?v=r13"></script>
-<script src="js/art.js?v=r13"></script>
-<script src="js/audio.js?v=r13"></script>
-<script src="js/ui.js?v=r13"></script>
-<script src="js/battle.js?v=r13"></script>
-<script src="js/game.js?v=r13"></script>
+<script src="js/data.js?v=r14"></script>
+<script src="js/util.js?v=r14"></script>
+<script src="js/world.js?v=r14"></script>
+<script src="js/art.js?v=r14"></script>
+<script src="js/audio.js?v=r14"></script>
+<script src="js/ui.js?v=r14"></script>
+<script src="js/battle.js?v=r14"></script>
+<script src="js/game.js?v=r14"></script>
 <script>
   window.CritterQuest = Game;
   window.addEventListener('DOMContentLoaded', () => Game.init());

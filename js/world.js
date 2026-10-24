@@ -5,9 +5,9 @@
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, N = W * H;
+  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, N = W * H;
   const HZ = 10; // Honmoon Island zone id
-  const MAX_Z = 13; // Highest zone id (Zones 11..13 on the Southern Continent)
+  const MAX_Z = 16; // Highest zone id (Zones 14..16 on the Grand Pokémon Continent)
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
   const T_NAMES = Object.keys(T);
   const WALK = new Uint8Array([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]);
@@ -38,6 +38,10 @@ const World = (() => {
     carnivaltent: { block: 1, act: 'sign' }, cauldron: { block: 1, act: 'sign' },
     pokecenter: { block: 1, act: 'heal' }, oaklab: { block: 1, act: 'sign' },
     mewshrine: { block: 1, act: 'sign' }, volcano: { block: 1, act: 'sign' },
+    // Grand Pokémon Continent (Zones 14..16: Johto Gen 2, Hoenn Gen 3, Sinnoh Gen 4)
+    belltower: { block: 1, act: 'sign' }, lugiaroost: { block: 1, act: 'sign' }, apricornshop: { block: 1, act: 'sign' },
+    skypillar: { block: 1, act: 'sign' }, secretbase: { block: 1, act: 'sign' },
+    spearpillar: { block: 1, act: 'sign' }, rowanlab: { block: 1, act: 'sign' },
   };
 
   const ground = new Uint8Array(N), zone = new Uint8Array(N), decal = new Uint8Array(N);
@@ -61,6 +65,12 @@ const World = (() => {
     return Math.hypot(dx, dy);
   }
   function zoneOf(x, y) {
+    if (y >= H2) {
+      const jx = x + (U.vnoise(x * 0.17, y * 0.17, 25) - 0.5) * 3;
+      if (jx < 44) return 14;
+      if (jx < 76) return 15;
+      return 16;
+    }
     if (y >= H1) {
       const jx = x + (U.vnoise(x * 0.17, y * 0.17, 15) - 0.5) * 3;
       if (jx < 44) return 11;
@@ -78,10 +88,15 @@ const World = (() => {
     }
     return best;
   }
-  /* Honmoon Island outline (rows H0..H1-1) and Southern Continent outline (rows H1..H-1). */
+  /* Honmoon Island outline (rows H0..H1-1), Southern Continent (rows H1..H2-1), and Grand Pokémon Continent (rows H2..H-1). */
   const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H1 - 1 };
-  const SOUTH = { x0: 5, x1: 115, y0: H1 + 1, y1: H - 1 };
+  const SOUTH = { x0: 5, x1: 115, y0: H1 + 1, y1: H2 - 1 };
+  const GEN234 = { x0: 5, x1: 115, y0: H2 + 1, y1: H - 1 };
   function coastVal(x, y) {
+    if (y >= H2) {
+      const d = Math.min(x - GEN234.x0, GEN234.x1 - x, y - GEN234.y0, GEN234.y1 - y);
+      return d + (U.fbm(x * 0.09, y * 0.09, 31) - 0.5) * 4;
+    }
     if (y >= H1) {
       const d = Math.min(x - SOUTH.x0, SOUTH.x1 - x, y - SOUTH.y0, SOUTH.y1 - y);
       return d + (U.fbm(x * 0.09, y * 0.09, 21) - 0.5) * 4;
@@ -118,7 +133,7 @@ const World = (() => {
           if (z === 3 && x < 77 + U.vnoise(x * 0.2, y * 0.2, 9) * 3) g = T.GRASS;
           ground[i] = g;
           if (z !== 1) {
-            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58 }[z];
+            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58, 14: 0.58, 15: 0.58, 16: 0.58 }[z];
             if (U.fbm(x * 0.13, y * 0.13, 100 + z) > thr) ground[i] = T.TALL;
             else if (z === 4 && U.fbm(x * 0.11, y * 0.11, 300) > 0.6) ground[i] = T.FLOWERS;
             else if (z >= HZ && U.fbm(x * 0.12, y * 0.12, 300 + z) > 0.64) ground[i] = T.FLOWERS;
@@ -726,7 +741,7 @@ const World = (() => {
     const r3 = U.mulberry32(20261024);
 
     // 1. River separating Zone 12 (Nightmare Carnival) and Zone 13 (Kanto Classics Bay)
-    for (let y = H1; y < H; y++) {
+    for (let y = H1; y < H2; y++) {
       const xc = 76 + Math.round(Math.sin(y * 0.22) * 0.8);
       for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
     }
@@ -799,8 +814,8 @@ const World = (() => {
     berryTree(83, 154, 'apple'); berryTree(109, 142, 'gold');
 
     // 7. NPCs, Special Critter Spots, and Signs for Zones 11..13
-    D.NPCS.forEach((def, k) => { if (def.zone > HZ) placeNPC(def, k); });
-    D.SPECIAL_SPOTS.forEach(s => { if (s.zone > HZ) addSpecial(s); });
+    D.NPCS.forEach((def, k) => { if (def.zone > HZ && def.zone <= 13) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone > HZ && s.zone <= 13) addSpecial(s); });
     for (const [x, y, text] of [
       [34, 108, "⬇ Minhwa Tiger Bridge → 🐯 Derpy's Minhwa Sanctum & Bathhouse Valley"],
       [61, 108, '⬇ Twilight Carnival Bridge → 🎪 Nightmare Critters Carnival & Twilight Hollow'],
@@ -812,10 +827,10 @@ const World = (() => {
     ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
 
     // 8. Scatter trees, bushes & rocks across Zones 11..13
-    for (let y = H1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    for (let y = H1; y < H2 - 1; y++) for (let x = 1; x < W - 1; x++) {
       const i = I(x, y);
       const z = zone[i];
-      if (z <= HZ || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      if (z <= HZ || z > 13 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
       const r = r3();
       let kind = null, variant = null;
       if (z === 11) {
@@ -851,7 +866,7 @@ const World = (() => {
     bfs(start.x, start.y);
     for (const z of [11, 12, 13]) {
       const list = [];
-      for (let y = H1 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+      for (let y = H1 + 1; y < H2 - 2; y++) for (let x = 2; x < W - 2; x++) {
         const i = I(x, y);
         if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
         let blocked = 0;
@@ -873,9 +888,9 @@ const World = (() => {
     }
 
     // 10. Decals across Zones 11..13
-    for (let y = H1; y < H; y++) for (let x = 0; x < W; x++) {
+    for (let y = H1; y < H2; y++) for (let x = 0; x < W; x++) {
       const i = I(x, y);
-      if (zone[i] <= HZ || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      if (zone[i] <= HZ || zone[i] > 13 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
       const z = zone[i], g = ground[i], r = r3();
       let d = 0;
       if (z === 11) {
@@ -888,6 +903,178 @@ const World = (() => {
       } else if (z === 13) {
         if (g === T.GRASS) d = r < 0.04 ? DEC.FLOWER_Y : r < 0.07 ? DEC.FLOWER_W : r < 0.09 ? DEC.CLOVER : 0;
         else if (g === T.SAND) d = r < 0.04 ? DEC.SHELL : r < 0.06 ? DEC.STARFISH : 0;
+      }
+      decal[i] = d;
+    }
+  }
+
+  /* ---------------- Zones 14..16: Grand Pokémon Continent (Gen 2 Johto, Gen 3 Hoenn, Gen 4 Sinnoh) ----------------
+   * Built AFTER buildSouthContinent() with its own RNG stream (r4 = U.mulberry32(20261025)),
+   * so all 68 existing chests in Zones 1..13 remain 100% untouched! */
+  function buildGen234Continent() {
+    const r4 = U.mulberry32(20261025);
+
+    // 1. Two scenic channels separating Zone 14 (Johto) | Zone 15 (Hoenn) | Zone 16 (Sinnoh)
+    for (let y = H2; y < H; y++) {
+      for (const base of [44, 76]) {
+        const xc = base + Math.round(Math.sin(y * 0.21) * 0.8);
+        for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
+      }
+    }
+
+    // 2. Plazas, Lakes & Sacred Courtyards for Johto (14), Hoenn (15), and Sinnoh (16)
+    // Zone 14 (Johto): Whirl Island Lugia Roost, Ecruteak Bell-Tower Courtyard, Pokémon Center & Kurt's Apricorn Plaza
+    for (let y = 181; y <= 188; y++) for (let x = 19; x <= 26; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 183; y <= 193; y++) for (let x = 26; x <= 34; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 193; y <= 199; y++) for (let x = 15; x <= 22; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 201; y <= 208; y++) for (let x = 29; x <= 36; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Ecruteak Crystal Spring (shallow duckie-float spring where Suicune waits)
+    ellipse(18, 210, 4.5, 2.8, (x, y) => { setT(x, y, T.SHALLOW); clear[I(x, y)] = 1; });
+
+    // Zone 15 (Hoenn): Sky Pillar Summit Plaza, Hoenn Pokémon Center & Secret Base Plaza, Sootopolis Lagoon & Meteor Crater
+    for (let y = 179; y <= 187; y++) for (let x = 56; x <= 64; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 188; y <= 196; y++) for (let x = 50; x <= 57; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 188; y <= 196; y++) for (let x = 65; x <= 71; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 209; y <= 214; y++) for (let x = 50; x <= 56; x++) { const i = I(x, y); ground[i] = T.SAND; clear[i] = 1; }
+    ellipse(64, 208, 4.8, 3.0, (x, y) => { setT(x, y, T.SHALLOW); clear[I(x, y)] = 1; });
+
+    // Zone 16 (Sinnoh): Spear Pillar Marble Hall, Sandgem Lab & Pokémon Center Square, Aura Dojo & Champion Cliff
+    for (let y = 179; y <= 190; y++) for (let x = 99; x <= 108; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    for (let y = 187; y <= 197; y++) for (let x = 80; x <= 95; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 209; y <= 214; y++) for (let x = 83; x <= 89; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 209; y <= 214; y++) for (let x = 103; x <= 109; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+
+    // 3. Three Sea Bridges south from Zones 11, 12, 13 (y = 144..200) + Grand Champion Highway (y = 200)
+    for (const bx of [24, 64, 90]) {
+      for (let y = 144; y <= 184; y++) for (let x = bx; x <= bx + 1; x++) {
+        const i = I(x, y);
+        if (objAt[i] >= 0 && objects[objAt[i]].rm) removeObj(objects[objAt[i]]);
+      }
+      roadSeg(bx, 144, bx, 200, 0);
+    }
+    // East-West Grand Champion Highway connecting Zone 14 (Johto) <-> Zone 15 (Hoenn) <-> Zone 16 (Sinnoh)
+    roadSeg(15, 200, 105, 200, 0);
+    // Local trails in Zones 14, 15, 16
+    trail([[24, 186], [30, 186]]);    // Lugia Roost <-> Bell Tower
+    trail([[18, 200], [18, 210]]);    // Highway -> Ecruteak Crystal Spring (Suicune)
+    trail([[32, 200], [32, 207]]);    // Highway -> Kurt's Apricorn Workshop
+    trail([[60, 200], [60, 185]]);    // Highway -> Sky Pillar Summit (Rayquaza)
+    trail([[53, 200], [53, 212]]);    // Highway -> Steven's Meteor Crater (Metagross)
+    trail([[103, 200], [103, 186]]);  // Highway -> Spear Pillar Temple (Arceus & Cynthia)
+    trail([[86, 200], [86, 212]]);    // Highway -> Aura Training Dojo (Lucario)
+    trail([[106, 200], [106, 212]]);  // Highway -> Cynthia's Champion Cliff (Garchomp)
+
+    // 4. Zone 14 Landmarks (Johto Bell-Tower Groves & Ecruteak Lake — Gen 2 Pokémon)
+    landmark('belltower', 28, 184, 4, 3, { name: 'Ecruteak Bell Tower', text: '🔔 The golden-roofed Ecruteak Bell Tower! Autumn maple leaves drift around the 3-tier pagoda where Ho-Oh and Lugia\'s legends began.' }, { ground: T.PLAZA, fx: 30 });
+    landmark('lugiaroost', 21, 182, 3, 2, { name: 'Whirl Island Lugia Roost', text: '🌊 Whirl Island Roost! Silver ocean spray and glowing tidal runes shimmer where Lugia rests its wings.' }, { ground: T.PLAZA, fx: 22 });
+    fountains[14] = landmark('pokecenter', 16, 194, 4, 3, { name: 'Johto Pokémon Center' }, { ground: T.PLAZA, fx: 18 });
+    landmark('apricornshop', 30, 202, 4, 3, { name: "Kurt's Apricorn Workshop", text: "🌰 Kurt's Azalea Apricorn Workshop! Baskets of red, blue, yellow and rainbow Apricorns are polished into custom capsules!" }, { ground: T.PLAZA, fx: 32 });
+    waypoints[14] = landmark('waypoint', 23, 198, 1, 1, { region: 14 }, { front: true, ring: true });
+    berryTree(13, 188, 'gold'); berryTree(38, 212, 'plum');
+
+    // 5. Zone 15 Landmarks (Hoenn Sky-Pillar Tropics & Sootopolis Lagoon — Gen 3 Pokémon)
+    landmark('skypillar', 58, 180, 4, 3, { name: 'Sky Pillar Tower', text: '🐉 The ancient emerald spire of Sky Pillar! Above the tropical clouds, Legendary Rayquaza watches over Hoenn.' }, { ground: T.PLAZA, fx: 60 });
+    fountains[15] = landmark('pokecenter', 51, 189, 4, 3, { name: 'Hoenn Pokémon Center' }, { ground: T.PLAZA, fx: 53 });
+    landmark('secretbase', 66, 189, 4, 3, { name: 'Hoenn Secret Base Treehouse', text: '🌴 A cozy Hoenn Secret Base Treehouse! Inside are PokéDolls of Treecko, Torchic & Mudkip and a sparkly slide!' }, { ground: T.PLAZA, fx: 68 });
+    waypoints[15] = landmark('waypoint', 61, 196, 1, 1, { region: 15 }, { front: true, ring: true });
+    berryTree(48, 186, 'coconut'); berryTree(71, 212, 'apple');
+
+    // 6. Zone 16 Landmarks (Sinnoh Spear-Pillar Peaks & Twinleaf Glade — Gen 4 Pokémon)
+    landmark('spearpillar', 101, 180, 5, 3, { name: 'Spear Pillar Temple', text: '👑 Spear Pillar & the Hall of Origin! Marble flutes and a golden celestial arch shine beneath Mythical Arceus.' }, { ground: T.FLOOR, fx: 103 });
+    fountains[16] = landmark('pokecenter', 81, 188, 4, 3, { name: 'Sinnoh Pokémon Center' }, { ground: T.PLAZA, fx: 83 });
+    landmark('rowanlab', 87, 188, 5, 3, { name: "Professor Rowan's Sandgem Lab", text: "🔬 Professor Rowan's Evolution Research Lab! Studies on Turtwig, Chimchar, Piplup, Lucario and Sinnoh's ancient myths line the bookshelves." }, { ground: T.PLAZA, fx: 89 });
+    waypoints[16] = landmark('waypoint', 94, 196, 1, 1, { region: 16 }, { ground: T.PLAZA });
+    berryTree(82, 182, 'frost'); berryTree(110, 204, 'gold');
+
+    // 7. NPCs, Special Critter Spots, and Signs for Zones 14..16
+    D.NPCS.forEach((def, k) => { if (def.zone >= 14) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone >= 14) addSpecial(s); });
+    for (const [x, y, text] of [
+      [23, 160, '⬇ Goldenrod Magnet Bridge → 🔔 Johto Bell-Tower Groves & Ecruteak Lake (Gen 2 Pokémon!)'],
+      [63, 160, '⬇ Slateport Ocean Bridge → 🌴 Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Gen 3 Pokémon!)'],
+      [89, 160, '⬇ Cycling Road Sea Bridge → 👑 Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Gen 4 Pokémon!)'],
+      [26, 199, "🔔 Johto Region (Gen 2) — ⬆ Bell Tower & Lugia Roost · ↙ Suicune's Crystal Spring · ↘ Kurt's Apricorn Workshop"],
+      [58, 199, "🌴 Hoenn Region (Gen 3) — ⬆ Sky Pillar (Rayquaza) & Pokémon Center · ↙ Steven's Meteor Crater (Metagross) · ↘ Sootopolis Lagoon"],
+      [92, 199, "👑 Sinnoh Region (Gen 4) — ⬆ Sandgem Lab & Spear Pillar (Arceus) · ↙ Aura Dojo (Lucario) · ↘ Champion Cliff (Garchomp)"],
+    ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
+
+    // 8. Scatter trees, bushes & rocks across Zones 14..16
+    for (let y = H2; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = I(x, y);
+      const z = zone[i];
+      if (z < 14 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      const r = r4();
+      let kind = null, variant = null;
+      if (z === 14) {
+        if (r < 0.045) { kind = 'tree'; variant = r < 0.028 ? 'blossom' : 'oak'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.068) kind = 'rock';
+      } else if (z === 15) {
+        if (r < 0.045) { kind = 'tree'; variant = r < 0.03 ? 'palm' : 'oak'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.07) kind = 'rock';
+      } else if (z === 16) {
+        if (r < 0.045) { kind = 'tree'; variant = r < 0.03 ? 'pine' : 'crystal'; }
+        else if (r < 0.06) kind = 'bush';
+        else if (r < 0.07) kind = 'rock';
+      }
+      if (!kind || !safeToBlock(x, y)) continue;
+      addObj(kind, x, y, 1, 1, { variant: variant || (r4() * 3) | 0 });
+    }
+
+    // 9. Treasure chests: 1 special Master Star chest + 5 hidden chests per new zone (18 new chests -> 86 total)
+    for (const [x, y, where] of [
+      [13, 214, 'Whirl Island Cove'],
+      [68, 215, 'Sootopolis Coral Atoll'],
+      [109, 215, 'Spear Pillar Overlook'],
+    ]) {
+      const i = I(x, y);
+      if (objAt[i] >= 0) removeObj(objects[objAt[i]]);
+      road[i] = 0;
+      if (!WALK[ground[i]] || ground[i] === T.SHALLOW) ground[i] = T.GRASS;
+      chests.push(addObj('chest', x, y, 1, 1, { loot: { master: 1, gold: 100 }, where, special: true }));
+      clearRect(x - 1, y - 1, 3, 3); ensureWalk(x, y + 1, true);
+    }
+    bfs(start.x, start.y);
+    for (const z of [14, 15, 16]) {
+      const list = [];
+      for (let y = H2 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+        const i = I(x, y);
+        if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+        let blocked = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && !isOpen(x + dx, y + dy)) blocked++;
+        if (blocked >= 2) list.push([x, y, blocked]);
+      }
+      for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(r4() * (k + 1)); const tmp = list[k]; list[k] = list[j]; list[j] = tmp; }
+      list.sort((a, b) => b[2] - a[2] + (r4() - 0.5) * 3);
+      let placed = 0;
+      for (const [x, y] of list) {
+        if (placed >= 5) break;
+        if (chests.some(c => Math.abs(c.x - x) + Math.abs(c.y - y) < 7)) continue;
+        if (objAt[I(x, y)] >= 0 || !safeToBlock(x, y)) continue;
+        const kind = U.weighted(r4, D.CHEST_LOOT);
+        const loot = kind === 'gold' ? { gold: 40 + 5 * U.randInt(r4, 0, 14) } : kind === 'berry' ? { berry: U.randInt(r4, 3, 6) } : kind === 'rainbow' ? { rainbow: U.randInt(r4, 1, 3) } : { master: 1 };
+        chests.push(addObj('chest', x, y, 1, 1, { loot }));
+        placed++;
+      }
+    }
+
+    // 10. Decals across Zones 14..16
+    for (let y = H2; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = I(x, y);
+      if (zone[i] < 14 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      const z = zone[i], g = ground[i], r = r4();
+      let d = 0;
+      if (z === 14) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.PETAL : r < 0.08 ? DEC.FLOWER_Y : r < 0.1 ? DEC.SPARKLE : 0;
+        else if (g === T.PLAZA || g === T.PATH) d = r < 0.06 ? DEC.PETAL : 0;
+      } else if (z === 15) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.FLOWER_P : r < 0.07 ? DEC.FLOWER_B : r < 0.09 ? DEC.CLOVER : 0;
+        else if (g === T.SAND) d = r < 0.05 ? DEC.SHELL : r < 0.08 ? DEC.STARFISH : 0;
+        else if (g === T.SHALLOW) d = r < 0.2 ? DEC.LILY : 0;
+      } else if (z === 16) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.SHARD : r < 0.07 ? DEC.FLOWER_W : r < 0.1 ? DEC.SPARKLE : 0;
+        else if (g === T.FLOOR) d = r < 0.08 ? DEC.SPARKLE : 0;
       }
       decal[i] = d;
     }
@@ -1016,6 +1203,7 @@ const World = (() => {
     decals();
     if (H > H0) buildHonmoon();
     if (H > H1) buildSouthContinent();
+    if (H > H2) buildGen234Continent();
     repairs = repair();
     bfs(start.x, start.y);
     computeEdges();

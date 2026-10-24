@@ -5,9 +5,10 @@
 const CQData = (() => {
   const TILE = 48;
   const MAP_W = 120;
-  const MAP_H = 174;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13)
-  const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay exactly the same)
+  const MAP_H = 230;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13), rows 174..229 = Grand Champion Continent (Zones 14..16: Johto, Hoenn, Sinnoh)
+  const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay 100% identical)
   const MAP_H1 = 118;  // height of Rainbow + Honmoon Islands (Honmoon layout & RNG stay 100% intact)
+  const MAP_H2 = 174;  // height of Rainbow + Honmoon + Southern Continent (Zones 11..13 layout & RNG stay 100% intact)
   const MAP_VERSION = 1;
 
   /* Elemental "types" are pure flavor: they pick the attack visual + colors. */
@@ -214,6 +215,81 @@ const CQData = (() => {
     { id: 'mew', name: 'Mew', emoji: '✨', icon: 'mew', type: 'galaxy', rarity: 'legendary', color: '#ff94c8', ears: 'cat',
       move: 'Psychic Bubble', bubbles: ['✨', 'Mew~!', '🫧', '🌌'], hpB: 5, atkB: 4,
       desc: 'The mythical pink Mirage Pokémon of Kanto! It floats inside a glowing psychic bubble and giggles with pure joy.' },
+    /* ---- Zone 14: Johto Bell-Tower Groves & Ecruteak Lake (Generation 2 Pokémon) ---- */
+    { id: 'chikorita', name: 'Chikorita', emoji: '🍃', icon: 'chikorita', type: 'leaf', rarity: 'common', color: '#7cc35a', ears: 'leaf',
+      move: 'Razor Leaf', bubbles: ['🍃', 'Chiko~!', '🌿', '🌸'], hpB: 2, atkB: 2,
+      desc: 'A sweet Johto Grass starter who waves the big green leaf on its head to release a soothing springtime aroma!' },
+    { id: 'cyndaquil', name: 'Cyndaquil', emoji: '🔥', icon: 'cyndaquil', type: 'sun', rarity: 'common', color: '#ff7a33', ears: 'flame',
+      move: 'Flame Wheel', bubbles: ['🔥', 'Cynda!', '☀️', '✨'], hpB: 2, atkB: 3,
+      desc: 'A cozy, timid Johto Fire starter whose back flares up with warm golden flames whenever it gets excited!' },
+    { id: 'totodile', name: 'Totodile', emoji: '💧', icon: 'totodile', type: 'water', rarity: 'common', color: '#3fa9e8', ears: 'gator',
+      move: 'Water Gun', bubbles: ['💧', 'Toto-dile!', '🌊', '😆'], hpB: 2, atkB: 3,
+      desc: 'A bouncy blue Johto Water starter who never stops dancing, splashing, and playfully chomping at water droplets!' },
+    { id: 'togepi', name: 'Togepi', emoji: '🥚', icon: 'togepi', type: 'star', rarity: 'common', color: '#ffd84d', ears: 'crown',
+      move: 'Metronome Sparkle', bubbles: ['🥚', 'Toge-priii!', '⭐', '💖'], hpB: 3, atkB: 2,
+      desc: 'A cheerful baby egg Pokémon patterned with red and blue triangles who shares good luck with kind-hearted friends!' },
+    { id: 'marill', name: 'Marill', emoji: '🫧', icon: 'marill', type: 'water', rarity: 'common', color: '#4fa3ff', ears: 'mouse',
+      move: 'Aqua Tail', bubbles: ['🫧', 'Mari-marill!', '💦', '🎵'], hpB: 3, atkB: 2,
+      desc: 'The round blue Aqua Mouse Pokémon! Its bouncy tail floats like a lifebuoy in Ecruteak Lake.' },
+    { id: 'umbreon', name: 'Umbreon', emoji: '🌙', icon: 'umbreon', type: 'moon', rarity: 'uncommon', color: '#4a4468', ears: 'fox',
+      move: 'Moonlight Pulse', bubbles: ['🌙', 'Umbre~!', '✨', '💛'], hpB: 3, atkB: 3,
+      desc: 'Eevee\'s sleek Moonlight evolution! Its golden rings glow softly beneath the Ecruteak Bell Tower at night.' },
+    { id: 'suicune', name: 'Suicune', emoji: '❄️', icon: 'suicune', type: 'ice', rarity: 'rare', color: '#58c4f5', ears: 'crown',
+      move: 'Aurora Beam', bubbles: ['❄️', 'Suiii~!', '💎', '🌊'], hpB: 4, atkB: 4,
+      desc: 'The Aurora Pokémon of Johto! Anywhere Suicune bounds across the water, muddy streams turn crystal clear.' },
+    { id: 'lugia', name: 'Lugia', emoji: '🌊', icon: 'lugia', type: 'galaxy', rarity: 'legendary', color: '#7b93e8', ears: 'wings',
+      move: 'Aeroblast', bubbles: ['🌊', 'Luuu-gia!', '🌪️', '🌌'], hpB: 6, atkB: 4,
+      desc: 'The Legendary Guardian of the Seas! One gentle flap of Lugia\'s silver wings calms every storm across the Whirl Islands.' },
+    /* ---- Zone 15: Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Generation 3 Pokémon) ---- */
+    { id: 'treecko', name: 'Treecko', emoji: '🌿', icon: 'treecko', type: 'leaf', rarity: 'common', color: '#5cc45a', ears: 'leaf',
+      move: 'Leaf Blade', bubbles: ['🌿', 'Tree-cko!', '😎', '🍃'], hpB: 2, atkB: 3,
+      desc: 'A cool, calm Hoenn Wood Gecko starter who climbs the tallest tropical trees with its sticky toe pads!' },
+    { id: 'torchic', name: 'Torchic', emoji: '🔥', icon: 'torchic', type: 'sun', rarity: 'common', color: '#ff8533', ears: 'plume',
+      move: 'Ember Peck', bubbles: ['🔥', 'Tor-chic!', '🐤', '☀️'], hpB: 2, atkB: 3,
+      desc: 'A fluffy orange chick Pokémon with a warm fire sac in its belly — hugging Torchic feels like a cozy hot-water bottle!' },
+    { id: 'mudkip', name: 'Mudkip', emoji: '💦', icon: 'mudkip', type: 'water', rarity: 'common', color: '#45a8f5', ears: 'fin',
+      move: 'Mudkip Splash', bubbles: ['💦', 'Mud-kip!', '🌊', '💙'], hpB: 3, atkB: 2,
+      desc: 'Everyone loves Mudkip! The fin on its head senses ocean currents while it splashes in Hoenn\'s tropical lagoons.' },
+    { id: 'gardevoir', name: 'Gardevoir', emoji: '💖', icon: 'gardevoir', type: 'heart', rarity: 'uncommon', color: '#72d49a', ears: 'flower',
+      move: 'Moonblast', bubbles: ['💖', 'Garde~!', '🌸', '✨'], hpB: 3, atkB: 3,
+      desc: 'A graceful Embrace Pokémon in a flowing white gown who dances through flower fields and protects its friends with fairy light!' },
+    { id: 'milotic', name: 'Milotic', emoji: '🌈', icon: 'milotic', type: 'rainbow', rarity: 'uncommon', color: '#ff7ab8', ears: 'fin',
+      move: 'Prism Surf', bubbles: ['🌈', 'Milo~♪', '💧', '✨'], hpB: 4, atkB: 3,
+      desc: 'Celebrated as the most beautiful Pokémon in the sea! Its rainbow-scale tail shimmers like stained glass in Sootopolis Lagoon.' },
+    { id: 'absol', name: 'Absol', emoji: '🌙', icon: 'absol', type: 'moon', rarity: 'uncommon', color: '#6c6488', ears: 'cat',
+      move: 'Night Slash', bubbles: ['🌙', 'Ab-sol!', '⭐', '❄️'], hpB: 2, atkB: 4,
+      desc: 'A snowy-furred Hoenn Pokémon with a crescent horn who bounds down mountain trails to warn villagers before a storm!' },
+    { id: 'metagross', name: 'Metagross', emoji: '⚡', icon: 'metagross', type: 'thunder', rarity: 'rare', color: '#4f7fc8', ears: 'crown',
+      move: 'Meteor Mash', bubbles: ['⚡', 'META-GROSS!', '☄️', '💎'], hpB: 5, atkB: 4,
+      desc: 'Champion Steven Stone\'s supercomputer Pokémon! Four linked brains let Metagross levitate and solve any puzzle in a flash.' },
+    { id: 'rayquaza', name: 'Rayquaza', emoji: '🐉', icon: 'rayquaza', type: 'galaxy', rarity: 'legendary', color: '#2fb36d', ears: 'dragon',
+      move: 'Dragon Ascent', bubbles: ['🐉', 'KYAAA-SHAA!', '🌌', '⚡'], hpB: 6, atkB: 5,
+      desc: 'The Legendary Emerald Sky Dragon of Hoenn! It coils around the summit of Sky Pillar above the clouds.' },
+    /* ---- Zone 16: Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Generation 4 Pokémon) ---- */
+    { id: 'turtwig', name: 'Turtwig', emoji: '🌱', icon: 'turtwig', type: 'leaf', rarity: 'common', color: '#6cc04f', ears: 'leaf',
+      move: 'Leaf Storm', bubbles: ['🌱', 'Turt-wig!', '🍃', '☀️'], hpB: 3, atkB: 2,
+      desc: 'A cheerful Sinnoh Tiny Leaf turtle Pokémon! The little sprout on its head perks up whenever it drinks cool mountain water.' },
+    { id: 'chimchar', name: 'Chimchar', emoji: '🔥', icon: 'chimchar', type: 'sun', rarity: 'common', color: '#ff7033', ears: 'flame',
+      move: 'Flame Wheel', bubbles: ['🔥', 'Chim-char!', '🙊', '✨'], hpB: 2, atkB: 3,
+      desc: 'An acrobatic Sinnoh Chimp Pokémon with a fiery tail who loves doing backflips across rocky mountain ledges!' },
+    { id: 'piplup', name: 'Piplup', emoji: '🐧', icon: 'piplup', type: 'ice', rarity: 'common', color: '#4fa3ff', ears: 'crown',
+      move: 'Bubble Beam', bubbles: ['🐧', 'Pip-piplup!', '❄️', '🫧'], hpB: 3, atkB: 2,
+      desc: 'A proud little Sinnoh Penguin starter who puffs out its chest, waddles adorably, and dives through icy waves!' },
+    { id: 'shinx', name: 'Shinx', emoji: '⚡', icon: 'shinx', type: 'thunder', rarity: 'common', color: '#5898f5', ears: 'cat',
+      move: 'Spark Fang', bubbles: ['⚡', 'Shinx~!', '⭐', '🐾'], hpB: 2, atkB: 3,
+      desc: 'A blue electric lion cub Pokémon with a golden star on its tail that twinkles like a nightlight!' },
+    { id: 'buneary', name: 'Buneary', emoji: '🎀', icon: 'buneary', type: 'heart', rarity: 'common', color: '#d99b6c', ears: 'bunny',
+      move: 'Dizzy Bounce', bubbles: ['🎀', 'Bun-eary!', '💖', '🌸'], hpB: 2, atkB: 2,
+      desc: 'A fluffy Sinnoh rabbit Pokémon with cream cotton-puff ears that unroll with a joyful BOING!' },
+    { id: 'lucario', name: 'Lucario', emoji: '💠', icon: 'lucario', type: 'spirit', rarity: 'rare', color: '#3b78d6', ears: 'dog',
+      move: 'Aura Sphere', bubbles: ['💠', 'Haa-AURA!', '🐾', '✨'], hpB: 4, atkB: 4,
+      desc: 'The noble Aura Pokémon of Sinnoh! It senses the friendly hearts of every Critter and launches glowing blue Aura Spheres.' },
+    { id: 'garchomp', name: 'Garchomp', emoji: '🦈', icon: 'garchomp', type: 'golden', rarity: 'rare', color: '#4a5a9c', ears: 'fin',
+      move: 'Dragon Rush', bubbles: ['🦈', 'GAR-CHOMP!', '⚡', '👑'], hpB: 4, atkB: 5,
+      desc: 'Champion Cynthia\'s supersonic jet-dragon Pokémon! It zooms across Sinnoh\'s mountain peaks faster than the wind.' },
+    { id: 'arceus', name: 'Arceus', emoji: '👑', icon: 'arceus', type: 'golden', rarity: 'legendary', color: '#ffd23b', ears: 'crown',
+      move: 'Judgment Star', bubbles: ['👑', 'AR-CE-US!', '🌟', '🌌'], hpB: 6, atkB: 5,
+      desc: 'The Mythical Alpha Pokémon of Sinnoh! Crowned with a golden wheel of a thousand stars, it waits atop Spear Pillar Temple.' },
   ];
   SPECIES.forEach((s, i) => { s.num = i + 1; s.rate = RARITY[s.rarity].rate; });
   const SP = {};
@@ -252,10 +328,18 @@ const CQData = (() => {
     { id: 13, key: 'kanto', name: 'Kanto Classics Bay & Pallet Meadow', short: 'Kanto Bay', emoji: '⚡', rect: [78, 122, 114, 167], lv: [14, 20],
       color: '#ff5a5a', music: 'kanto', isNew: true,
       table: [['pikachu', 15], ['bulbasaur', 13], ['charmander', 13], ['squirtle', 13], ['jigglypuff', 11], ['psyduck', 10], ['eevee', 9], ['meowth', 8], ['gengar', 8]] },
+    { id: 14, key: 'johto', name: 'Johto Bell-Tower Groves & Ecruteak Lake (Gen 2)', short: 'Johto', emoji: '🔔', rect: [8, 178, 42, 223], lv: [16, 22],
+      color: '#f59e0b', music: 'johto', isNew: true,
+      table: [['chikorita', 18], ['cyndaquil', 18], ['totodile', 18], ['togepi', 16], ['marill', 16], ['umbreon', 14]] },
+    { id: 15, key: 'hoenn', name: 'Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Gen 3)', short: 'Hoenn', emoji: '🌴', rect: [45, 178, 75, 223], lv: [18, 24],
+      color: '#10b981', music: 'hoenn', isNew: true,
+      table: [['treecko', 18], ['torchic', 18], ['mudkip', 18], ['gardevoir', 16], ['milotic', 15], ['absol', 15]] },
+    { id: 16, key: 'sinnoh', name: 'Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Gen 4)', short: 'Sinnoh', emoji: '👑', rect: [78, 178, 114, 223], lv: [20, 26],
+      color: '#6366f1', music: 'sinnoh', isNew: true,
+      table: [['turtwig', 20], ['chimchar', 20], ['piplup', 20], ['shinx', 20], ['buneary', 20]] },
   ];
-  /* The official lands (fast-travel destinations); Crossroads is a bonus park. Honmoon Island (10) and the Southern Continent (11..13)
-     are reached over the golden bridges south of Sunshine Village and Honmoon Island. */
-  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13];
+  /* The official lands (fast-travel destinations); Crossroads is a bonus park. */
+  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16];
 
   /* Where each rare / legendary always waits (until caught) — so 100% CritterDex completion is always possible. */
   const SPECIAL_SPOTS = [
@@ -272,6 +356,13 @@ const CQData = (() => {
     { sp: 'snorlax', zone: 13, at: [80, 144], lv: 20, place: 'the Snorlax Footbridge' },
     { sp: 'charizard', zone: 13, at: [106, 130], lv: 22, place: 'Ember Volcano Peak' },
     { sp: 'mew', zone: 13, at: [104, 158], lv: 25, place: 'the Cerulean Mew Shrine' },
+    { sp: 'suicune', zone: 14, at: [18, 210], lv: 24, place: 'Ecruteak Crystal Spring' },
+    { sp: 'lugia', zone: 14, at: [22, 186], lv: 27, place: 'Whirl Island Lugia Roost' },
+    { sp: 'metagross', zone: 15, at: [52, 212], lv: 25, place: "Steven's Meteor Crater" },
+    { sp: 'rayquaza', zone: 15, at: [60, 185], lv: 28, place: 'Sky Pillar Summit' },
+    { sp: 'lucario', zone: 16, at: [86, 212], lv: 26, place: 'the Aura Training Dojo' },
+    { sp: 'garchomp', zone: 16, at: [106, 212], lv: 27, place: "Cynthia's Champion Cliff" },
+    { sp: 'arceus', zone: 16, at: [104, 185], lv: 30, place: 'Spear Pillar Temple' },
   ];
 
   const ITEMS = {
@@ -287,8 +378,8 @@ const CQData = (() => {
       lines: ['Good morning, Chuyu! 🌞 Did you sleep well?', 'If your Critters get sleepy, splash them at a 💖 Healing Fountain — or come home for a nap!', 'Here, take some snacks for your adventure! I love you! 💕'],
       gift: { berry: 5 }, after: ['Be careful and have fun, sweetie! Come home any time for a nap. 🏡'] },
     { id: 'prof', name: 'Professor Bubba', zone: 1, at: [63, 69], look: { skin: '#f5cfa5', hair: '#d9d9d9', hairStyle: 'short', shirt: '#ffffff', pants: '#5a7bd6', hat: 'elephant', coat: true, glasses: true },
-      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Fifty-six different Critters live across Rainbow Island, Honmoon Island, and the Southern Lands!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
-      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the bridges south of Honmoon Island to explore Derpy\'s Sanctum, Nightmare Carnival, and Kanto Classics Bay! 🐯🎪⚡'] },
+      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Eighty different Critters live across Rainbow Island, Honmoon Island, the Southern Lands, and the Grand Pokémon Continent (Johto, Hoenn & Sinnoh)!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
+      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the southern bridges to explore Johto 🔔, Hoenn 🌴, and Sinnoh 👑 for Generations 2, 3, and 4 Pokémon!'] },
     { id: 'shopkeeper', name: 'Shopkeeper Penny', zone: 1, at: [54, 76], look: { skin: '#e8b48a', hair: '#2b2b2b', hairStyle: 'ponytail', shirt: '#2fb39a', pants: '#3c4a6b', hat: 'none', apron: '#fff3c4' },
       lines: ['Welcome to the Capsule & Berry Shop! 🛒'], shop: true },
     { id: 'timmy', name: 'Timmy', zone: 1, at: [57, 74], look: { skin: '#ffe0c2', hair: '#e8b84a', hairStyle: 'spiky', shirt: '#ffb020', pants: '#3b6fd6', hat: 'none' },
@@ -376,6 +467,39 @@ const CQData = (() => {
       look: { skin: '#d99b6c', hair: '#3b2416', hairStyle: 'spiky', shirt: '#5c8a3a', pants: '#8a6d4b', hat: 'none' },
       lines: ['Hey there! Up on Ember Volcano Peak 🔥, a mighty ✨ Charizard 🐉 is warming its wings!', 'I cooked up a batch of sweet berry snacks for your team — take them! 🍓'],
       gift: { berry: 5 }, after: ['A well-fed Critter is a happy Critter! 🍓'] },
+    /* ---- Zone 14: Johto Bell-Tower Groves & Ecruteak Lake (Generation 2 Pokémon) ---- */
+    { id: 'profelm', name: 'Professor Elm', zone: 14, at: [29, 192],
+      look: { skin: '#f5cfa5', hair: '#6b4c35', hairStyle: 'short', shirt: '#38bdf8', pants: '#475569', hat: 'none', coat: true, glasses: true },
+      lines: ['Welcome to the Johto Region, Chuyu! 🔔🍁', 'Here in Ecruteak & New Bark Groves, Chikorita 🍃, Cyndaquil 🔥, Totodile 💧, Togepi 🥚, Marill 🫧 and Umbreon 🌙 play beneath golden maple leaves!', 'At the Ecruteak Crystal Spring, ✨ Suicune ❄️ purifies the water — and high on Whirl Island Roost, Legendary 👑 Lugia 🌊 guards the sea!'] },
+    { id: 'kurt', name: 'Apricorn Crafter Kurt', zone: 14, at: [32, 206],
+      look: { skin: '#ecc398', hair: '#d9d9d9', hairStyle: 'bald', shirt: '#b45309', pants: '#374151', hat: 'none', beard: true },
+      lines: ['Well now, a young trainer in Azalea Workshop! I craft special capsules out of Johto Apricorns! 🌰✨', 'Take these freshly polished Rainbow Capsules and sweet Johto berries for your adventure!'],
+      gift: { rainbow: 4, berry: 5 }, after: ['Nothing beats hand-crafted Apricorn capsules! 🌈'] },
+    { id: 'ethan', name: 'Ethan', zone: 14, at: [25, 187],
+      look: { skin: '#f3c79b', hair: '#1f2937', hairStyle: 'spiky', shirt: '#ef4444', pants: '#374151', hat: 'cap2' },
+      lines: ['Hey, Chuyu! Look up at the Ecruteak Bell Tower 🔔 and the Whirl Island Roost 🌊!', 'Lugia loves singing with trainers who treat their Critters kindly!'] },
+    /* ---- Zone 15: Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Generation 3 Pokémon) ---- */
+    { id: 'profbirch', name: 'Professor Birch', zone: 15, at: [53, 194],
+      look: { skin: '#e8b98a', hair: '#5c3d28', hairStyle: 'short', shirt: '#22c55e', pants: '#78553a', hat: 'none', coat: true, beard: true },
+      lines: ['Haha! Great to see you doing fieldwork in the Hoenn Tropics, Chuyu! 🌴🌺', 'Treecko 🌿, Torchic 🔥, Mudkip 💦, Gardevoir 💖, Milotic 🌈 and Absol 🌙 love our warm beaches and Secret Base Treehouses!'] },
+    { id: 'steven', name: 'Champion Steven Stone', zone: 15, at: [55, 211],
+      look: { skin: '#f7d8ba', hair: '#94a3b8', hairStyle: 'spiky', shirt: '#334155', pants: '#1e293b', hat: 'none' },
+      lines: ['Greetings, Chuyu. I am Steven Stone. I study rare glowing stones across Hoenn. 💎✨', 'Just west of me at the Meteor Crater waits my trusted steel companion, ✨ Metagross ⚡ — and atop Sky Pillar Summit coils the Legendary 👑 Rayquaza 🐉!', 'Please accept these rare gems and capsules for your quest.'],
+      gift: { gold: 200, rainbow: 3 }, after: ['In the end, the strongest trainers are those whose hearts shine like stardust. ✨'] },
+    { id: 'may', name: 'May', zone: 15, at: [64, 198],
+      look: { skin: '#ffd6b5', hair: '#6b3e26', hairStyle: 'pigtails', shirt: '#ef4444', pants: '#1e3a8a', hat: 'visor' },
+      lines: ['Hi Chuyu! Welcome to Sootopolis Lagoon! 🌈🌺', 'Look at the coral lagoon — Milotic and Mudkip love swimming around the tropical flowers!'] },
+    /* ---- Zone 16: Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Generation 4 Pokémon) ---- */
+    { id: 'profrowan', name: 'Professor Rowan', zone: 16, at: [89, 193],
+      look: { skin: '#ecc29b', hair: '#e5e7eb', hairStyle: 'short', shirt: '#2563eb', pants: '#374151', hat: 'none', coat: true, beard: true },
+      lines: ['Hmph! You have come a very long way, Chuyu. Welcome to the Sinnoh Region! 🏔️👑', 'Turtwig 🌱, Chimchar 🔥, Piplup 🐧, Shinx ⚡ and Buneary 🎀 thrive around Twinleaf Glade and Mount Coronet!'] },
+    { id: 'cynthia', name: 'Champion Cynthia', zone: 16, at: [101, 189],
+      look: { skin: '#fde2c8', hair: '#facc15', hairStyle: 'long', shirt: '#1e1b4b', pants: '#1f2937', hat: 'crown' },
+      lines: ['Welcome to Spear Pillar, Chuyu. I\'m Cynthia, Champion of the Sinnoh region. 👑✨', 'At the Aura Dojo to the southwest trains ✨ Lucario 💠, on the eastern cliff soars ✨ Garchomp 🦈, and right above us at Spear Pillar Temple shines the Mythical 👑 Arceus 🌟!', 'Take this Master Star Capsule and Rainbow Capsules — you have earned a Champion\'s blessing!'],
+      gift: { rainbow: 3, master: 1 }, after: ['Every bond you form with your 80 Critters makes the world brighter! 🌟'] },
+    { id: 'dawn', name: 'Dawn', zone: 16, at: [84, 206],
+      look: { skin: '#ffd8ba', hair: '#2563eb', hairStyle: 'pigtails', shirt: '#ec4899', pants: '#1f2937', hat: 'beanie2' },
+      lines: ['No need to worry! 🐧✨ Piplup, Buneary and I are practicing for the Sinnoh Super Contest!', 'Look right beside the Aura Dojo — ✨ Lucario 💠 is meditating by the crystal torches!'] },
   ];
 
   /* Chest contents are decided by world generation; these are the reward tiers. */
@@ -388,15 +512,15 @@ const CQData = (() => {
     'Tip: Feed a 🍓 berry before throwing a capsule: +45% catch chance!',
     'Tip: Attacks never knock a wild Critter out — they just get dizzy 🎯 and easier to catch!',
     'Tip: Press B for ⚡ roller-skate dash!',
-    'Tip: The 🗺️ Map can teleport you to any of the 12 lands in one tap!',
+    'Tip: The 🗺️ Map can teleport you to any of the 15 lands in one tap!',
     'Tip: Cross the Golden Honmoon Bridge south of Sunshine Village to meet the K-Pop Demon Hunters! 🎤',
     'Tip: Tap knocked-over flowerpots 🪴 in Derpy\'s Sanctum to pat them upright like Derpy Tiger!',
-    'Tip: Visit Nightmare Carnival 🎪 and Kanto Classics Bay ⚡ in the far south to catch Nightmare Critters & Gen 1 Pokémon!',
+    'Tip: Explore Johto 🔔, Hoenn 🌴 & Sinnoh 👑 in the far south to catch Gen 2, Gen 3 & Gen 4 Pokémon!',
   ];
 
   function maxHp(sp, lv) { return Math.round(18 + lv * 4 + sp.hpB * lv * 0.5); }
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
 })();
