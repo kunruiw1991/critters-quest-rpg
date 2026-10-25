@@ -129,3 +129,5 @@ const U = (() => {
 
   return { mulberry32, hash2, vnoise, fbm, clamp, lerp, easeOut, easeIn, easeInOut, easeOutBack, pick, weighted, randInt, MinHeap, astar, fmt, escapeHtml };
 })();
+if (typeof window !== 'undefined') window.U = U;
+

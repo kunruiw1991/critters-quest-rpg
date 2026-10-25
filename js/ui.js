@@ -93,8 +93,13 @@ const UI = (() => {
   function banner(reg) {
     if (!reg) return;
     const b = $('banner');
-    b.innerHTML = '<span class="be">' + reg.emoji + '</span><span class="bt">' + esc(reg.name) + '</span>';
-    b.style.setProperty('--c', reg.color);
+    if (typeof reg === 'string') {
+      b.innerHTML = '<span class="bt">' + esc(reg) + '</span>';
+      b.style.setProperty('--c', '#ffd84d');
+    } else {
+      b.innerHTML = '<span class="be">' + (reg.emoji || '🚪') + '</span><span class="bt">' + esc(reg.name || '') + '</span>';
+      b.style.setProperty('--c', reg.color || '#ffd84d');
+    }
     b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
     clearTimeout(bannerTimer);
     bannerTimer = setTimeout(() => b.classList.remove('show'), 2900);
@@ -112,12 +117,13 @@ const UI = (() => {
   }
   function dialog(speaker, lines, onDone) {
     if (dlgTimer) { clearInterval(dlgTimer); dlgTimer = null; }
-    dlg = { speaker, lines: lines.slice(), i: 0, onDone, typing: false, full: '', shown: 0 };
-    $('dlgName').textContent = speaker.name || '';
+    const normLines = Array.isArray(lines) ? lines.slice() : [String(lines || '')];
+    dlg = { speaker: speaker || { name: '' }, lines: normLines, i: 0, onDone, typing: false, full: '', shown: 0 };
+    $('dlgName').textContent = (speaker && speaker.name) || '';
     const face = $('dlgFace');
     face.innerHTML = '';
-    if (speaker.look) face.appendChild(personCanvas(speaker.look));
-    else face.textContent = speaker.emoji || '💬';
+    if (speaker && speaker.look) face.appendChild(personCanvas(speaker.look));
+    else face.textContent = (speaker && speaker.emoji) || '💬';
     $('dialog').classList.remove('hidden');
     document.body.classList.add('in-dialog');
     if (Game.mode === 'play') Game.mode = 'dialog';
@@ -199,12 +205,14 @@ const UI = (() => {
     const s = Game.state;
     if (!s || Game.mode === 'battle') return;
     if (!minimap) minimap = Art.renderMinimap(6);
-    const pct = (x, y) => 'left:' + ((x + 0.5) / World.W * 100).toFixed(2) + '%;top:' + ((y + 0.5) / World.H * 100).toFixed(2) + '%';
+    const ow = World.overworld || World;
+    const owW = ow.W || 120, owH = ow.H || 230;
+    const pct = (x, y) => 'left:' + ((x + 0.5) / owW * 100).toFixed(2) + '%;top:' + ((y + 0.5) / owH * 100).toFixed(2) + '%';
     let labels = '';
     const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105], 11: [22, 136], 12: [60, 158], 13: [98, 136], 14: [22, 192], 15: [60, 214], 16: [98, 192] };
-    for (let z = 1; z < D.REGIONS.length; z++) {
+    for (let z = 1; z < 17; z++) {
       const reg = D.REGIONS[z], st = regionStats(z);
-      if (!labelAt[z]) continue;
+      if (!reg || !labelAt[z]) continue;
       const habs = st.ids.map(id => '<img src="' + Art.portraitURL(id) + '" class="' + (s.team[id] ? 'got' : 'nope') + '" alt="" title="' + esc(D.SP[id].name) + '">').join('');
       const [lx, ly] = labelAt[z];
       const done = st.total > 0 && st.caught === st.total;
@@ -212,8 +220,15 @@ const UI = (() => {
         '<span class="ml-t">' + reg.emoji + ' ' + esc(reg.short) + '</span>' + (st.total ? '<span class="ml-c">' + (done ? '✅ ' : '🐾 ') + st.caught + '/' + st.total + '</span>' : '<span class="ml-c">🏡 Home</span>') +
         (habs ? '<span class="ml-h">' + habs + '</span>' : '') + '</button>';
     }
+    for (const o of (ow.objects || World.objects)) {
+      if (o.kind !== 'subportal') continue;
+      const visited = !!(s.subVisited && s.subVisited[o.submapId]);
+      labels += '<span class="map-pin subportal' + (visited ? ' visited' : '') + '" data-submap="' + esc(o.submapId) + '" title="' + esc((o.emoji || '🚪') + ' ' + (o.name || o.label || o.submapId)) + '" style="position:absolute;transform:translate(-50%,-50%);font-size:11px;pointer-events:none;z-index:2;' + pct(o.x, o.y) + '">' + (o.emoji || '🚪') + '</span>';
+    }
     const me = Game.player;
-    labels += '<div class="map-me" style="' + pct(me.x, me.y) + '"><i></i><span>Chuyu</span></div>';
+    const meX = (s.submap && Number.isInteger(s.submap.returnX)) ? s.submap.returnX : me.x;
+    const meY = (s.submap && Number.isInteger(s.submap.returnY)) ? s.submap.returnY : me.y;
+    labels += '<div class="map-me" style="' + pct(meX, meY) + '"><i></i><span>Chuyu</span></div>';
     let list = '';
     const tpz = D.MAIN_REGIONS.concat([9]);
     for (const z of tpz) {
@@ -222,20 +237,27 @@ const UI = (() => {
       const done = st.total > 0 && st.caught === st.total;
       const here = z === Game.zone, atCrystal = here && nearCrystal(z);
       const fresh = reg.isNew && !s.visited[z];
+      const zoneSubs = (World.submapList || []).filter(sm => sm.zoneId === z);
+      const subTxt = zoneSubs.length ? ' · 🚪 ' + zoneSubs.map(sm => (s.subVisited && s.subVisited[sm.id] ? '✅ ' : '') + esc(sm.name)).join(', ') : '';
       list += '<button class="map-tp' + (done ? ' done' : '') + (fresh ? ' fresh' : '') + '" data-tp="' + z + '" style="--c:' + reg.color + '"><span class="mt-e">' + reg.emoji + '</span><span class="mt-t"><b>' + (fresh ? '🆕 ' : '') + esc(reg.name) + '</b><small>' +
-        (st.total ? (done ? '✅ All ' + st.total + ' Critters caught!' : '🐾 ' + st.caught + '/' + st.total + ' Critters caught') : '🏡 Home sweet home') + ' · ' + (st.chests > 0 && st.opened === st.chests ? '🎁 All ' + st.chests + ' opened! ✨' : '🎁 ' + st.opened + '/' + st.chests) + (s.visited[z] ? ' · ✨ visited' : '') + '</small>' +
+        (st.total ? (done ? '✅ All ' + st.total + ' Critters caught!' : '🐾 ' + st.caught + '/' + st.total + ' Critters caught') : '🏡 Home sweet home') + ' · ' + (st.chests > 0 && st.opened === st.chests ? '🎁 All ' + st.chests + ' opened! ✨' : '🎁 ' + st.opened + '/' + st.chests) + subTxt + (s.visited[z] ? ' · ✨ visited' : '') + '</small>' +
         (habRow ? '<span class="mt-h">' + habRow + '</span>' : '') + '</span><span class="mt-go">' + (here ? (atCrystal ? '📍 At Crystal' : '📍 Re-center') : '✨ Teleport') + '</span></button>';
     }
     const caught = Object.keys(s.team).length;
-    const ar = (World.W / World.H).toFixed(4);
-    const html = '<div class="map-top"><span>📍 Chuyu is in <b>' + esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island') + '</b></span><span>📖 ' + caught + '/' + D.SPECIES.length + ' caught · 🎁 ' + Game.openedChests() + '/' + World.chests.length + ' chests</span></div>' +
-      '<div class="map-layout"><div class="map-col"><div class="map-wrap" style="--map-ar:' + ar + '"><div class="map-inner" id="mapInner" style="aspect-ratio:' + World.W + ' / ' + World.H + '"><canvas id="mapCanvas" width="' + minimap.width + '" height="' + minimap.height + '"></canvas>' + labels + '</div></div>' +
-      '<div class="map-legend">🎁 chest · 💖 healing fountain · 🔮 rainbow crystal · ⭐ rare Critter spot · 🔴 Chuyu · ✅ land complete</div></div>' +
+    const subVisitedCount = s.subVisited ? Object.keys(s.subVisited).filter(k => s.subVisited[k]).length : 0;
+    const totalSubs = (World.submapList && World.submapList.length) || 20;
+    const locLabel = World.activeSubmap
+      ? (World.activeSubmap.emoji || '🚪') + ' ' + esc(World.activeSubmap.name) + ' (' + esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island') + ')'
+      : esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island');
+    const ar = (owW / owH).toFixed(4);
+    const html = '<div class="map-top"><span>📍 Chuyu is in <b>' + locLabel + '</b></span><span>📖 ' + caught + '/' + D.SPECIES.length + ' caught · 🎁 ' + Game.openedChests() + '/' + World.chests.length + ' chests · 🚪 ' + subVisitedCount + '/' + totalSubs + ' sub-maps</span></div>' +
+      '<div class="map-layout"><div class="map-col"><div class="map-wrap" style="--map-ar:' + ar + '"><div class="map-inner" id="mapInner" style="aspect-ratio:' + owW + ' / ' + owH + '"><canvas id="mapCanvas" width="' + minimap.width + '" height="' + minimap.height + '"></canvas>' + labels + '</div></div>' +
+      '<div class="map-legend">🎁 chest · 💖 healing fountain · 🔮 rainbow crystal · 🚪 sub-map (' + subVisitedCount + '/' + totalSubs + ') · ⭐ rare Critter spot · 🔴 Chuyu · ✅ land complete</div></div>' +
       '<div class="map-regions">' + list + '</div></div>';
     openModal('map', '🗺️ World Map / Fast Travel <small>tap any land to teleport!</small>', html);
     const c = $('mapCanvas'), g = c.getContext('2d');
     g.drawImage(minimap, 0, 0);
-    const px = minimap.width / World.W;
+    const px = minimap.width / owW;
     for (const ch of World.chests) {
       if (ch.removed) continue;
       const open = !!s.chests[ch.key];
@@ -249,7 +271,17 @@ const UI = (() => {
       g.fillStyle = '#b44dff'; g.strokeStyle = '#fff'; g.lineWidth = 2;
       g.beginPath(); g.moveTo(x, y - 8); g.lineTo(x + 6, y); g.lineTo(x, y + 8); g.lineTo(x - 6, y); g.closePath(); g.fill(); g.stroke();
     }
-    for (const sp of World.specials) {
+    for (const o of (ow.objects || World.objects)) {
+      if (o.kind !== 'subportal') continue;
+      const x = (o.x + 0.5) * px, y = (o.y + 0.5) * px;
+      const visited = !!(s.subVisited && s.subVisited[o.submapId]);
+      g.fillStyle = visited ? '#4cd964' : '#00e5ff';
+      g.strokeStyle = '#1b2838'; g.lineWidth = 1.8;
+      g.beginPath(); g.arc(x, y, 5.5, 0, Math.PI * 2); g.fill(); g.stroke();
+      g.fillStyle = '#ffffff';
+      g.beginPath(); g.arc(x, y, 2, 0, Math.PI * 2); g.fill();
+    }
+    for (const sp of (ow.specials || World.specials)) {
       if (s.team[sp.sp]) continue;
       g.fillStyle = '#fff36b'; g.strokeStyle = '#b8860b'; g.lineWidth = 1.5;
       Art.helpers.star(g, (sp.x + 0.5) * px, (sp.y + 0.5) * px, 8, 3.5, 5); g.fill(); g.stroke();
@@ -257,13 +289,14 @@ const UI = (() => {
     $('modalBody').querySelectorAll('[data-tp]').forEach(b => b.addEventListener('click', ev => { ev.stopPropagation(); teleport(+b.dataset.tp); }));
     c.addEventListener('click', ev => {
       const r = c.getBoundingClientRect();
-      const tx = Math.floor((ev.clientX - r.left) / r.width * World.W), ty = Math.floor((ev.clientY - r.top) / r.height * World.H);
-      const z = World.zoneAt(tx, ty);
+      const tx = Math.floor((ev.clientX - r.left) / r.width * owW), ty = Math.floor((ev.clientY - r.top) / r.height * owH);
+      const z = (ow.zone && tx >= 0 && ty >= 0 && tx < owW && ty < owH) ? ow.zone[ty * owW + tx] : World.zoneAt(tx, ty);
       if (z) teleport(z);
     });
   }
   function crystalOf(z) { return z === 9 ? { x: 58, y: 47 } : World.waypoints[z]; }
   function nearCrystal(z) {
+    if (Game.state && Game.state.submap) return false;
     const c = crystalOf(z), p = Game.player;
     return !!c && Math.abs(p.x - c.x) <= 3 && Math.abs(p.y - c.y) <= 3;
   }
@@ -276,7 +309,7 @@ const UI = (() => {
   /* ---------------- CritterDex ---------------- */
   function habitatsOf(id) {
     const out = [];
-    for (let z = 1; z < D.REGIONS.length; z++) { const reg = D.REGIONS[z]; if (reg.table.some(e => e[0] === id)) out.push(z); }
+    for (let z = 1; z < D.REGIONS.length; z++) { const reg = D.REGIONS[z]; if (reg && reg.table && reg.table.some(e => e[0] === id)) out.push(z); }
     D.SPECIAL_SPOTS.forEach(s => { if (s.sp === id && out.indexOf(s.zone) < 0) out.push(s.zone); });
     D.NPCS.forEach(n => { if (n.join === id && out.indexOf(n.zone) < 0) out.push(n.zone); });
     return out;
@@ -451,6 +484,9 @@ const UI = (() => {
     const s = Game.state;
     if (!s || Game.mode === 'battle') return;
     const st = s.stats;
+    const subVisitedCount = s.subVisited ? Object.keys(s.subVisited).filter(k => s.subVisited[k]).length : 0;
+    const bossesCount = s.bosses ? Object.keys(s.bosses).filter(k => s.bosses[k]).length : 0;
+    const totalSubs = (World.submapList && World.submapList.length) || 20;
     const html = '<div class="menu-grid">' +
       '<button class="big-btn" id="mSound">' + (Sound.muted ? '🔇 Sound is OFF — turn on' : '🔊 Sound is ON — turn off') + '</button>' +
       '<button class="big-btn green" id="mSave">💾 Save now</button>' +
@@ -459,6 +495,7 @@ const UI = (() => {
       '<div class="stats-box"><h4>📊 Chuyu\'s Adventure</h4><ul>' +
       '<li>🐾 Critters caught: <b>' + Object.keys(s.team).length + '/' + D.SPECIES.length + '</b></li>' +
       '<li>🎁 Chests opened: <b>' + Game.openedChests() + '/' + World.chests.length + '</b></li>' +
+      '<li>🚪 Sub-maps explored: <b>' + subVisitedCount + '/' + totalSubs + '</b> · 👑 Guardians: <b>' + bossesCount + '/' + totalSubs + '</b></li>' +
       '<li>⚔️ Battles: <b>' + st.battles + '</b> · ⭐ Level-ups: <b>' + st.levelUps + '</b></li>' +
       '<li>👣 Steps: <b>' + U.fmt(st.steps) + '</b> · ⏱️ Play time: <b>' + fmtTime(st.playMs) + '</b></li>' +
       '<li>🗺️ Lands visited: <b>' + D.MAIN_REGIONS.filter(z => s.visited[z]).length + '/' + D.MAIN_REGIONS.length + '</b></li>' +

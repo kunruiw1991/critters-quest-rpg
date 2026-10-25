@@ -4,9 +4,18 @@
  * overworld critters, interactions, encounters, saving, and a test API.
  * ========================================================================== */
 const Game = (() => {
-  const D = CQData, T = World.T, TS = 48, W = World.W, H = World.H;
+  const D = CQData, T = World.T, TS = 48;
+  let W = World.W, H = World.H;
+  function syncDims() { W = World.W; H = World.H; }
   const SAVE_KEY = 'critterQuestRPG_v1';
   const DV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  function normDir(d) {
+    if (d === 0) return 'down';
+    if (d === 1) return 'left';
+    if (d === 2) return 'right';
+    if (d === 3) return 'up';
+    return DV[d] ? d : 'down';
+  }
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
   const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9 };
 
@@ -34,7 +43,8 @@ const Game = (() => {
       seen: { [starter]: true },
       inv: { gold: 100, berry: 5, rainbow: 2, master: 0 },
       pos: { x: World.start.x, y: World.start.y, dir: 'down' },
-      chests: {}, trees: {}, gifts: {}, pots: {}, visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
+      chests: {}, subChests: {}, trees: {}, gifts: {}, pots: {}, bosses: {}, subVisited: {}, submap: null,
+      visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
       news: { honmoon: true, southlands: true, gen234: true },
     };
@@ -55,18 +65,40 @@ const Game = (() => {
       created: s.created || Date.now(), starter: D.SP[s.starter] ? s.starter : ids[0],
       partner: team[s.partner] ? s.partner : ids[0], team,
       seen: Object.assign({}, s.seen || {}), inv: Object.assign(base.inv, s.inv || {}),
-      chests: Object.assign({}, s.chests || {}), trees: Object.assign({}, s.trees || {}), gifts: Object.assign({}, s.gifts || {}), pots: Object.assign({}, s.pots || {}),
+      chests: Object.assign({}, s.chests || {}), subChests: Object.assign({}, s.subChests || {}),
+      trees: Object.assign({}, s.trees || {}), gifts: Object.assign({}, s.gifts || {}), pots: Object.assign({}, s.pots || {}),
+      bosses: Object.assign({}, s.bosses || {}), subVisited: Object.assign({}, s.subVisited || {}),
+      submap: (s.submap && typeof s.submap === 'object' && typeof s.submap.id === 'string' && World.submaps && World.submaps[s.submap.id]) ? (() => {
+        const sm = World.submaps[s.submap.id];
+        let sx = Number.isInteger(s.submap.x) ? s.submap.x : sm.entry.x;
+        let sy = Number.isInteger(s.submap.y) ? s.submap.y : sm.entry.y;
+        if (sx < 0 || sy < 0 || sx >= sm.W || sy >= sm.H || sm.reach[sy * sm.W + sx] !== 1) {
+          sx = sm.entry.x; sy = sm.entry.y;
+        }
+        return {
+          id: s.submap.id,
+          x: sx,
+          y: sy,
+          dir: normDir(s.submap.dir || sm.entry.dir),
+          returnX: Number.isInteger(s.submap.returnX) ? s.submap.returnX : (s.pos && Number.isInteger(s.pos.x) ? s.pos.x : (sm.entrance ? sm.entrance.x : World.start.x)),
+          returnY: Number.isInteger(s.submap.returnY) ? s.submap.returnY : (s.pos && Number.isInteger(s.pos.y) ? s.pos.y : (sm.entrance ? sm.entrance.y : World.start.y)),
+          returnDir: normDir(s.submap.returnDir || (s.pos && s.pos.dir) || 'down'),
+        };
+      })() : null,
       visited: Object.assign({ 1: true }, s.visited || {}), dash: !!s.dash, stats: Object.assign(base.stats, s.stats || {}),
       news: Object.assign({}, s.news || {}),
     });
     ids.forEach(id => { out.seen[id] = true; });
     ['gold', 'berry', 'rainbow', 'master'].forEach(k => { out.inv[k] = Math.max(0, Math.floor(Number(out.inv[k]) || 0)); });
-    if (s.mapV === D.MAP_VERSION && s.pos && World.inb(s.pos.x | 0, s.pos.y | 0) && World.walkable(s.pos.x | 0, s.pos.y | 0) && World.reach[World.I(s.pos.x | 0, s.pos.y | 0)]) {
+    const ow = World.overworld || World;
+    const owInb = (x, y) => x >= 0 && y >= 0 && x < ow.W && y < ow.H;
+    const owWalk = (x, y) => owInb(x, y) && ow.reach[y * ow.W + x] === 1;
+    if (s.mapV === D.MAP_VERSION && s.pos && owWalk(s.pos.x | 0, s.pos.y | 0)) {
       out.pos = { x: s.pos.x | 0, y: s.pos.y | 0, dir: DV[s.pos.dir] ? s.pos.dir : 'down' };
       if (Number.isInteger(s.pos.fx) && Number.isInteger(s.pos.fy)) { out.pos.fx = s.pos.fx; out.pos.fy = s.pos.fy; out.pos.fdir = DV[s.pos.fdir] ? s.pos.fdir : 'down'; }
-      if (s.lastHeal && World.inb(s.lastHeal.x | 0, s.lastHeal.y | 0) && World.walkable(s.lastHeal.x | 0, s.lastHeal.y | 0)) out.lastHeal = { x: s.lastHeal.x | 0, y: s.lastHeal.y | 0 };
+      if (s.lastHeal && owWalk(s.lastHeal.x | 0, s.lastHeal.y | 0)) out.lastHeal = { x: s.lastHeal.x | 0, y: s.lastHeal.y | 0 };
     } else if (s.mapV !== D.MAP_VERSION) {
-      out.chests = {}; out.trees = {}; out.pots = {};
+      out.chests = {}; out.subChests = {}; out.trees = {}; out.pots = {}; out.submap = null;
     }
     return out;
   }
@@ -77,7 +109,18 @@ const Game = (() => {
     if (!state) return false;
     if (playAcc > 0) { state.stats.playMs += Math.round(playAcc * 1000); playAcc = 0; }
     state.saved = Date.now();
-    state.pos = { x: player.x, y: player.y, dir: player.dir, fx: follower.x, fy: follower.y, fdir: follower.dir };
+    if (World.activeSubmap && state.submap) {
+      state.submap.x = player.x;
+      state.submap.y = player.y;
+      state.submap.dir = player.dir;
+      state.pos = {
+        x: Number.isInteger(state.submap.returnX) ? state.submap.returnX : World.start.x,
+        y: Number.isInteger(state.submap.returnY) ? state.submap.returnY : World.start.y,
+        dir: normDir(state.submap.returnDir || 'down'),
+      };
+    } else {
+      state.pos = { x: player.x, y: player.y, dir: player.dir, fx: follower.x, fy: follower.y, fdir: follower.dir };
+    }
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) { return false; }
     if (reason !== 'auto-quiet') UI.flashSave();
     return true;
@@ -128,6 +171,7 @@ const Game = (() => {
       else if (k === 'berry') msgs.push('+' + n + ' 🍓 Sweet Berr' + (n > 1 ? 'ies' : 'y'));
       else if (k === 'rainbow') msgs.push('+' + n + ' 🌈 Rainbow Capsule' + (n > 1 ? 's' : ''));
       else if (k === 'master') msgs.push('+' + n + ' 👑 Master Star Capsule' + (n > 1 ? 's' : '') + '!');
+      else if (k === 'star') msgs.push('+' + n + ' ⭐ Star Capsule' + (n > 1 ? 's' : ''));
     }
     UI.updateHUD();
     return msgs;
@@ -162,38 +206,53 @@ const Game = (() => {
   function wildAt(x, y) { for (const w of wilds) if (w.x === x && w.y === y) return w; return null; }
   function occupied(x, y) { return wildAt(x, y) || (player.x === x && player.y === y) || (follower.x === x && follower.y === y); }
   function pickSpecies(zone) {
+    const sm = World.activeSubmap;
+    if (sm && sm.wildPool && Array.isArray(sm.wildPool.table) && sm.wildPool.table.length) {
+      return U.weighted(rng, sm.wildPool.table);
+    }
     const reg = D.REGIONS[zone];
     if (!reg || !reg.table.length) return null;
     return U.weighted(rng, reg.table);
   }
   /* Core (common/uncommon) species of a zone that currently have no visible roaming Critter there. */
   function missingCore(zone) {
+    const sm = World.activeSubmap;
+    if (sm && sm.wildPool && Array.isArray(sm.wildPool.table)) {
+      return sm.wildPool.table.map(e => e[0]).filter(id => D.SP[id] && !wilds.some(w => w.sp === id));
+    }
     const reg = D.REGIONS[zone];
     if (!reg) return [];
     return reg.table.map(e => e[0]).filter(id => { const r = D.SP[id].rarity; return (r === 'common' || r === 'uncommon') && !wilds.some(w => w.zone === zone && w.sp === id); });
   }
   function wildLevel(spId, zone) {
-    const reg = D.REGIONS[zone], sp = D.SP[spId];
+    const sm = World.activeSubmap;
+    const sp = D.SP[spId];
+    if (sm && sm.wildPool && Array.isArray(sm.wildPool.lv)) {
+      return U.randInt(rng, sm.wildPool.lv[0], sm.wildPool.lv[1]);
+    }
+    const reg = D.REGIONS[zone];
     let lv = U.randInt(rng, reg.lv[0], reg.lv[1]);
     if (sp.rarity === 'rare') lv += 2;
     if (sp.rarity === 'legendary') lv = Math.max(lv, 18);
     return lv;
   }
   function spawnWild(zone, anchor) {
-    let tiles = World.spawnTiles[zone];
+    const sm = World.activeSubmap;
+    let tiles = sm ? (Array.isArray(World.spawnTiles) ? World.spawnTiles : (World.spawnTiles[zone] || [])) : World.spawnTiles[zone];
     if (!tiles || !tiles.length) return null;
-    if (anchor) {
+    if (anchor && !sm) {
       const near = nearTiles(zone, anchor.x, anchor.y);
       if (near.length) tiles = near;
     }
+    const minDist = sm ? 2 : (anchor ? 3 : 8);
     for (let tries = 0; tries < 60; tries++) {
       const i = tiles[(rng() * tiles.length) | 0];
       const x = i % W, y = (i / W) | 0;
-      if (Math.abs(x - player.x) + Math.abs(y - player.y) < (anchor ? 3 : 8)) continue;
+      if (Math.abs(x - player.x) + Math.abs(y - player.y) < minDist) continue;
       if (occupied(x, y) || World.specials.some(s => s.x === x && s.y === y)) continue;
       const miss = missingCore(zone);
       const sp = miss.length ? miss[0] : pickSpecies(zone);
-      if (!sp || D.SP[sp].rarity === 'legendary' && rng() < 0.6) continue;
+      if (!sp || (!sm && D.SP[sp].rarity === 'legendary' && rng() < 0.6)) continue;
       const w = { uid: wildUid++, sp, zone, x, y, px: x * TS, py: y * TS, hx: x, hy: y, lv: wildLevel(sp, zone), dir: 'down', mv: null, next: time + 0.5 + rng() * 2.5, bubble: null, bubbleT: 0, special: false, pause: 0, phase: rng() * 6 };
       wilds.push(w);
       return w;
@@ -202,7 +261,8 @@ const Game = (() => {
   }
   /* Spawn tiles that are on-screen around (x,y) on every device: |dx|,|dy| <= 5 and at least 2-3 tiles away. */
   function nearTiles(zone, x, y) {
-    return (World.spawnTiles[zone] || []).filter(i => {
+    const list = Array.isArray(World.spawnTiles) ? World.spawnTiles : (World.spawnTiles[zone] || []);
+    return list.filter(i => {
       const dx = Math.abs(i % W - x), dy = Math.abs(((i / W) | 0) - y);
       return dx <= 5 && dy <= 5 && Math.max(dx, dy) >= 3;
     });
@@ -224,9 +284,22 @@ const Game = (() => {
   }
   function initWilds() {
     wilds = []; respawns = [];
+    const sm = World.activeSubmap;
     for (const s of World.specials) {
-      if (state.team[s.sp]) continue;
-      wilds.push({ uid: wildUid++, sp: s.sp, zone: s.zone, x: s.x, y: s.y, px: s.x * TS, py: s.y * TS, hx: s.x, hy: s.y, lv: s.lv, dir: 'down', mv: null, next: 1e9, bubble: null, bubbleT: 0, special: true, pause: 0, phase: rng() * 6 });
+      const done = s.isBoss ? (state.bosses && state.bosses[s.key]) : state.team[s.sp];
+      if (done) continue;
+      wilds.push({
+        uid: wildUid++, sp: s.sp, zone: s.zone, x: s.x, y: s.y, px: s.x * TS, py: s.y * TS, hx: s.x, hy: s.y,
+        lv: s.lv, dir: 'down', mv: null, next: 1e9, bubble: null, bubbleT: 0, special: true,
+        isBoss: !!s.isBoss, boss: !!s.boss, key: s.key || null, title: s.title || null,
+        intro: s.intro || null, winLines: s.winLines || null, reward: s.reward || null, submapId: s.submapId || null,
+        pause: 0, phase: rng() * 6
+      });
+    }
+    if (sm) {
+      const maxW = (sm.wildPool && sm.wildPool.maxWilds) || 4;
+      for (let k = 0; k < maxW; k++) spawnWild(sm.zoneId);
+      return;
     }
     for (const z in ZONE_WILDS) {
       let k = 0;
@@ -237,6 +310,7 @@ const Game = (() => {
   }
   function updateWilds(dt) {
     for (let k = respawns.length - 1; k >= 0; k--) if (time >= respawns[k].at) { spawnWild(respawns[k].zone); respawns.splice(k, 1); }
+    const sm = World.activeSubmap;
     for (const w of wilds) {
       if (w.bubbleT > 0) { w.bubbleT -= dt; if (w.bubbleT <= 0) w.bubble = null; }
       else if (rng() < dt * 0.09) { const sp = D.SP[w.sp]; w.bubble = U.pick(rng, sp.bubbles); w.bubbleT = 2.4; }
@@ -256,12 +330,13 @@ const Game = (() => {
         const nx = w.x + DV[d][0], ny = w.y + DV[d][1];
         if (Math.abs(nx - w.hx) > 6 || Math.abs(ny - w.hy) > 6) continue;
         if (!World.inb(nx, ny) || World.zoneAt(nx, ny) !== w.zone || !World.walkable(nx, ny) || !World.reach[World.I(nx, ny)]) continue;
+        if (sm && nx === sm.entry.x && ny === sm.entry.y) continue;
         if (World.road[World.I(nx, ny)] && rng() < 0.7) continue;
         const g = World.groundAt(nx, ny);
         if (g === T.BRIDGE_H || g === T.BRIDGE_V || g === T.STONES) continue;
         if (occupied(nx, ny)) continue;
         const ob = World.objectAt(nx, ny);
-        if (ob && ob.kind === 'trampoline') continue;
+        if (ob && (ob.kind === 'trampoline' || ob.kind === 'subportal' || ob.kind === 'exitmat')) continue;
         w.mv = { fx: w.x, fy: w.y, t: 0, dur: 0.32 };
         w.dir = d; w.x = nx; w.y = ny;
         break;
@@ -272,6 +347,83 @@ const Game = (() => {
     const k = wilds.indexOf(w);
     if (k >= 0) wilds.splice(k, 1);
     if (respawn && !w.special) respawns.push({ zone: w.zone, at: time + 20 + rng() * 15 });
+  }
+
+  /* ---------------- sub-map transitions ---------------- */
+  function enterSubmap(submapId, opts) {
+    if (!state || !submapId) return false;
+    opts = opts || {};
+    const prevSub = state.submap;
+    const sm = World.setActiveSubmap(submapId);
+    if (!sm) return false;
+    const returnX = prevSub && Number.isInteger(prevSub.returnX) ? prevSub.returnX : (sm.entrance ? sm.entrance.x : player.x);
+    const returnY = prevSub && Number.isInteger(prevSub.returnY) ? prevSub.returnY : (sm.entrance ? sm.entrance.y : player.y);
+    const returnDir = prevSub && prevSub.returnDir ? prevSub.returnDir : (player.dir || 'down');
+    syncDims();
+    const hasCustomPos = opts.x != null && opts.y != null && World.inb(opts.x, opts.y) && World.walkable(opts.x, opts.y);
+    const ex = hasCustomPos ? opts.x : sm.entry.x;
+    const ey = hasCustomPos ? opts.y : sm.entry.y;
+    const edir = normDir(opts.dir != null ? opts.dir : sm.entry.dir);
+    state.submap = { id: sm.id, x: ex, y: ey, dir: edir, returnX, returnY, returnDir };
+    if (!state.subVisited) state.subVisited = {};
+    state.subVisited[sm.id] = true;
+    player.x = ex; player.y = ey; player.px = ex * TS; player.py = ey * TS;
+    player.dir = edir;
+    player.mv = null; player.path = []; player.target = null; dest = null; walkGoal = null; player.jump = 0;
+    clearInput();
+    placeFollowerBehind();
+    fx = []; parts = [];
+    initWilds();
+    snapCamera();
+    curZone = sm.zoneId;
+    const mReg = D.REGIONS[sm.musicZone || sm.zoneId] || D.REGIONS[sm.zoneId];
+    if (mReg && (mode === 'play' || mode === 'dialog' || mode === 'modal')) Sound.music(mReg.music);
+    if (!opts.silent) {
+      Sound.sfx('warp');
+      addFx('warp', player.px + 24, player.py + 24);
+      UI.banner({ emoji: sm.emoji || '🚪', name: sm.name, color: sm.color || (mReg && mReg.color) || '#ffd84d' });
+    }
+    encounterCooldown = 3;
+    graceUntil = time + 1.2;
+    UI.updateHUD();
+    save('auto-quiet');
+    return true;
+  }
+  function exitSubmap(silent) {
+    if (!state || (!World.activeSubmapId && !state.submap)) return false;
+    const sub = state.submap;
+    const sm = World.activeSubmap || (sub && World.submaps && World.submaps[sub.id]);
+    let rx = (sub && Number.isInteger(sub.returnX)) ? sub.returnX : (sm && sm.entrance ? sm.entrance.x : World.start.x);
+    let ry = (sub && Number.isInteger(sub.returnY)) ? sub.returnY : (sm && sm.entrance ? sm.entrance.y : World.start.y);
+    const rdir = normDir((sub && sub.returnDir) || 'down');
+    World.setActiveSubmap(null);
+    syncDims();
+    state.submap = null;
+    if (!World.inb(rx, ry) || !World.walkable(rx, ry)) {
+      rx = World.start.x; ry = World.start.y;
+    }
+    player.x = rx; player.y = ry; player.px = rx * TS; player.py = ry * TS;
+    player.dir = rdir;
+    player.mv = null; player.path = []; player.target = null; dest = null; walkGoal = null; player.jump = 0;
+    clearInput();
+    placeFollowerBehind();
+    fx = []; parts = [];
+    initWilds();
+    snapCamera();
+    const z = zoneHere();
+    curZone = z;
+    const reg = D.REGIONS[z];
+    if (reg && (mode === 'play' || mode === 'dialog' || mode === 'modal')) Sound.music(reg.music);
+    if (!silent) {
+      Sound.sfx('warp');
+      addFx('warp', player.px + 24, player.py + 24);
+      if (reg) UI.banner(reg);
+    }
+    encounterCooldown = 3;
+    graceUntil = time + 1.2;
+    UI.updateHUD();
+    save('auto-quiet');
+    return true;
   }
 
   /* ---------------- movement ---------------- */
@@ -294,7 +446,12 @@ const Game = (() => {
     follower.x = player.x; follower.y = player.y; follower.px = player.px; follower.py = player.py;
   }
   function stepDur() { return (state.dash || input.dashHeld) ? DASH_MS : WALK_MS; }
-  function tryStep(dir) {
+  function tryStep(a, b, c) {
+    let dir = a;
+    if (typeof a === 'number') {
+      dir = c || (a > 0 ? 'right' : a < 0 ? 'left' : b > 0 ? 'down' : 'up');
+    }
+    if (!DV[dir]) return false;
     player.dir = dir;
     const nx = player.x + DV[dir][0], ny = player.y + DV[dir][1];
     const w = wildAt(nx, ny);
@@ -302,6 +459,15 @@ const Game = (() => {
       if (time < graceUntil) return false;
       startWildBattle(w);
       return false;
+    }
+    const stepObj = World.objectAt(nx, ny);
+    if (stepObj && !stepObj.removed && (stepObj.act === 'subportal' || stepObj.act === 'submap')) {
+      enterSubmap(stepObj.submapId);
+      return true;
+    }
+    if (stepObj && !stepObj.removed && stepObj.act === 'exitmat') {
+      exitSubmap();
+      return true;
     }
     if (!World.walkable(nx, ny)) {
       if (player.bumpArmed) {
@@ -335,12 +501,17 @@ const Game = (() => {
     if (g === T.SHALLOW && (!mv || World.groundAt(mv.fx, mv.fy) !== T.SHALLOW)) { Sound.sfx('splash'); addFx('ripple', player.x * TS + 24, player.y * TS + 40); }
     if (g === T.STONES) { Sound.sfx('splash'); addFx('ripple', player.x * TS + 24, player.y * TS + 40); }
     const ob = World.objectAt(player.x, player.y);
+    if (ob && (ob.act === 'subportal' || ob.act === 'submap')) { enterSubmap(ob.submapId); return; }
+    if (ob && ob.act === 'exitmat') { exitSubmap(); return; }
     if (ob && ob.kind === 'trampoline' && !(mv && mv.arc)) { bounce(); return; }
     if (encounterCooldown > 0) encounterCooldown--;
     if (g === T.TALL) {
       addFx('rustle', player.x * TS + 24, player.y * TS + 30);
       Sound.sfx('rustle');
-      if (encounterCooldown <= 0 && D.REGIONS[z] && D.REGIONS[z].table.length && rng() < ENCOUNTER_RATE) { grassEncounter(z); return; }
+      const hasTable = World.activeSubmap
+        ? (World.activeSubmap.wildPool && World.activeSubmap.wildPool.table && World.activeSubmap.wildPool.table.length)
+        : (D.REGIONS[z] && D.REGIONS[z].table.length);
+      if (encounterCooldown <= 0 && hasTable && rng() < ENCOUNTER_RATE) { grassEncounter(z); return; }
     }
     if (player.path.length === 0 && player.target) {
       const tg = player.target;
@@ -443,7 +614,7 @@ const Game = (() => {
         const ni = ny * W + nx;
         if (seen[ni] || !World.walkable(nx, ny) || wildSet.has(ni)) continue;
         const ob = World.objectAt(nx, ny);
-        if (ob && ob.kind === 'trampoline') continue;
+        if (ob && (ob.kind === 'trampoline' || ob.kind === 'subportal' || ob.kind === 'exitmat')) continue;
         seen[ni] = 1; prev[ni] = c; q[t++] = ni;
       }
     }
@@ -517,6 +688,11 @@ const Game = (() => {
     return out;
   }
   function walkToTarget(tg, silent) {
+    if (tg.obj && player.x >= tg.obj.x && player.x < tg.obj.x + tg.obj.w && player.y >= tg.obj.y && player.y < tg.obj.y + tg.obj.h) {
+      player.path = []; player.target = null; dest = null;
+      useObject(tg.obj);
+      return true;
+    }
     const tiles = targetTiles(tg);
     if (tiles.some(([x, y]) => x === player.x && y === player.y)) { player.path = []; player.target = null; dest = null; faceAndInteract(tg); return true; }
     let b = bfsFrom(player.x, player.y);
@@ -556,6 +732,10 @@ const Game = (() => {
     if (mode !== 'play' || player.mv) return;
     const tx = player.x + DV[player.dir][0], ty = player.y + DV[player.dir][1];
     if (interactAt(tx, ty, false)) return;
+    const hereObj = World.objectAt(player.x, player.y);
+    if (hereObj && (hereObj.act === 'subportal' || hereObj.act === 'submap' || hereObj.act === 'exitmat')) {
+      if (useObject(hereObj)) return;
+    }
     const g = World.groundAt(player.x, player.y);
     if (g === T.TALL) UI.toast('Rustle rustle... 🌿 Walk around in tall grass to find Critters!');
     else UI.toast(U.pick(rng, ['Nothing here! Try tapping a chest 🎁, tree 🌳 or Critter 🐾', 'Explore! Every land hides chests and Critters ✨']));
@@ -572,7 +752,7 @@ const Game = (() => {
     }
     return false;
   }
-  function chestOpen(o) { return !!(state && state.chests[o.key]); }
+  function chestOpen(o) { return !!(state && ((state.chests && state.chests[o.key]) || (state.subChests && state.subChests[o.key]))); }
   function treeReady(o) { const t = state && state.trees[o.key]; return !t || (Date.now() - t) / 1000 >= TREE_REGROW; }
   function potUpright(o) { return !!(state && state.pots && state.pots[o.key]); }
   function doorX(o) { return o.kind === 'lab' ? o.x + 2 : o.x + 1; }
@@ -583,15 +763,33 @@ const Game = (() => {
       return true;
     }
     switch (o.act) {
+      case 'subportal':
+      case 'submap': {
+        return enterSubmap(o.submapId);
+      }
+      case 'exitmat': {
+        return exitSubmap();
+      }
       case 'chest': {
         if (chestOpen(o)) { UI.toast('This chest is empty. ✨ Find more treasure!'); Sound.sfx('bump'); return true; }
+        const isSubChest = !!(World.activeSubmap || String(o.key || '').startsWith('sub:'));
+        if (isSubChest) {
+          if (!state.subChests) state.subChests = {};
+          state.subChests[o.key] = Date.now();
+        }
         state.chests[o.key] = Date.now();
         state.stats.chests++;
         const msgs = giveItems(o.loot);
         Sound.sfx('chest'); setTimeout(() => Sound.sfx('coin'), 380);
         addFx('burst', o.x * TS + 24, o.y * TS + 18, '#ffd84d');
         addFx('text', o.x * TS + 24, o.y * TS - 6, msgs.join('  '));
-        UI.toast('🎁 Treasure! ' + msgs.join(' · ') + '  (' + openedChests() + '/' + World.chests.length + ' chests)');
+        if (isSubChest && World.activeSubmap) {
+          const smChests = World.activeSubmap.chests || [];
+          const smOpened = smChests.filter(c => chestOpen(c)).length;
+          UI.toast('🎁 Treasure! ' + msgs.join(' · ') + '  (' + smOpened + '/' + smChests.length + ' in ' + World.activeSubmap.name + ')');
+        } else {
+          UI.toast('🎁 Treasure! ' + msgs.join(' · ') + '  (' + openedChests() + '/' + World.chests.length + ' chests)');
+        }
         save('chest');
         return true;
       }
@@ -635,9 +833,11 @@ const Game = (() => {
       case 'heal': {
         healAll();
         const fx0 = o.x * TS + o.w * 24, fy0 = o.y * TS + o.h * 24;
-        let best = null, bd = Infinity;
-        for (const [x, y] of targetTiles({ obj: o })) { if (World.inb(x, y) && World.walkable(x, y) && World.reach[World.I(x, y)]) { const d = Math.abs(x - player.x) + Math.abs(y - player.y); if (d < bd) { bd = d; best = { x, y }; } } }
-        state.lastHeal = best || { x: player.x, y: player.y };
+        if (!World.activeSubmap) {
+          let best = null, bd = Infinity;
+          for (const [x, y] of targetTiles({ obj: o })) { if (World.inb(x, y) && World.walkable(x, y) && World.reach[World.I(x, y)]) { const d = Math.abs(x - player.x) + Math.abs(y - player.y); if (d < bd) { bd = d; best = { x, y }; } } }
+          state.lastHeal = best || { x: player.x, y: player.y };
+        }
         if (o.kind === 'ramen') { Sound.sfx('munch'); setTimeout(() => Sound.sfx('heal'), 420); } else Sound.sfx('heal');
         for (let k = 0; k < 8; k++) addFx('heart', fx0 - 30 + rng() * 60, fy0 - rng() * 30);
         if (o.kind === 'ramen') { addFx('text', fx0, o.y * TS - 10, '🍜 Slurp slurp!'); UI.toast('🍜 Slurp slurp! Yummy Honmoon ramen — all your Critters are full of energy! 💖'); }
@@ -658,13 +858,13 @@ const Game = (() => {
         return true;
       }
       case 'sign': {
-        UI.dialog({ name: o.name || (o.kind === 'mailbox' ? 'Mailbox' : 'Sign'), emoji: o.kind === 'mailbox' ? '📬' : o.kind === 'sign' ? '🪧' : '✨' }, [o.text || ('✨ ' + (o.name || 'A mysterious landmark.'))]);
+        UI.dialog({ name: o.name || o.title || (o.kind === 'mailbox' ? 'Mailbox' : 'Sign'), emoji: o.kind === 'mailbox' ? '📬' : o.kind === 'sign' ? '🪧' : '✨' }, [o.text || o.msg || ('✨ ' + (o.name || o.title || 'A mysterious landmark.'))]);
         return true;
       }
       case 'door': {
         if (o.kind === 'house') {
           UI.dialog({ name: "Chuyu's House", emoji: '🏡' }, ['Home sweet home! 🏡 Chuyu takes a cozy nap...', '💤 Zzz... Your Critters are fully rested and happy! 💖'], () => {
-            healAll(); state.lastHeal = { x: o.x + 1, y: o.y + o.h }; UI.updateHUD(); Sound.sfx('heal'); save('nap');
+            healAll(); if (!World.activeSubmap) state.lastHeal = { x: o.x + 1, y: o.y + o.h }; UI.updateHUD(); Sound.sfx('heal'); save('nap');
           });
         } else if (o.kind === 'lab') {
           const prof = World.npcs.find(n => n.id === 'prof');
@@ -717,7 +917,9 @@ const Game = (() => {
   function hideJoinedHeroes() {
     for (const n of World.npcs) if (n.join && state && state.team[n.join]) World.hideNPC(n);
   }
-  function openedChests() { return state && state.chests ? Object.keys(state.chests).length : 0; }
+  function openedChests() {
+    return state && state.chests ? Object.keys(state.chests).filter(k => state.chests[k] && !k.startsWith('sub:')).length : 0;
+  }
 
   /* ---------------- battles ---------------- */
   function startWildBattle(w) {
@@ -749,22 +951,45 @@ const Game = (() => {
     mode = 'play';
     encounterCooldown = 4;
     graceUntil = time + 1.5;
+    let bossWinInfo = null;
     if (res.entity) {
       const e = res.entity;
-      // Landmark rares/legendaries only leave their spot once they are actually caught.
-      const leave = res.outcome === 'caught' || (res.outcome === 'finished' && !e.special);
-      if (leave) removeWild(e, true);
+      const isBoss = !!(e.isBoss || e.boss);
+      const won = res.outcome === 'caught' || res.outcome === 'finished';
+      // Landmark rares/legendaries only leave their spot once they are actually caught; sub-map bosses leave once caught or defeated.
+      const leave = res.outcome === 'caught' || (res.outcome === 'finished' && (!e.special || isBoss));
+      if (leave) removeWild(e, !isBoss);
       else { e.pause = time + (e.special ? 5 : 3); e.next = time + 0.4; }
+      if (isBoss && won) {
+        if (!state.bosses) state.bosses = {};
+        const bKey = e.key || ('boss_' + (e.submapId || (World.activeSubmap && World.activeSubmap.id) || e.sp));
+        const firstWin = !state.bosses[bKey];
+        state.bosses[bKey] = true;
+        if (firstWin) {
+          const rMsgs = e.reward ? giveItems(e.reward) : [];
+          bossWinInfo = {
+            speaker: { name: e.title || (D.SP[e.sp] && D.SP[e.sp].name) || 'Guardian', emoji: (D.SP[e.sp] && D.SP[e.sp].emoji) || '👑' },
+            lines: (Array.isArray(e.winLines) ? e.winLines.slice() : [String(e.winLines || 'You befriended the Guardian!')]).concat(
+              rMsgs.length ? ['🎁 Guardian Blessing: ' + rMsgs.join(' · ') + '!'] : []
+            ),
+          };
+        }
+      }
     }
     if (res.outcome === 'wiped') {
+      if (World.activeSubmap || state.submap) exitSubmap(true);
       healAll();
       const h = state.lastHeal;
       teleportTo(h.x, h.y, true);
       UI.toast('💖 Your Critters had a rest at the Healing Fountain. All better!');
     }
     UI.updateHUD();
-    const reg = D.REGIONS[zoneHere()];
+    const mZone = World.activeSubmap ? (World.activeSubmap.musicZone || World.activeSubmap.zoneId) : zoneHere();
+    const reg = D.REGIONS[mZone];
     if (reg) Sound.music(reg.music, true);
+    if (bossWinInfo) {
+      UI.dialog(bossWinInfo.speaker, bossWinInfo.lines);
+    }
     // Level-up celebration on the overworld
     if (lvSnapshot) {
       const ups = Object.keys(state.team).filter(id => lvSnapshot[id] != null && state.team[id].lv > lvSnapshot[id]);
@@ -784,10 +1009,11 @@ const Game = (() => {
 
   /* ---------------- teleport ---------------- */
   function teleportTo(x, y, quiet, dir) {
+    if (typeof quiet === 'string' && !dir) { dir = quiet; quiet = true; }
     if (!state || !World.inb(x, y) || !World.walkable(x, y) || !World.reach[World.I(x, y)]) return false;
     if (!quiet) { addFx('warp', player.px + 24, player.py + 24); Sound.sfx('warp'); }
     player.x = x; player.y = y; player.px = x * TS; player.py = y * TS; player.mv = null; player.path = []; player.target = null; dest = null;
-    player.dir = dir || (y >= 75 ? 'up' : 'down');
+    player.dir = DV[dir] ? dir : (y >= 75 ? 'up' : 'down');
     placeFollowerBehind();
     snapCamera();
     const z = zoneHere();
@@ -798,6 +1024,12 @@ const Game = (() => {
   }
   function teleportToRegion(z) {
     if (!state) return false;
+    if (World.activeSubmap || state.submap) {
+      World.setActiveSubmap(null);
+      syncDims();
+      state.submap = null;
+      initWilds();
+    }
     if (z === 9) {
       for (let r = 0; r < 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
         const x = 58 + dx, y = 47 + dy;
@@ -848,7 +1080,7 @@ const Game = (() => {
   }
 
   /* ---------------- rendering ---------------- */
-  function sortKeyObj(o) { return o.kind === 'trampoline' ? o.y * TS : (o.y + o.h) * TS - 1; }
+  function sortKeyObj(o) { return (o.kind === 'trampoline' || o.kind === 'exitmat') ? o.y * TS : (o.y + o.h) * TS - 1; }
   function render() {
     const S = Art.S, tpx = Art.tpx;
     const ox = Math.round(cam.x * S), oy = Math.round(cam.y * S);
@@ -856,10 +1088,13 @@ const Game = (() => {
     const tx0 = Math.floor(cam.x / TS), ty0 = Math.floor(cam.y / TS);
     const tx1 = Math.ceil((cam.x + viewW) / TS), ty1 = Math.ceil((cam.y + viewH) / TS);
     const wf = Math.floor(time * 2.2) % 4, gf = Math.floor(time * 1.6) % 2;
+    const sm = World.activeSubmap;
+    const oobTile = sm ? (sm.borderTile != null ? sm.borderTile : T.CLIFF) : T.DEEP;
+    const oobPal = sm ? (sm.paletteId || sm.zoneId || 1) : 3;
     for (let ty = ty0; ty < ty1; ty++) {
       for (let tx = tx0; tx < tx1; tx++) {
         let spr;
-        if (tx < 0 || ty < 0 || tx >= W || ty >= H) spr = Art.tile(T.DEEP, 3, 0, wf, 0, 0);
+        if (tx < 0 || ty < 0 || tx >= W || ty >= H) spr = Art.tile(oobTile, oobPal, 0, wf, 0, 0);
         else {
           const i = ty * W + tx, g = World.ground[i];
           const v = (U.hash2(tx, ty, 9) * 4) | 0;
@@ -905,7 +1140,7 @@ const Game = (() => {
     drawParticles();
   }
   function drawObject(o) {
-    const def = Art.OBJ[o.kind];
+    const def = Art.OBJ[o.kind] || { box: [-6, -28, 60, 76] };
     if (!def) return;
     let st = '';
     if (o.kind === 'chest') st = chestOpen(o) ? 'open' : 'closed';
@@ -971,18 +1206,29 @@ const Game = (() => {
   }
   function drawWild(w) {
     const sp = D.SP[w.sp];
+    const isBoss = !!(w.isBoss || w.boss);
     const bob = (w.hop || 0) + Math.abs(Math.sin(time * 2.2 + w.phase)) * 2;
     const x = w.px + 24, y = w.py + 22 - bob;
     const fl = World.groundAt(w.x, w.y) === T.SHALLOW;
     ctx.fillStyle = fl ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.22)';
-    ctx.beginPath(); ctx.ellipse(w.px + 24, w.py + 42, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(w.px + 24, w.py + 42, isBoss ? 19 : 15, isBoss ? 6.5 : 5, 0, 0, Math.PI * 2); ctx.fill();
+    if (isBoss) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,216,77,' + (0.55 + 0.35 * Math.sin(time * 4)) + ')';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.ellipse(w.px + 24, w.py + 42, 21 + Math.sin(time * 4) * 2, 7.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
     if (fl) Art.drawMiniFloat(ctx, x, y + 15, 18, false, '#4fb3ff');
-    Art.drawMedallion(ctx, sp, x, y, 17, time);
+    Art.drawMedallion(ctx, sp, x, y, isBoss ? 19 : 17, time, isBoss ? { aura: true } : undefined);
     if (fl) Art.drawMiniFloat(ctx, x, y + 15, 18, true, '#4fb3ff');
     if (inTall(w.x, w.y) && !w.mv) tallOverlay(w.x, w.y, 35);
     const caught = !!state.team[w.sp];
-    const badge = (sp.rarity === 'legendary' ? '👑 ' : sp.rarity === 'rare' ? '★ ' : '') + (!caught ? 'NEW!' : '');
-    Art.nameTag(ctx, x, w.py + 52, sp.name + ' Lv' + w.lv, sp.color, badge.trim());
+    const badge = isBoss ? '👑 BOSS' : ((sp.rarity === 'legendary' ? '👑 ' : sp.rarity === 'rare' ? '★ ' : '') + (!caught ? 'NEW!' : '')).trim();
+    const label = (isBoss && w.title ? w.title : sp.name) + ' Lv' + w.lv;
+    Art.nameTag(ctx, x, w.py + 52, label, sp.color, badge);
     if (w.bubble) Art.bubble(ctx, x, y - 24, w.bubble);
   }
   function drawNPC(n) {
@@ -1110,6 +1356,14 @@ const Game = (() => {
   }
   function tapWorld(wx, wy) {
     if (!state || mode !== 'play') return false;
+    if (Number.isInteger(wx) && Number.isInteger(wy) && wx >= 0 && wy >= 0 && wx < W && wy < H) {
+      const tileObj = World.objectAt(wx, wy) || World.npcAtTile(wx, wy);
+      const pxObj = World.objectAt(Math.floor(wx / TS), Math.floor(wy / TS));
+      if (tileObj && !pxObj) {
+        wx = wx * TS + 24;
+        wy = wy * TS + 24;
+      }
+    }
     let best = null, bd = 34 * 34;
     for (const w of wilds) { const dx = wx - (w.px + 24), dy = wy - (w.py + 22); const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = w; } }
     if (best) {
@@ -1192,22 +1446,44 @@ const Game = (() => {
   /* ---------------- boot ---------------- */
   function startWith(s, isNew) {
     state = s;
+    World.setActiveSubmap(null);
+    syncDims();
     hideJoinedHeroes();
     document.body.classList.remove('at-title', 'in-battle');
     document.getElementById('title').classList.add('hidden');
-    player.x = s.pos.x; player.y = s.pos.y; player.dir = s.pos.dir || 'down';
-    player.px = player.x * TS; player.py = player.y * TS;
-    const p0 = s.pos;
-    if (Number.isInteger(p0.fx) && Number.isInteger(p0.fy) && Math.abs(p0.fx - player.x) + Math.abs(p0.fy - player.y) === 1 && World.walkable(p0.fx, p0.fy)) {
-      follower.x = p0.fx; follower.y = p0.fy; follower.px = p0.fx * TS; follower.py = p0.fy * TS; follower.dir = p0.fdir || 'down'; follower.mv = null;
-    } else placeFollowerBehind();
+    if (!isNew && s.submap && s.submap.id && World.submaps && World.submaps[s.submap.id]) {
+      const sm = World.setActiveSubmap(s.submap.id);
+      syncDims();
+      const sx = (Number.isInteger(s.submap.x) && World.inb(s.submap.x, s.submap.y) && World.walkable(s.submap.x, s.submap.y)) ? s.submap.x : sm.entry.x;
+      const sy = (Number.isInteger(s.submap.x) && World.inb(s.submap.x, s.submap.y) && World.walkable(s.submap.x, s.submap.y)) ? s.submap.y : sm.entry.y;
+      player.x = sx; player.y = sy; player.dir = normDir(s.submap.dir || sm.entry.dir);
+      player.px = player.x * TS; player.py = player.y * TS;
+      placeFollowerBehind();
+      if (!state.subVisited) state.subVisited = {};
+      state.subVisited[sm.id] = true;
+    } else {
+      state.submap = null;
+      player.x = s.pos.x; player.y = s.pos.y; player.dir = s.pos.dir || 'down';
+      player.px = player.x * TS; player.py = player.y * TS;
+      const p0 = s.pos;
+      if (Number.isInteger(p0.fx) && Number.isInteger(p0.fy) && Math.abs(p0.fx - player.x) + Math.abs(p0.fy - player.y) === 1 && World.walkable(p0.fx, p0.fy)) {
+        follower.x = p0.fx; follower.y = p0.fy; follower.px = p0.fx * TS; follower.py = p0.fy * TS; follower.dir = p0.fdir || 'down'; follower.mv = null;
+      } else placeFollowerBehind();
+    }
     snapCamera();
     initWilds();
     mode = 'play';
     curZone = 0;
     enterZone(zoneHere());
-    const reg0 = D.REGIONS[zoneHere()];
-    if (reg0) Sound.music(reg0.music, true);
+    if (World.activeSubmap) {
+      const sm = World.activeSubmap;
+      const mReg = D.REGIONS[sm.musicZone || sm.zoneId] || D.REGIONS[sm.zoneId];
+      if (mReg) Sound.music(mReg.music, true);
+      UI.banner({ emoji: sm.emoji || '🚪', name: sm.name, color: sm.color || (mReg && mReg.color) || '#ffd84d' });
+    } else {
+      const reg0 = D.REGIONS[zoneHere()];
+      if (reg0) Sound.music(reg0.music, true);
+    }
     UI.updateHUD();
     if (isNew) {
       save('new');
@@ -1253,6 +1529,7 @@ const Game = (() => {
     canvas = document.getElementById('world');
     ctx = canvas.getContext('2d');
     World.generate();
+    syncDims();
     resize();
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', () => setTimeout(resize, 200));
@@ -1280,13 +1557,20 @@ const Game = (() => {
 
   /* ---------------- public / test API ---------------- */
   const api = {
-    init, save, load, newAdventure, setPartner, addExp, healAll, giveItems, teleportToRegion, teleportTo, walkTo, tapWorld, interactFacing,
+    init, save, load, validate, newState, startWith, render, newAdventure, setPartner, addExp, healAll, giveItems,
+    teleportToRegion, teleportTo, enterSubmap, exitSubmap,
+    walkTo, tryStep, tapWorld, interactFacing,
     pressA, pressB, toggleDash, onBattleEnd, beginBattle, member, maxHpOf, partnerSp, openedChests,
+    getState() { return state; },
     get state() { return state; }, get mode() { return mode; }, set mode(m) { mode = m; }, get player() { return player; }, get wilds() { return wilds; },
     get time() { return time; }, get cam() { return cam; }, get zone() { return curZone; }, get follower() { return follower; },
     treeReady, chestOpen, potUpright,
     screenOf(tx, ty) { const r = canvas.getBoundingClientRect(); return [r.left + ((tx * TS + 24 - cam.x) * Art.S) / (canvas.width / r.width), r.top + ((ty * TS + 24 - cam.y) * Art.S) / (canvas.height / r.height)]; },
     pickStarter(id) { if (mode !== 'title' || !D.SP[id]) return false; UI.pickStarter(id); return true; },
   };
+  if (typeof window !== 'undefined') {
+    window.Game = api;
+    window.CritterQuest = api;
+  }
   return api;
 })();

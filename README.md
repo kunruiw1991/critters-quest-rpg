@@ -3,15 +3,51 @@
 🎮 **Play Live (GitHub Pages):** **[https://kunruiw1991.github.io/critters-quest-rpg/](https://kunruiw1991.github.io/critters-quest-rpg/)**
 
 A cozy, kid-friendly **2D classic RPG** — a Pokémon-style adventure where **Chuyu** explores a huge
-**120 × 230 tile world (27,600 tiles)** across **15 hand-themed lands** (Rainbow Island, **Honmoon Island** with the
-**K-Pop Demon Hunters** 🎤, **Derpy's Minhwa Sanctum** 🐯, the **Nightmare Critters Carnival** 🎪, **Kanto Classics Bay** ⚡,
-**Johto Bell-Tower Groves** 🔔, **Hoenn Sky-Pillar Tropics** 🌴, and **Sinnoh Spear-Pillar Peaks** 👑),
-makes friends with villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, and
+**120 × 230 tile world (27,600 tiles)** across **15 hand-themed lands + Rainbow Crossroads Park (`Zones 1..16`)** and **20 enterable embedded small maps** (cozy village halls, mushroom grottos, crystal caverns, sea-bottom coral cities, pirate shipwrecks, pharaoh tombs, glacier caves, moon dungeons, secret treehouses, K-Pop backstage lounges, underworld sanctums, Minhwa tiger dens, bathhouse steam grottos, funhouse mazes, and legendary Pokémon sanctums),
+makes friends with villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, battles 20 sub-map Bosses/Guardians, and
 **catches all 80 Critters** for the CritterDex!
 
 ![Chuyu's Critter Quest screenshot](screenshot.jpg)
 
-## 🆕 NEW: The Grand Pokémon Continent Expansion — Generations 2, 3 & 4 (Johto 🔔, Hoenn 🌴 & Sinnoh 👑)
+## 🚪🏰 NEW: 20 Enterable Embedded Small Maps Across All 16 Regions!
+
+| 🏡 Sunshine Cozy Village Hall (`submap_01`) | 🐚 Sea-Bottom Coral City (`submap_04`) | 🎤 Honmoon Backstage Idol Lounge (`submap_10`) | 🔥 Gwi-Ma's Underworld Sanctum (`submap_11`) |
+|---|---|---|---|
+| ![Sunshine Cozy Village Hall](screenshots/submap_01_village_hall.png) | ![Sea-Bottom Coral City](screenshots/submap_04_coral_city.png) | ![Honmoon Backstage Idol Lounge](screenshots/submap_10_idol_lounge.png) | ![Gwi-Ma's Underworld Sanctum](screenshots/submap_11_underworld_sanctum.png) |
+| **🧬 Kanto Cerulean Cave (`submap_15`)** | **✨ Sinnoh Hall of Origin Sanctum (`submap_20`)** | **⚔️ Standing Boss / Guardian Battle (Arceus)** | **🗺️ World Map with All 20 Sub-Map Pins** |
+| ![Kanto Cerulean Cave](screenshots/submap_15_cerulean_cave.png) | ![Sinnoh Hall of Origin Sanctum](screenshots/submap_20_hall_of_origin.png) | ![Standing Boss Battle](screenshots/submap_boss_battle.png) | ![World Map 20 Sub-Maps](screenshots/world_map_20_submaps.png) |
+
+Every region across the `120 × 230` overworld now features interactive **Sub-Map Entrances** (`🚪` doors, glowing caves, whirlpools, hatches, pyramid tombs, ladders, neon doors, underworld rifts, bathhouse curtains, and temple stairs). Walk onto an entrance, tap it, or press `A` (`Enter` / `Space` / `Z`) to step inside—and step onto the interior exit mat to return to the exact overworld entrance tile!
+
+- **20 Self-Contained Interior Maps (`20 × 16` to `26 × 20` tiles)** with custom color palettes (`Art.PAL[21..40]`), procedural furniture & interactive props, **40 interior treasure chests**, **20 friendly Host NPCs** who bestow a one-time gift, roaming thematic wild Critters, and **20 standing Boss / Guardian encounters** with custom battle intros and victory blessings!
+- **100% Reachability & Save Persistence**: Verified programmatically via `World.audit()` (`repairs === 0`, `unreachable.length === 0`) and `World.auditSubmaps()` (`count === 20`, `ok === true`, `unreachable.length === 0`), with full mid-dungeon save/reload persistence in `critterQuestRPG_v1`.
+
+| # | Sub-Map ID | Name & Emoji | Zone | Overworld Entrance `(x, y)` | Size `W × H` | Host NPC & Gift | Wild Critters | Standing Boss / Guardian |
+| :-: | :--- | :--- | :-: | :-: | :-: | :--- | :--- | :--- |
+| 1 | `submap_01` | 🏡 **Sunshine Cozy Village Hall** | Zone 1 | `(60, 67)` | `20 × 16` | **Elder Sunny** (`3 🍓, 2 ⭐, 50 🪙`) | DogDay, CatNap, Hoppy, Bobby | **Village Guardian Sunny** (`sunny`, Lv 8) |
+| 2 | `submap_02` | 🍄 **Whispering Mushroom Grotto** | Zone 2 | `(16, 78)` | `22 × 16` | **Herbalist Fern** (`4 🍓, 1 🌈, 60 🪙`) | PickyPiggy, Bobby, Mikey, Poppy | **Grotto Guardian Mikey** (`mikey`, Lv 10) |
+| 3 | `submap_03` | 💎 **Crystal Cavern** | Zone 4 | `(17, 37)` | `22 × 18` | **Crystal Sage Lyra** (`2 🌈, 2 ⭐, 80 🪙`) | CraftyCorn, Bobby, Poppy, Prism | **Prism Guardian CraftyCorn** (`prism`, Lv 13) |
+| 4 | `submap_04` | 🐚 **Sea-Bottom Coral City** | Zone 3 | `(98, 67)` | `24 × 18` | **Coral Diver Marina** (`2 🌈, 3 🍓, 75 🪙`) | JJ, Poppy, Bubba, Marill | **Coral King Bubba** (`bubba`, Lv 12) |
+| 5 | `submap_05` | 🏴‍☠️ **Pirate Shipwreck Hold** | Zone 5 | `(112, 35)` | `24 × 16` | **First Mate Barnaby** (`2 🌈, 2 ⭐, 110 🪙`) | Hoppy, KickinChicken, JJ, Thunderbolt | **Storm-Captain Thunderbolt** (`thunderbolt`, Lv 14) |
+| 6 | `submap_06` | 🏺 **Pyramid Pharaoh Tomb** | Zone 6 | `(15, 11)` | `24 × 18` | **Explorer Nile** (`2 🌈, 3 ⭐, 130 🪙`) | DogDay, SunnyFox, KickinChicken, Superstar | **Pharaoh Guardian Superstar** (`superstar`, Lv 16) |
+| 7 | `submap_07` | ❄️ **Glacier Ice Cavern** | Zone 7 | `(84, 13)` | `22 × 18` | **Skier Yukiko** (`2 🌈, 4 🍓, 120 🪙`) | Bubba, Huggy Wuggy, Aurora | **Aurora Guardian Fluff** (`aurora`, Lv 18) |
+| 8 | `submap_08` | 🌙 **Starlight Moon Dungeon** | Zone 8 | `(59, 12)` | `24 × 18` | **Astrologer Selene** (`3 🌈, 3 ⭐, 150 🪙`) | CatNap, LunaBat, Galaxy, Solar | **Moon-Sanctum Guardian Galaxy** (`galaxy`, Lv 21) |
+| 9 | `submap_09` | 🌳 **Crossroads Secret Treehouse** | Zone 9 | `(63, 45)` | `20 × 16` | **Scout Maple** (`2 🌈, 4 🍓, 100 🪙`) | DogDay, CatNap, Hoppy, Solar | **Canopy Guardian Solar** (`solar`, Lv 15) |
+| 10 | `submap_10` | 🎤 **Honmoon Backstage Idol Lounge** | Zone 10 | `(81, 101)` | `22 × 16` | **Manager Bobby** (`3 🌈, 4 🍓, 150 🪙`) | Derpy, Sussie, Abby, Mystery, Romance, Jinu | **Backstage Idol Leader Jinu** (`jinu`, Lv 19) |
+| 11 | `submap_11` | 🔥 **Gwi-Ma's Underworld Sanctum** | Zone 10 | `(90, 102)` | `24 × 18` | **Guardian Mentor Celine** (`1 👑, 3 🌈, 180 🪙`) | Gat Demon, Baby, Abby, Mystery, Jinu, Gwi-Ma | **Underworld Flame King Gwi-Ma** (`gwima`, Lv 24) |
+| 12 | `submap_12` | 🐯 **Derpy's Secret Tiger Den** | Zone 11 | `(23, 130)` | `22 × 16` | **Minhwa Painter Seojun** (`3 🌈, 4 🍓, 140 🪙`) | Derpy, Sussie, Flight Dokkaebi, Jeoseung, Gat-Derpy | **Secret Den Guardian Gat-Derpy** (`gatderpy`, Lv 20) |
+| 13 | `submap_13` | ♨️ **Bathhouse Steam Grotto** | Zone 11 | `(22, 148)` | `20 × 16` | **Bathhouse Auntie Bora** (`5 🍓, 2 🌈, 130 🪙`) | Water Demon, Derpy, Sussie, Jeoseung | **Steam-Spring Lord Water Demon** (`waterdemon`, Lv 19) |
+| 14 | `submap_14` | 🎪 **Nightmare Funhouse Maze** | Zone 12 | `(55, 133)` | `24 × 18` | **Ringmaster Trick** (`3 🌈, 3 ⭐, 160 🪙`) | Baba, Icky, Rabie, Allister, Poe, Touille, Maggie | **Mirror-Maze Ringmaster Simon Smoke** (`simon`, Lv 22) |
+| 15 | `submap_15` | 🧬 **Kanto Cerulean Cave** | Zone 13 | `(95, 155)` | `24 × 18` | **Professor Oak's Aide** (`1 👑, 3 🌈, 200 🪙`) | Pikachu, Eevee, Psyduck, Gengar, Snorlax, Mew | **Cerulean Sanctum Guardian Mew** (`mew`, Lv 26) |
+| 16 | `submap_16` | 🌋 **Volcano Magma Chamber** | Zone 13 | `(104, 129)` | `22 × 18` | **Volcano Tamer Blaine** (`3 🌈, 3 ⭐, 180 🪙`) | Charmander, Pikachu, Meowth, Gengar, Charizard | **Magma Core Guardian Charizard** (`charizard`, Lv 24) |
+| 17 | `submap_17` | 🌊 **Johto Whirl Islands Abyss** | Zone 14 | `(20, 185)` | `24 × 18` | **Tidal Sage Hiro** (`1 👑, 3 🌈, 220 🪙`) | Totodile, Marill, Umbreon, Suicune, Lugia | **Abyssal Roost Guardian Lugia** (`lugia`, Lv 28) |
+| 18 | `submap_18` | 🔔 **Bell Tower Sacred Attic** | Zone 14 | `(30, 188)` | `22 × 18` | **Bell Keeper Eusine** (`3 🌈, 4 ⭐, 200 🪙`) | Chikorita, Cyndaquil, Togepi, Umbreon, Suicune | **Sacred Bell Guardian Suicune** (`suicune`, Lv 27) |
+| 19 | `submap_19` | 🏛️ **Hoenn Sootopolis Underwater Temple** | Zone 15 | `(64, 204)` | `24 × 18` | **Champion Steven** (`1 👑, 4 🌈, 250 🪙`) | Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol | **Sky-Temple Guardian Rayquaza** (`rayquaza`, Lv 30) |
+| 20 | `submap_20` | ✨ **Sinnoh Hall of Origin Sanctum** | Zone 16 | `(103, 184)` | `26 × 20` | **Champion Cynthia** (`2 👑, 5 🌈, 300 🪙`) | Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp | **Alpha Creator Arceus** (`arceus`, Lv 32) |
+
+---
+
+## 🌟 The Grand Pokémon Continent Expansion — Generations 2, 3 & 4 (Johto 🔔, Hoenn 🌴 & Sinnoh 👑)
 
 | 🔔 Johto Bell-Tower Groves (Gen 2) | 🌴 Hoenn Sky-Pillar Tropics (Gen 3) | 👑 Sinnoh Spear-Pillar Peaks (Gen 4) |
 |---|---|---|

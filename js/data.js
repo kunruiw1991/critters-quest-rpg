@@ -518,9 +518,20 @@ const CQData = (() => {
     'Tip: Explore Johto 🔔, Hoenn 🌴 & Sinnoh 👑 in the far south to catch Gen 2, Gen 3 & Gen 4 Pokémon!',
   ];
 
+  window.CQSubmaps = window.CQSubmaps || [];
+  const SUBMAPS = window.CQSubmaps;
+  function registerSubmap(def) {
+    if (!def || !def.id) return;
+    const idx = SUBMAPS.findIndex(s => s.id === def.id || (def.index && s.index === def.index));
+    if (idx >= 0) SUBMAPS[idx] = def;
+    else SUBMAPS.push(def);
+    SUBMAPS.sort((a, b) => (a.index || 0) - (b.index || 0));
+  }
+
   function maxHp(sp, lv) { return Math.round(18 + lv * 4 + sp.hpB * lv * 0.5); }
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_VERSION, TYPES, RARITY, SPECIES, SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_VERSION, TYPES, RARITY, SPECIES, SP, BY_ID: SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, SUBMAPS, registerSubmap, maxHp, attackPower, expToNext };
 })();
+window.CQData = CQData;

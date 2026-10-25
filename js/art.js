@@ -259,8 +259,20 @@ const Art = (() => {
     c.fillStyle = '#5a3418';
     for (let k = 4; k < 48; k += 16) { if (horiz) { circ(c, k, 1.5, 1.2); c.fill(); circ(c, k, 46.5, 1.2); c.fill(); } else { circ(c, 1.5, k, 1.2); c.fill(); circ(c, 46.5, k, 1.2); c.fill(); } }
   }
+  function ensureSubmapPalettes() {
+    if (typeof CQData !== 'undefined' && Array.isArray(CQData.SUBMAPS)) {
+      for (const sm of CQData.SUBMAPS) {
+        if (!sm) continue;
+        const pid = sm.paletteId || (20 + (sm.index || 1));
+        if (!PAL[pid] && sm.palette) {
+          PAL[pid] = Object.assign({}, PAL[sm.zoneId || 1] || PAL[1], sm.palette);
+        }
+      }
+    }
+  }
   function cliffTile(c, z, v, edges) {
-    const p = z === 6 ? PAL[6] : z === 7 ? PAL[7] : GREY_CLIFF;
+    ensureSubmapPalettes();
+    const p = (z > 20 && PAL[z] && PAL[z].cliff) ? PAL[z] : (z === 6 ? PAL[6] : z === 7 ? PAL[7] : GREY_CLIFF);
     c.fillStyle = p.cliff; c.fillRect(0, 0, 48, 48);
     c.strokeStyle = p.cliffd; c.lineWidth = 2;
     const r = rnd(v * 71 + z);
@@ -342,6 +354,25 @@ const Art = (() => {
     c.quadraticCurveTo(x + s * 1.35, y - s * 1.45, x + s * 0.68, y - s * 1.6); c.closePath(); c.fill();
   }
   function floorTile(c, z, v, plaza) {
+    ensureSubmapPalettes();
+    if (z > 20 && PAL[z]) {
+      const p = PAL[z];
+      if (plaza && p.plaza) {
+        c.fillStyle = p.plaza; c.fillRect(0, 0, 48, 48);
+        c.fillStyle = p.plazal || 'rgba(255,255,255,.22)'; c.fillRect(0, 0, 24, 24); c.fillRect(24, 24, 24, 24);
+        c.strokeStyle = p.plazad || 'rgba(0,0,0,.2)'; c.lineWidth = 1.5;
+        c.strokeRect(0.75, 0.75, 22.5, 22.5); c.strokeRect(24.75, 0.75, 22.5, 22.5); c.strokeRect(0.75, 24.75, 22.5, 22.5); c.strokeRect(24.75, 24.75, 22.5, 22.5);
+        if (v === 0) { c.fillStyle = p.t3 || '#ffd84d'; star(c, 24, 24, 4.8, 2.1, 5); c.fill(); }
+        return;
+      }
+      if (!plaza && p.floor) {
+        c.fillStyle = p.floor; c.fillRect(0, 0, 48, 48);
+        c.fillStyle = p.floord || shade(p.floor, -18); c.fillRect(0, 0, 24, 24); c.fillRect(24, 24, 24, 24);
+        c.strokeStyle = 'rgba(255,255,255,.2)'; c.lineWidth = 1; c.strokeRect(0.5, 0.5, 47, 47);
+        if (v === 1) { c.fillStyle = p.t3 || '#fff4b0'; sparkle(c, 36, 12, 2.8); }
+        return;
+      }
+    }
     if (z === 10 || z === 11) return plaza ? honmoonPlaza(c, v) : stageFloor(c, v);
     if (z === 12 && !plaza) return stageFloor(c, v);
     if (plaza) {
@@ -399,10 +430,28 @@ const Art = (() => {
         c.fillStyle = 'rgba(255,255,255,.8)'; circ(c, ox - 0.9, oy + 4.3, 0.75); c.fill();
         if (v % 2) { c.fillStyle = 'rgba(255,214,90,.9)'; sparkle(c, ox + 9, oy - 2, 2.2); }
         break;
+      case DEC.RUNE || 17:
+        c.strokeStyle = 'rgba(244,63,94,.75)'; c.lineWidth = 1.4; circ(c, ox, oy, 5.5); c.stroke();
+        c.fillStyle = '#fb7185'; star(c, ox, oy, 4.2, 1.8, 4); c.fill();
+        break;
+      case DEC.PAW || 18:
+        c.fillStyle = 'rgba(56,189,248,.8)'; circ(c, ox, oy + 2, 3.2); c.fill();
+        for (const dx of [-3.5, 0, 3.5]) { circ(c, ox + dx, oy - 2.5, 1.5); c.fill(); }
+        break;
+      case DEC.CONFETTI || 19:
+        [['#f43f5e', -4, -3], ['#facc15', 4, -2], ['#38bdf8', 0, 4], ['#c084fc', 6, 3]].forEach(([col, dx, dy]) => {
+          c.fillStyle = col; c.fillRect(ox + dx, oy + dy, 3, 2);
+        });
+        break;
+      case DEC.CRYSTAL_GLOW || 20:
+        c.fillStyle = 'rgba(244,114,182,.85)'; star(c, ox, oy, 5, 2, 4); c.fill();
+        c.fillStyle = '#ffffff'; circ(c, ox, oy, 1.5); c.fill();
+        break;
       default: break;
     }
   }
   function renderTile(type, z, v, f, edges, d) {
+    ensureSubmapPalettes();
     const cv = mk(tpx, tpx), c = cv.getContext('2d');
     c.scale(S, S);
     switch (type) {
@@ -433,11 +482,11 @@ const Art = (() => {
   function tile(type, z, v, f, edges, d) {
     if (NO_VARIANT[type]) v = 0;
     if (type === T.BRIDGE_H || type === T.BRIDGE_V) z = 0;
-    // 16 zone slots (zones 0..10) and 32 decal slots (DEC 0..16) so zone 10 / PETAL / NOTE never collide
-    const key = ((((type * 16 + z) * 4 + v) * 4 + f) * 16 + edges) * 32 + d;
+    // 64 zone/palette slots (zones 0..40+) and 32 decal slots so sub-map palettes 21..40 never collide
+    const key = ((((type * 64 + z) * 4 + v) * 4 + f) * 16 + edges) * 32 + d;
     let cv = tileCache.get(key);
     if (!cv) {
-      if (tileCache.size > 1500) tileCache.clear();
+      if (tileCache.size > 2400) tileCache.clear();
       cv = renderTile(type, z, v, f, edges, d);
       tileCache.set(key, cv);
     }
@@ -1586,6 +1635,37 @@ const Art = (() => {
     secretbase: { box: [-16, -68, 224, 220], draw: drawSecretBase },
     spearpillar: { box: [-20, -96, 280, 248], draw: drawSpearPillar, anim: animSpearPillar },
     rowanlab: { box: [-16, -60, 272, 212], draw: drawRowanLab },
+    // Sub-Map Portals & Interior Props
+    subportal: { box: [-8, -28, 64, 78], draw: drawSubportal, anim: animSubportal },
+    exitmat: { box: [-6, -12, 60, 62], draw: drawExitmat, anim: animExitmat },
+    table: { box: [-4, -10, 56, 58], draw: drawInteriorProp },
+    bookshelf: { box: [-4, -28, 56, 76], draw: drawInteriorProp },
+    bed: { box: [-4, -14, 56, 62], draw: drawInteriorProp },
+    rug: { box: [0, 0, 48, 48], draw: drawInteriorProp },
+    torch: { box: [0, -24, 48, 72], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#ff9f43', 24, 8) },
+    barrel: { box: [0, -8, 48, 56], draw: drawInteriorProp },
+    crate: { box: [0, -8, 48, 56], draw: drawInteriorProp },
+    statue: { box: [-4, -32, 56, 80], draw: drawInteriorProp },
+    crystal_pillar: { box: [-4, -36, 56, 84], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#c084fc', 24, 4) },
+    cauldron_pot: { box: [-4, -16, 56, 64], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#a855f7', 24, 12) },
+    pagoda_bell: { box: [-6, -34, 60, 82], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#fbbf24', 24, 2) },
+    whirlpool_vortex: { box: [-6, -6, 60, 60], draw: drawInteriorProp },
+    magma_vent: { box: [-4, -12, 56, 60], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#ef4444', 24, 16) },
+    stage_light: { box: [-4, -28, 56, 76], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#ff5fa8', 24, 2) },
+    minhwa_screen: { box: [-8, -28, 64, 76], draw: drawInteriorProp },
+    steam_vent: { box: [-4, -16, 56, 64], draw: drawInteriorProp },
+    mirror_arch: { box: [-6, -32, 60, 80], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#e879f9', 24, 6) },
+    origin_ring: { box: [-8, -36, 64, 84], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#fde047', 24, 2) },
+    throne: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    banner_stand: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    crystal_cluster: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    coral_arch: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    brazier: { box: [-6, -28, 60, 76], draw: drawInteriorProp, anim: (c, o, t) => animGlow(c, o, t, '#fb923c', 24, 10) },
+    counter: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    ice_pillar: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    telescope: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    arcade: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
+    torii_mini: { box: [-6, -28, 60, 76], draw: drawInteriorProp },
   };
   OBJ.pyramid.draw = drawPyramid;
 
@@ -1995,15 +2075,126 @@ const Art = (() => {
     for (const wx of [26, 62, 152, 188]) { rr(c, wx, 64, 26, 34, 4); c.fill(); }
   }
 
+  /* --- Sub-Map Portals, Exit Mats & Interior Props --- */
+  function drawSubportal(c, o) {
+    const st = (o && o.style) || 'door';
+    shadow(c, 24, 42, 20, 7, 0.28);
+    if (st === 'whirlpool' || st === 'temple_dive') {
+      c.fillStyle = st === 'temple_dive' ? '#047857' : '#0284c7'; ell(c, 24, 28, 20, 14); c.fill();
+      c.fillStyle = st === 'temple_dive' ? '#34d399' : '#38bdf8'; ell(c, 24, 28, 15, 10); c.fill();
+      c.fillStyle = '#e0f2fe'; ell(c, 24, 28, 9, 6); c.fill();
+      c.fillStyle = '#082f49'; ell(c, 24, 28, 5, 3.5); c.fill();
+    } else if (st === 'rift' || st === 'lava_tube') {
+      const col1 = st === 'rift' ? '#701a75' : '#7f1d1d';
+      const col2 = st === 'rift' ? '#f43f5e' : '#f97316';
+      c.fillStyle = col1; rr(c, 6, 4, 36, 40, 14); c.fill();
+      c.fillStyle = col2; rr(c, 11, 10, 26, 30, 10); c.fill();
+      c.fillStyle = '#fde047'; ell(c, 24, 25, 8, 11); c.fill();
+    } else if (st === 'cellar' || st === 'stair_down' || st === 'stair_up' || st === 'pagoda_stairs' || st === 'origin_stairs') {
+      const gold = st === 'origin_stairs' || st === 'pagoda_stairs';
+      c.fillStyle = gold ? '#b45309' : '#57534e'; rr(c, 4, 8, 40, 36, 6); c.fill();
+      c.fillStyle = gold ? '#fef08a' : '#292524'; rr(c, 8, 12, 32, 28, 4); c.fill();
+      for (let k = 0; k < 4; k++) {
+        c.fillStyle = gold ? (k % 2 ? '#facc15' : '#eab308') : (k % 2 ? '#78716c' : '#a8a29e');
+        c.fillRect(10, 14 + k * 6.5, 28, 5);
+      }
+    } else {
+      // Ornate archway / doorway / Hollow / funhouse / bath_curtain / neon_door / den / cave
+      const frameCol = st === 'neon_door' ? '#ec4899' : st === 'funhouse' ? '#9333ea' : st === 'bath_curtain' ? '#0284c7' : st === 'Hollow' ? '#78350f' : '#92400e';
+      const innerCol = st === 'neon_door' ? '#3b0764' : st === 'funhouse' ? '#4c1d95' : st === 'bath_curtain' ? '#38bdf8' : '#1e1b4b';
+      c.fillStyle = frameCol; rr(c, 6, 2, 36, 42, 14); c.fill();
+      c.fillStyle = innerCol; rr(c, 11, 7, 26, 35, 10); c.fill();
+      c.strokeStyle = '#fde047'; c.lineWidth = 2; rr(c, 8, 4, 32, 38, 12); c.stroke();
+      c.fillStyle = 'rgba(253,224,71,.75)'; star(c, 24, 18, 6, 2.6, 5); c.fill();
+    }
+  }
+  function animSubportal(c, o, t) {
+    const x = o.x * 48 + 24, y = o.y * 48 + 20;
+    const bob = Math.sin(t * 3.2 + o.x) * 3.5;
+    c.save();
+    c.globalAlpha = 0.55 + 0.35 * Math.sin(t * 3 + o.y);
+    c.strokeStyle = '#fde047'; c.lineWidth = 2.2;
+    ell(c, x, y + 12, 18 + Math.sin(t * 2.5) * 2, 8); c.stroke();
+    c.globalAlpha = 0.95;
+    c.fillStyle = '#fde047';
+    star(c, x, y - 22 + bob, 6.5, 2.8, 5); c.fill();
+    c.restore();
+  }
+  function drawExitmat(c, o) {
+    shadow(c, 24, 28, 22, 12, 0.25);
+    c.fillStyle = '#b45309'; rr(c, 4, 10, 40, 28, 7); c.fill();
+    c.fillStyle = '#f59e0b'; rr(c, 7, 13, 34, 22, 5); c.fill();
+    c.strokeStyle = '#fef08a'; c.lineWidth = 2; rr(c, 9, 15, 30, 18, 4); c.stroke();
+    // Return arrow emblem on mat
+    c.fillStyle = '#fffbeb';
+    c.beginPath(); c.moveTo(24, 30); c.lineTo(15, 20); c.lineTo(20, 20); c.lineTo(20, 16); c.lineTo(28, 16); c.lineTo(28, 20); c.lineTo(33, 20); c.closePath(); c.fill();
+  }
+  function animExitmat(c, o, t) {
+    const x = o.x * 48 + 24, y = o.y * 48 + 24;
+    c.save();
+    c.globalAlpha = 0.4 + 0.3 * Math.sin(t * 3.4);
+    c.strokeStyle = '#fef08a'; c.lineWidth = 2;
+    rr(c, x - 19, y - 12, 38, 24, 6); c.stroke();
+    c.restore();
+  }
+  function drawInteriorProp(c, o) {
+    const k = o.kind;
+    shadow(c, 24, 42, 18, 6, 0.22);
+    if (k === 'rug') {
+      c.fillStyle = '#be123c'; rr(c, 2, 6, 44, 36, 6); c.fill();
+      c.strokeStyle = '#fde047'; c.lineWidth = 2; rr(c, 6, 10, 36, 28, 4); c.stroke();
+      return;
+    }
+    if (k === 'bookshelf') {
+      c.fillStyle = '#78350f'; rr(c, 4, -18, 40, 60, 4); c.fill();
+      for (let row = 0; row < 3; row++) {
+        c.fillStyle = '#451a03'; c.fillRect(8, -12 + row * 18, 32, 14);
+        ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#a855f7'].forEach((col, i) => {
+          c.fillStyle = col; c.fillRect(10 + i * 6, -10 + row * 18, 5, 12);
+        });
+      }
+      return;
+    }
+    if (k === 'bed') {
+      c.fillStyle = '#78350f'; rr(c, 4, 6, 40, 38, 5); c.fill();
+      c.fillStyle = '#f8fafc'; rr(c, 8, 10, 32, 12, 3); c.fill();
+      c.fillStyle = '#ec4899'; rr(c, 8, 20, 32, 20, 4); c.fill();
+      return;
+    }
+    if (k === 'table') {
+      c.fillStyle = '#78350f'; c.fillRect(8, 26, 5, 16); c.fillRect(35, 26, 5, 16);
+      c.fillStyle = '#b45309'; rr(c, 4, 12, 40, 18, 5); c.fill();
+      c.fillStyle = '#d97706'; rr(c, 6, 14, 36, 12, 4); c.fill();
+      return;
+    }
+    if (k === 'torch' || k === 'stage_light') {
+      c.fillStyle = '#475569'; rr(c, 19, 8, 10, 34, 3); c.fill();
+      c.fillStyle = k === 'stage_light' ? '#ff5fa8' : '#f97316'; circ(c, 24, 4, 8); c.fill();
+      c.fillStyle = '#fef08a'; circ(c, 24, 4, 4); c.fill();
+      return;
+    }
+    if (k === 'crystal_pillar' || k === 'statue' || k === 'origin_ring' || k === 'pagoda_bell' || k === 'mirror_arch') {
+      c.fillStyle = '#cbd5e1'; rr(c, 10, 26, 28, 16, 4); c.fill();
+      c.fillStyle = k === 'origin_ring' || k === 'pagoda_bell' ? '#f59e0b' : '#a855f7';
+      rr(c, 14, -14, 20, 42, 8); c.fill();
+      c.fillStyle = '#fef08a'; star(c, 24, -4, 8, 3.5, 5); c.fill();
+      return;
+    }
+    // Default barrel / crate / decorative prop
+    c.fillStyle = '#92400e'; rr(c, 8, 10, 32, 32, 6); c.fill();
+    c.strokeStyle = '#fbbf24'; c.lineWidth = 2; rr(c, 10, 12, 28, 28, 4); c.stroke();
+  }
+
   function fenceMask(o) {
     let m = 0;
     const f = (x, y) => { const q = World.objectAt(x, y); return q && q.kind === 'fence'; };
     if (f(o.x, o.y - 1)) m |= 1; if (f(o.x + 1, o.y)) m |= 2; if (f(o.x, o.y + 1)) m |= 4; if (f(o.x - 1, o.y)) m |= 8;
     return m;
   }
+  const FALLBACK_OBJ_DEF = { box: [-4, -16, 56, 64], draw: drawInteriorProp };
   function objSprite(o, state) {
-    const def = OBJ[o.kind];
-    if (!def || def.noCache) return null;
+    const def = OBJ[o.kind] || FALLBACK_OBJ_DEF;
+    if (def.noCache) return null;
     let key = o.kind + '|' + (o.variant != null ? o.variant : '') + '|' + o.z + '|' + o.w + 'x' + o.h + '|' + (state || '') + '|' + (o.style || '') + '|' + (o.roof || '') + '|' + (o.hue != null ? o.hue : '') + '|' + (o.big ? 'b' : '');
     let mask = 0;
     if (o.kind === 'fence') { mask = fenceMask(o); key += '|' + mask; }
@@ -2019,14 +2210,34 @@ const Art = (() => {
     else if (o.kind === 'berrytree') drawBerryTree(c, o, o.z, state !== 'empty');
     else def.draw(c, o);
     spr = { cv, bx, by };
-    if (objCache.size > 600) objCache.clear();
+    if (objCache.size > 800) objCache.clear();
     objCache.set(key, spr);
     return spr;
   }
 
   /* ======================= PEOPLE ======================= */
   const CHUYU_LOOK = { skin: '#ffdcbc', hair: '#4a2c1a', hairStyle: 'short', shirt: '#3d8bfd', pants: '#2c4f8f', hat: 'cap', hatColor: '#ff4d4d', backpack: '#ffb020' };
+  const LOOK_PRESETS = {
+    elder: { skin: '#f6d2b0', hair: '#e2e8f0', hairStyle: 'short', shirt: '#7c3aed', pants: '#4c1d95', glasses: true },
+    gardener: { skin: '#ffd8b8', hair: '#854d0e', hairStyle: 'ponytail', shirt: '#ec4899', pants: '#15803d', hat: 'straw', apron: '#fef08a' },
+    wizard: { skin: '#fde2c8', hair: '#c084fc', hairStyle: 'long', shirt: '#4338ca', pants: '#312e81', hat: 'witch', hatColor: '#6d28d9', glow: '#c084fc' },
+    sailor: { skin: '#f4c69c', hair: '#1e3a8a', hairStyle: 'short', shirt: '#0284c7', pants: '#f8fafc', hat: 'cap', hatColor: '#38bdf8' },
+    scholar: { skin: '#ffd8b8', hair: '#451a03', hairStyle: 'short', shirt: '#0d9488', pants: '#334155', coat: true, glasses: true },
+    girl: { skin: '#ffe0c4', hair: '#db2777', hairStyle: 'pigtails', shirt: '#f472b6', pants: '#9d174d', bow: '#fde047' },
+    princess: { skin: '#ffe4cc', hair: '#fde047', hairStyle: 'long', shirt: '#a855f7', pants: '#6b21a8', crown: true, glow: '#fde047' },
+    boy: { skin: '#f5cba7', hair: '#78350f', hairStyle: 'spiky', shirt: '#ea580c', pants: '#431407', hat: 'bandana', hatColor: '#facc15' },
+    bobby: { skin: '#ffd8b8', hair: '#1e293b', hairStyle: 'short', shirt: '#ec4899', pants: '#1e1b4b', glasses: true },
+    celine: { skin: '#fde2c8', hair: '#312e81', hairStyle: 'long', shirt: '#fbbf24', pants: '#4c1d95', glow: '#fbbf24' },
+    chef: { skin: '#ffdcbc', hair: '#3f271d', hairStyle: 'bun', shirt: '#f97316', pants: '#334155', hat: 'chef', apron: '#ffffff' },
+    witch: { skin: '#f3e8ff', hair: '#9333ea', hairStyle: 'twintails', shirt: '#c026d3', pants: '#3b0764', hat: 'witch', hatColor: '#4c1d95' },
+    oak: { skin: '#f5d0b0', hair: '#94a3b8', hairStyle: 'short', shirt: '#dc2626', pants: '#475569', coat: true },
+    guard: { skin: '#f1c29b', hair: '#991b1b', hairStyle: 'spiky', shirt: '#dc2626', pants: '#1e293b', hat: 'bandana', hatColor: '#f97316' },
+    elm: { skin: '#ffdcbc', hair: '#78350f', hairStyle: 'short', shirt: '#d97706', pants: '#451a03', coat: true, glasses: true },
+    steven: { skin: '#fde6d2', hair: '#94a3b8', hairStyle: 'spiky', shirt: '#0f766e', pants: '#1e293b', glow: '#34d399' },
+    cynthia: { skin: '#fde6d2', hair: '#fde047', hairStyle: 'long', shirt: '#1e1b4b', pants: '#0f172a', crown: true, glow: '#facc15' }
+  };
   function drawPerson(c, look, dir, frame, opts) {
+    look = typeof look === 'string' ? (LOOK_PRESETS[look] || LOOK_PRESETS.scholar) : (look || CHUYU_LOOK);
     opts = opts || {};
     const walk = opts.moving ? (frame % 2 ? 1 : -1) : 0;
     const bob = opts.moving ? -Math.abs(walk) * 1.2 : 0;
@@ -2813,6 +3024,7 @@ const Art = (() => {
     const base = {};
     const icons = Array.from(new Set(CQData.SPECIES.map(s => s.icon)));
     const loads = icons.map(icon => new Promise(res => {
+      if (typeof Image === 'undefined') { base[icon] = null; res(false); return; }
       const img = new Image();
       let done = false;
       const finish = ok => { if (done) return; done = true; base[icon] = ok ? img : null; res(ok); };
@@ -2859,15 +3071,16 @@ const Art = (() => {
   }
   function hex(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
   function renderMinimap(px) {
-    const W = World.W, H = World.H;
+    const src = World.overworld || World;
+    const W = src.W, H = src.H;
     const cv = mk(W * px, H * px), c = cv.getContext('2d');
     const id = c.createImageData(W * px, H * px), d = id.data;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = World.I(x, y);
-      let col = minimapColor(World.ground[i], World.zone[i]);
-      const o = World.objAt[i];
+      const i = y * W + x;
+      let col = minimapColor(src.ground[i], src.zone[i]);
+      const o = src.objAt[i];
       if (o >= 0) {
-        const ob = World.objects[o];
+        const ob = src.objects[o];
         if (ob.kind === 'tree' || ob.kind === 'bush' || ob.kind === 'hedge') col = ob.variant === 'pine' ? [47, 100, 84] : ob.variant === 'moon' ? [70, 84, 160] : ob.variant === 'crystal' ? [200, 170, 240] : ob.variant === 'blossom' ? [255, 168, 206] : [44, 118, 52];
         else if (ob.kind === 'cactus') col = [46, 139, 87];
         else if (ob.kind === 'rock' || ob.kind === 'pillar') col = [150, 140, 130];
@@ -2898,6 +3111,7 @@ const Art = (() => {
         else if (ob.kind === 'belltower' || ob.kind === 'apricornshop') col = [245, 158, 11];
         else if (ob.kind === 'skypillar' || ob.kind === 'secretbase') col = [16, 185, 129];
         else if (ob.kind === 'spearpillar') col = [250, 204, 21];
+        else if (ob.kind === 'subportal') col = [253, 224, 71];
       }
       for (let yy = 0; yy < px; yy++) for (let xx = 0; xx < px; xx++) {
         const k = ((y * px + yy) * W * px + x * px + xx) * 4;

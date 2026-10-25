@@ -5,7 +5,8 @@
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const W = D.MAP_W, H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, N = W * H;
+  const OW_W = D.MAP_W, OW_H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, OW_N = OW_W * OW_H;
+  let W = OW_W, H = OW_H, N = OW_N;
   const HZ = 10; // Honmoon Island zone id
   const MAX_Z = 16; // Highest zone id (Zones 14..16 on the Grand Pokémon Continent)
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
@@ -15,7 +16,7 @@ const World = (() => {
   [T.SAND, T.GRASS, T.TALL, T.FLOWERS, T.SNOW].forEach(t => { SOLID[t] = 1; });
   const WATERLIKE = new Uint8Array(15);
   [T.DEEP, T.SHALLOW, T.STONES, T.BRIDGE_H, T.BRIDGE_V].forEach(t => { WATERLIKE[t] = 1; });
-  const DEC = { NONE: 0, SHELL: 1, STARFISH: 2, PEBBLE: 3, MUSH: 4, LILY: 5, FLOWER_P: 6, FLOWER_Y: 7, FLOWER_B: 8, SPARKLE: 9, SHARD: 10, TUFT: 11, CRACK: 12, CLOVER: 13, FLOWER_W: 14, PETAL: 15, NOTE: 16 };
+  const DEC = { NONE: 0, SHELL: 1, STARFISH: 2, PEBBLE: 3, MUSH: 4, LILY: 5, FLOWER_P: 6, FLOWER_Y: 7, FLOWER_B: 8, SPARKLE: 9, SHARD: 10, TUFT: 11, CRACK: 12, CLOVER: 13, FLOWER_W: 14, PETAL: 15, NOTE: 16, RUNE: 17, PAW: 18, CONFETTI: 19, CRYSTAL_GLOW: 20 };
   const DIRS4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
   const KIND = {
@@ -42,12 +43,27 @@ const World = (() => {
     belltower: { block: 1, act: 'sign' }, lugiaroost: { block: 1, act: 'sign' }, apricornshop: { block: 1, act: 'sign' },
     skypillar: { block: 1, act: 'sign' }, secretbase: { block: 1, act: 'sign' },
     spearpillar: { block: 1, act: 'sign' }, rowanlab: { block: 1, act: 'sign' },
+    // Sub-Map Portals & Interior Props
+    subportal: { block: 0, act: 'subportal' }, exitmat: { block: 0, act: 'exitmat' },
+    table: { block: 1, act: 'sign' }, bookshelf: { block: 1, act: 'sign' }, bed: { block: 1, act: 'heal' },
+    rug: { block: 0 }, torch: { block: 1 }, barrel: { block: 1 }, crate: { block: 1 },
+    statue: { block: 1, act: 'sign' }, crystal_pillar: { block: 1, act: 'sign' }, cauldron_pot: { block: 1, act: 'sign' },
+    pagoda_bell: { block: 1, act: 'sign' }, whirlpool_vortex: { block: 1, act: 'sign' }, magma_vent: { block: 1, act: 'sign' },
+    stage_light: { block: 1 }, minhwa_screen: { block: 1, act: 'sign' }, steam_vent: { block: 1 },
+    mirror_arch: { block: 1, act: 'sign' }, origin_ring: { block: 1, act: 'sign' },
+    throne: { block: 1, act: 'sign' }, banner_stand: { block: 1, act: 'sign' }, crystal_cluster: { block: 1, act: 'sign' },
+    coral_arch: { block: 1, act: 'sign' }, brazier: { block: 1 }, counter: { block: 1, act: 'sign' },
+    ice_pillar: { block: 1, act: 'sign' }, telescope: { block: 1, act: 'sign' }, arcade: { block: 1, act: 'sign' },
+    torii_mini: { block: 1, act: 'sign' },
   };
 
-  const ground = new Uint8Array(N), zone = new Uint8Array(N), decal = new Uint8Array(N);
-  const road = new Uint8Array(N), clear = new Uint8Array(N), front = new Uint8Array(N), reach = new Uint8Array(N), edge = new Uint8Array(N);
-  const objAt = new Int16Array(N), anchorAt = new Int16Array(N), npcAt = new Int16Array(N);
+  const owGround = new Uint8Array(OW_N), owZone = new Uint8Array(OW_N), owDecal = new Uint8Array(OW_N);
+  const owRoad = new Uint8Array(OW_N), owClear = new Uint8Array(OW_N), owFront = new Uint8Array(OW_N), owReach = new Uint8Array(OW_N), owEdge = new Uint8Array(OW_N);
+  const owObjAt = new Int16Array(OW_N), owAnchorAt = new Int16Array(OW_N), owNpcAt = new Int16Array(OW_N);
+  let ground = owGround, zone = owZone, decal = owDecal, road = owRoad, clear = owClear, front = owFront, reach = owReach, edge = owEdge;
+  let objAt = owObjAt, anchorAt = owAnchorAt, npcAt = owNpcAt;
   let objects = [], npcs = [], specials = [], chests = [], berryTrees = [], waypoints = {}, fountains = {}, spawnTiles = {};
+  let overworld = null, submaps = {}, activeSubmapId = null;
   const start = { x: 52, y: 69, dir: 'down' };
   let rng = Math.random;
   let repairs = 0;
@@ -1091,7 +1107,7 @@ const World = (() => {
     const list = [];
     for (const o of objects) {
       if (o.removed || !o.act) continue;
-      if (o.kind === 'trampoline') list.push({ label: 'trampoline@' + o.x + ',' + o.y, tiles: [[o.x, o.y]] });
+      if (o.kind === 'trampoline' || o.kind === 'subportal' || o.kind === 'exitmat') list.push({ label: o.kind + '@' + o.x + ',' + o.y, tiles: [[o.x, o.y]] });
       else list.push({ label: o.kind + '@' + o.x + ',' + o.y, tiles: rectNeighbors(o.x, o.y, o.w, o.h) });
     }
     for (const n of npcs) if (!n.hidden) list.push({ label: 'npc:' + n.id, tiles: rectNeighbors(n.x, n.y, 1, 1) });
@@ -1188,7 +1204,411 @@ const World = (() => {
     }
   }
 
+  function syncRegisteredSubmaps() {
+    if (typeof window !== 'undefined' && Array.isArray(window.CQSubmaps) && typeof D.registerSubmap === 'function') {
+      window.CQSubmaps.forEach(def => D.registerSubmap(def));
+    }
+  }
+
+  function placeSubmapEntrances() {
+    syncRegisteredSubmaps();
+    const list = D.SUBMAPS || [];
+    for (const def of list) {
+      if (!def || !def.entrance) continue;
+      const ex = def.entrance.x, ey = def.entrance.y;
+      if (!inb(ex, ey)) continue;
+      ensureWalk(ex, ey, true);
+      addObj('subportal', ex, ey, 1, 1, {
+        submapId: def.id,
+        style: def.entrance.style || 'door',
+        label: def.entrance.label || def.name,
+        emoji: def.emoji || '🚪',
+        name: def.name
+      });
+    }
+  }
+
+  function buildSubmap(def) {
+    const sw = def.width || 22, sh = def.height || 16, sn = sw * sh;
+    const palId = def.paletteId || (20 + (def.index || 1));
+    const zId = def.zoneId || 1;
+    const smGround = new Uint8Array(sn);
+    const smZone = new Uint8Array(sn);
+    const smDecal = new Uint8Array(sn);
+    const smRoad = new Uint8Array(sn);
+    const smClear = new Uint8Array(sn);
+    const smFront = new Uint8Array(sn);
+    const smReach = new Uint8Array(sn);
+    const smEdge = new Uint8Array(sn);
+    const smObjAt = new Int16Array(sn).fill(-1);
+    const smAnchorAt = new Int16Array(sn).fill(-1);
+    const smNpcAt = new Int16Array(sn).fill(-1);
+    const smObjects = [], smNpcs = [], smSpecials = [], smChests = [], smBerryTrees = [];
+    const smWaypoints = {}, smFountains = {};
+
+    smZone.fill(palId);
+    if (typeof window !== 'undefined' && window.Art && window.Art.PAL && def.palette) {
+      window.Art.PAL[palId] = Object.assign({}, window.Art.PAL[zId] || window.Art.PAL[1], def.palette);
+    }
+
+    const smI = (x, y) => y * sw + x;
+    const smInb = (x, y) => x >= 0 && y >= 0 && x < sw && y < sh;
+
+    if (Array.isArray(def.tiles)) {
+      if (Array.isArray(def.tiles[0])) {
+        for (let y = 0; y < sh; y++) {
+          const row = def.tiles[y] || [];
+          for (let x = 0; x < sw; x++) {
+            const t = row[x] != null ? row[x] : T.FLOOR;
+            smGround[smI(x, y)] = (t >= 0 && t <= 14) ? t : T.FLOOR;
+          }
+        }
+      } else {
+        for (let i = 0; i < sn; i++) {
+          const t = def.tiles[i] != null ? def.tiles[i] : T.FLOOR;
+          smGround[i] = (t >= 0 && t <= 14) ? t : T.FLOOR;
+        }
+      }
+    } else {
+      smGround.fill(T.FLOOR);
+    }
+
+    const entry = Object.assign({ x: (sw >> 1), y: sh - 3, dir: 3 }, def.entry || {});
+    const exit = Object.assign({ x: entry.x, y: Math.min(sh - 2, entry.y + 1), kind: 'exitmat', style: (def.entrance && def.entrance.style) || 'door', label: 'Return to Overworld' }, def.exit || {});
+    if (smInb(entry.x, entry.y) && !WALK[smGround[smI(entry.x, entry.y)]]) smGround[smI(entry.x, entry.y)] = T.FLOOR;
+    if (smInb(exit.x, exit.y) && !WALK[smGround[smI(exit.x, exit.y)]]) smGround[smI(exit.x, exit.y)] = T.FLOOR;
+
+    if (Array.isArray(def.decals)) {
+      for (const dc of def.decals) {
+        if (!dc || !smInb(dc.x, dc.y)) continue;
+        const val = typeof dc.d === 'string' ? (DEC[dc.d] || 0) : (dc.d || 0);
+        smDecal[smI(dc.x, dc.y)] = val;
+      }
+    }
+
+    // Reserve critical interactive coordinates so decorative props never seal them
+    const reserved = new Set();
+    reserved.add(smI(entry.x, entry.y));
+    reserved.add(smI(exit.x, exit.y));
+    if (Array.isArray(def.chests)) {
+      for (const c of def.chests) if (c && smInb(c.x, c.y)) reserved.add(smI(c.x, c.y));
+    }
+    const rawNpcs = Array.isArray(def.npcs) ? def.npcs.slice() : (def.npc ? [def.npc] : []);
+    for (const n of rawNpcs) if (n && smInb(n.x, n.y)) reserved.add(smI(n.x, n.y));
+    if (def.boss && smInb(def.boss.x, def.boss.y)) reserved.add(smI(def.boss.x, def.boss.y));
+
+    function addSmObj(kind, x, y, w, h, props) {
+      w = w || 1; h = h || 1;
+      if (!smInb(x, y) || !smInb(x + w - 1, y + h - 1)) return null;
+      const k = KIND[kind] || { block: (props && props.block != null) ? props.block : 1, act: (props && (props.act || ((props.text || props.msg) ? 'sign' : null))) || null };
+      const o = Object.assign({
+        id: smObjects.length,
+        kind, x, y, w, h,
+        block: k.block != null ? k.block : 1,
+        act: k.act || ((props && (props.text || props.msg)) ? 'sign' : null),
+        rm: !!k.rm,
+        z: zId,
+        key: 'sub:' + def.id + ':' + kind + ':' + x + ',' + y
+      }, props || {});
+      if (!o.name && o.title) o.name = o.title;
+      if (!o.text && o.msg) o.text = o.msg;
+      smObjects.push(o);
+      for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) smObjAt[smI(xx, yy)] = o.id;
+      smAnchorAt[smI(x, y + h - 1)] = o.id;
+      if (o.act === 'heal') {
+        const fKey = o.fountainKey || ('sub_' + def.id + '_heal_' + x + '_' + y);
+        o.fountainKey = fKey;
+        smFountains[fKey] = { name: o.name || (def.name + ' Healing Spring'), x: x + (w >> 1), y: Math.min(sh - 2, y + h) };
+      }
+      if (o.kind === 'berrytree') smBerryTrees.push(o);
+      return o;
+    }
+
+    // Place exit mat(s)
+    addSmObj('exitmat', exit.x, exit.y, 1, 1, {
+      submapId: def.id,
+      style: exit.style || (def.entrance && def.entrance.style) || 'door',
+      label: exit.label || 'Return to Overworld',
+      block: 0,
+      act: 'exitmat'
+    });
+    if (Array.isArray(def.exits)) {
+      for (const ex of def.exits) {
+        if (!ex || (ex.x === exit.x && ex.y === exit.y)) continue;
+        if (smInb(ex.x, ex.y) && !WALK[smGround[smI(ex.x, ex.y)]]) smGround[smI(ex.x, ex.y)] = T.FLOOR;
+        addSmObj('exitmat', ex.x, ex.y, 1, 1, {
+          submapId: def.id,
+          style: ex.style || exit.style || 'door',
+          label: ex.label || exit.label || 'Return to Overworld',
+          block: 0,
+          act: 'exitmat'
+        });
+      }
+    }
+
+    // Place decorative & interactive props
+    if (Array.isArray(def.props)) {
+      for (const p of def.props) {
+        if (!p || !p.kind) continue;
+        const pw = p.w || 1, ph = p.h || 1;
+        let overlapsReserved = false;
+        for (let yy = p.y; yy < p.y + ph; yy++) {
+          for (let xx = p.x; xx < p.x + pw; xx++) {
+            if (!smInb(xx, yy) || reserved.has(smI(xx, yy)) || smObjAt[smI(xx, yy)] >= 0) overlapsReserved = true;
+          }
+        }
+        if (overlapsReserved) continue;
+        addSmObj(p.kind, p.x, p.y, pw, ph, p);
+      }
+    }
+
+    // Place chests
+    if (Array.isArray(def.chests)) {
+      for (const c of def.chests) {
+        if (!c || !smInb(c.x, c.y)) continue;
+        if (!WALK[smGround[smI(c.x, c.y)]]) smGround[smI(c.x, c.y)] = T.FLOOR;
+        const ch = addSmObj('chest', c.x, c.y, 1, 1, {
+          key: c.key || ('sub:' + def.id + ':chest:' + c.x + ',' + c.y),
+          loot: c.loot || { rainbow: 2, berry: 3, gold: 100 },
+          block: 1,
+          act: 'chest'
+        });
+        if (ch) smChests.push(ch);
+      }
+    }
+
+    // Place NPC(s)
+    rawNpcs.forEach((n, idx) => {
+      if (!n || !smInb(n.x, n.y)) return;
+      const ni = smI(n.x, n.y);
+      if (!WALK[smGround[ni]]) smGround[ni] = T.FLOOR;
+      const lines = typeof n.lines === 'string' ? [n.lines] : (Array.isArray(n.lines) && n.lines.length ? n.lines : ['Welcome to ' + def.name + '!']);
+      const after = typeof n.after === 'string' ? [n.after] : (Array.isArray(n.after) && n.after.length ? n.after : lines);
+      const npcObj = Object.assign({}, n, {
+        id: n.id || ('sub_npc_' + (def.index || 1) + (idx > 0 ? '_' + idx : '')),
+        name: n.name || 'Sub-Map Guide',
+        look: n.look || 'scholar',
+        x: n.x,
+        y: n.y,
+        dir: n.dir || 'down',
+        lines,
+        after,
+        idx
+      });
+      smNpcs.push(npcObj);
+      smNpcAt[ni] = smNpcs.length - 1;
+    });
+
+    // Place Boss / Guardian
+    let smBoss = null;
+    if (def.boss && smInb(def.boss.x, def.boss.y)) {
+      const bi = smI(def.boss.x, def.boss.y);
+      if (!WALK[smGround[bi]]) smGround[bi] = T.FLOOR;
+      const winLines = typeof def.boss.winLines === 'string' ? [def.boss.winLines] : (Array.isArray(def.boss.winLines) && def.boss.winLines.length ? def.boss.winLines : ['You befriended the guardian of ' + def.name + '!']);
+      smBoss = Object.assign({}, def.boss, {
+        key: def.boss.key || ('boss_' + def.id),
+        sp: def.boss.sp,
+        lv: def.boss.lv || 15,
+        x: def.boss.x,
+        y: def.boss.y,
+        title: def.boss.title || def.name + ' Guardian',
+        intro: def.boss.intro || ('✨ ' + (def.boss.title || 'Guardian') + ' steps forward to challenge you!'),
+        winLines,
+        reward: def.boss.reward || { rainbow: 2, berry: 3, gold: 120 },
+        isBoss: true,
+        submapId: def.id
+      });
+      smSpecials.push(smBoss);
+    }
+
+    function smIsOpen(x, y) {
+      if (!smInb(x, y)) return false;
+      const i = smI(x, y);
+      if (!WALK[smGround[i]]) return false;
+      const o = smObjAt[i];
+      if (o >= 0 && smObjects[o].block) return false;
+      return smNpcAt[i] < 0;
+    }
+
+    function smBfs() {
+      smReach.fill(0);
+      if (!smInb(entry.x, entry.y)) return;
+      const q = new Int32Array(sn);
+      let h = 0, t = 0;
+      const s = smI(entry.x, entry.y);
+      smReach[s] = 1; q[t++] = s;
+      while (h < t) {
+        const c = q[h++];
+        const cx = c % sw, cy = (c / sw) | 0;
+        for (let d = 0; d < 4; d++) {
+          const nx = cx + DIRS4[d][0], ny = cy + DIRS4[d][1];
+          if (!smInb(nx, ny)) continue;
+          const ni = smI(nx, ny);
+          if (smReach[ni] || !smIsOpen(nx, ny)) continue;
+          smReach[ni] = 1; q[t++] = ni;
+        }
+      }
+    }
+
+    function ensureTargetReachable(tx, ty, standOnTile) {
+      const checkTiles = standOnTile ? [[tx, ty]] : DIRS4.map(([dx, dy]) => [tx + dx, ty + dy]).filter(([nx, ny]) => smInb(nx, ny));
+      if (checkTiles.some(([nx, ny]) => smReach[smI(nx, ny)] === 1)) return;
+      const goal = checkTiles[0] || [tx, ty];
+      let cx = entry.x, cy = entry.y;
+      while (cx !== goal[0] || cy !== goal[1]) {
+        if (cx !== goal[0]) cx += Math.sign(goal[0] - cx);
+        else cy += Math.sign(goal[1] - cy);
+        if (!smInb(cx, cy)) break;
+        const ci = smI(cx, cy);
+        if (!WALK[smGround[ci]]) smGround[ci] = T.FLOOR;
+        if (smObjAt[ci] >= 0 && smObjects[smObjAt[ci]].block && smObjects[smObjAt[ci]].kind !== 'chest') {
+          const ro = smObjects[smObjAt[ci]];
+          for (let yy = ro.y; yy < ro.y + ro.h; yy++) for (let xx = ro.x; xx < ro.x + ro.w; xx++) if (smObjAt[smI(xx, yy)] === ro.id) smObjAt[smI(xx, yy)] = -1;
+          if (smAnchorAt[smI(ro.x, ro.y + ro.h - 1)] === ro.id) smAnchorAt[smI(ro.x, ro.y + ro.h - 1)] = -1;
+          ro.removed = true;
+        }
+      }
+      smBfs();
+    }
+
+    smBfs();
+    ensureTargetReachable(exit.x, exit.y, true);
+    for (const c of smChests) ensureTargetReachable(c.x, c.y, false);
+    for (const n of smNpcs) ensureTargetReachable(n.x, n.y, false);
+    if (smBoss) ensureTargetReachable(smBoss.x, smBoss.y, true);
+
+    // Compute edges for sub-map
+    for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) {
+      const i = smI(x, y), g = smGround[i];
+      let b = 0;
+      const nb = [[0, -1, 1], [1, 0, 2], [0, 1, 4], [-1, 0, 8]];
+      for (const [dx, dy, bit] of nb) {
+        const nx = x + dx, ny = y + dy;
+        if (!smInb(nx, ny)) continue;
+        const ng = smGround[smI(nx, ny)];
+        if (g === T.DEEP && ng !== T.DEEP && ng !== T.STONES && ng !== T.BRIDGE_H && ng !== T.BRIDGE_V) b |= bit;
+        else if (g === T.SHALLOW && !WATERLIKE[ng]) b |= bit;
+        else if (g === T.CLIFF && ng !== T.CLIFF) b |= bit;
+        else if (g === T.ICE && ng !== T.ICE) b |= bit;
+      }
+      smEdge[i] = b;
+    }
+
+    // Compute spawn tiles (Array of tile indices, also indexed by zoneId/palId for compatibility)
+    const smSpawnList = [];
+    for (let i = 0; i < sn; i++) {
+      if (!smReach[i] || smObjAt[i] >= 0 || smNpcAt[i] >= 0) continue;
+      const sx = i % sw, sy = (i / sw) | 0;
+      if ((sx === entry.x && sy === entry.y) || (sx === exit.x && sy === exit.y)) continue;
+      if (smBoss && sx === smBoss.x && sy === smBoss.y) continue;
+      const g = smGround[i];
+      if (g === T.TALL || g === T.GRASS || g === T.FLOWERS || g === T.SAND || g === T.SNOW || g === T.SHALLOW || g === T.ICE) {
+        smSpawnList.push(i);
+      }
+    }
+    if (smSpawnList.length < 12) {
+      for (let i = 0; i < sn; i++) {
+        if (!smReach[i] || smObjAt[i] >= 0 || smNpcAt[i] >= 0 || smSpawnList.includes(i)) continue;
+        const sx = i % sw, sy = (i / sw) | 0;
+        if (Math.abs(sx - entry.x) + Math.abs(sy - entry.y) <= 1) continue;
+        if (Math.abs(sx - exit.x) + Math.abs(sy - exit.y) <= 1) continue;
+        if (smBoss && sx === smBoss.x && sy === smBoss.y) continue;
+        if (WALK[smGround[i]]) smSpawnList.push(i);
+      }
+    }
+
+    return {
+      id: def.id,
+      index: def.index,
+      key: def.key,
+      name: def.name,
+      emoji: def.emoji || '🗺️',
+      zoneId: zId,
+      paletteId: palId,
+      musicZone: def.musicZone || zId,
+      color: def.color || '#7c3aed',
+      borderTile: def.borderTile != null ? def.borderTile : T.CLIFF,
+      W: sw,
+      H: sh,
+      N: sn,
+      entrance: def.entrance,
+      entry,
+      exit,
+      palette: def.palette || null,
+      wildPool: def.wildPool || { lv: [2, 5], maxWilds: 4, table: [['spark', 50], ['bubba', 50]] },
+      boss: smBoss,
+      ground: smGround,
+      zone: smZone,
+      decal: smDecal,
+      road: smRoad,
+      clear: smClear,
+      front: smFront,
+      reach: smReach,
+      edge: smEdge,
+      objAt: smObjAt,
+      anchorAt: smAnchorAt,
+      npcAt: smNpcAt,
+      objects: smObjects,
+      npcs: smNpcs,
+      specials: smSpecials,
+      chests: smChests,
+      berryTrees: smBerryTrees,
+      waypoints: smWaypoints,
+      fountains: smFountains,
+      spawnTiles: smSpawnList,
+      def
+    };
+  }
+
+  function rebuildSubmaps() {
+    syncRegisteredSubmaps();
+    submaps = {};
+    const list = D.SUBMAPS || [];
+    for (const def of list) {
+      if (!def || !def.id) continue;
+      const sm = buildSubmap(def);
+      submaps[def.id] = sm;
+      const pad = String(def.index || 0).padStart(2, '0');
+      for (const alias of ['sub_' + pad + '_' + def.key, def.key]) {
+        if (alias && !submaps[alias]) {
+          Object.defineProperty(submaps, alias, { value: sm, enumerable: false, configurable: true, writable: true });
+        }
+      }
+    }
+    return submaps;
+  }
+
+  function applyContext(ctx) {
+    W = ctx.W; H = ctx.H; N = ctx.N;
+    ground = ctx.ground; zone = ctx.zone; decal = ctx.decal;
+    road = ctx.road; clear = ctx.clear; front = ctx.front;
+    reach = ctx.reach; edge = ctx.edge;
+    objAt = ctx.objAt; anchorAt = ctx.anchorAt; npcAt = ctx.npcAt;
+    objects = ctx.objects; npcs = ctx.npcs; specials = ctx.specials;
+    chests = ctx.chests; berryTrees = ctx.berryTrees;
+    waypoints = ctx.waypoints; fountains = ctx.fountains; spawnTiles = ctx.spawnTiles;
+  }
+
+  function setActiveSubmap(id) {
+    if (!id) {
+      if (overworld) applyContext(overworld);
+      activeSubmapId = null;
+      return overworld;
+    }
+    const sm = submaps[id];
+    if (!sm) return null;
+    applyContext(sm);
+    activeSubmapId = sm.id;
+    return sm;
+  }
+
   function generate() {
+    W = OW_W; H = OW_H; N = OW_N;
+    ground = owGround; zone = owZone; decal = owDecal;
+    road = owRoad; clear = owClear; front = owFront;
+    reach = owReach; edge = owEdge;
+    objAt = owObjAt; anchorAt = owAnchorAt; npcAt = owNpcAt;
+    activeSubmapId = null;
     rng = U.mulberry32(20261014);
     objects = []; npcs = []; specials = []; chests = []; berryTrees = []; waypoints = {}; fountains = {};
     objAt.fill(-1); anchorAt.fill(-1); npcAt.fill(-1);
@@ -1204,10 +1624,22 @@ const World = (() => {
     if (H > H0) buildHonmoon();
     if (H > H1) buildSouthContinent();
     if (H > H2) buildGen234Continent();
+    placeSubmapEntrances();
     repairs = repair();
     bfs(start.x, start.y);
     computeEdges();
     computeSpawns();
+    overworld = {
+      id: null,
+      W: OW_W, H: OW_H, N: OW_N,
+      ground: owGround, zone: owZone, decal: owDecal,
+      road: owRoad, clear: owClear, front: owFront,
+      reach: owReach, edge: owEdge,
+      objAt: owObjAt, anchorAt: owAnchorAt, npcAt: owNpcAt,
+      objects, npcs, specials, chests, berryTrees, waypoints, fountains, spawnTiles
+    };
+    rebuildSubmaps();
+    setActiveSubmap(null);
   }
 
   /* ---------------- queries ---------------- */
@@ -1221,10 +1653,16 @@ const World = (() => {
     if (npcAt[i] >= 0 && npcs[npcAt[i]] === n) npcAt[i] = -1;
   }
   function walkable(x, y) { return isOpen(x, y); }
-  function groundAt(x, y) { return inb(x, y) ? ground[I(x, y)] : T.DEEP; }
-  function zoneAt(x, y) { return inb(x, y) ? zone[I(x, y)] : 0; }
+  function groundAt(x, y) { return inb(x, y) ? ground[I(x, y)] : (activeSubmapId && submaps[activeSubmapId] ? submaps[activeSubmapId].borderTile : T.DEEP); }
+  function zoneAt(x, y) {
+    if (activeSubmapId && submaps[activeSubmapId]) return submaps[activeSubmapId].zoneId;
+    return inb(x, y) ? zone[I(x, y)] : 0;
+  }
 
   function audit() {
+    if (!overworld) generate();
+    const prevId = activeSubmapId;
+    if (prevId) setActiveSubmap(null);
     const counts = {};
     objects.forEach(o => { if (!o.removed) counts[o.kind] = (counts[o.kind] || 0) + 1; });
     const unreachable = targets().filter(tg => !tg.tiles.some(([x, y]) => inb(x, y) && reach[I(x, y)])).map(t => t.label);
@@ -1238,21 +1676,137 @@ const World = (() => {
     for (let z = 1; z <= MAX_Z; z++) spawn[z] = (spawnTiles[z] || []).length;
     let reachable = 0, walk = 0;
     for (let i = 0; i < N; i++) { if (reach[i]) reachable++; if (WALK[ground[i]]) walk++; }
-    return {
+    const res = {
       size: W + 'x' + H, tiles: N, worldPx: (W * D.TILE) + 'x' + (H * D.TILE),
       chests: chests.filter(c => !c.removed).length, berryTrees: berryTrees.filter(o => !o.removed).length,
       fountains: Object.keys(fountains).length, waypoints: Object.keys(waypoints).length,
-      npcs: npcs.length, specials: specials.length, repairs, unreachable, counts,
+      npcs: npcs.length, specials: specials.length, subportals: counts.subportal || 0,
+      repairs, unreachable, counts,
       zoneTiles, zoneReach, tallReachable: tall, spawnTiles: spawn, reachable, walkableTiles: walk,
+    };
+    if (prevId) setActiveSubmap(prevId);
+    return res;
+  }
+
+  function auditSubmaps() {
+    if (!overworld) generate();
+    const prevId = activeSubmapId;
+    const ids = Object.keys(submaps).sort();
+    const unreachable = [];
+    const errors = [];
+    const perMap = {};
+    let allEntriesWalkable = ids.length === 20;
+    let allEntrancesReachable = ids.length === 20;
+    let roundTripOk = ids.length === 20;
+
+    for (const id of ids) {
+      const sm = submaps[id];
+      const sw = sm.W, sh = sm.H;
+      const smI = (x, y) => y * sw + x;
+      const smInb = (x, y) => x >= 0 && y >= 0 && x < sw && y < sh;
+
+      // 1. Overworld entrance reachability & subportal presence
+      const ent = sm.entrance || {};
+      const owInb = ent.x >= 0 && ent.y >= 0 && ent.x < OW_W && ent.y < OW_H;
+      const owIdx = owInb ? (ent.y * OW_W + ent.x) : -1;
+      const owReachable = owInb && overworld && overworld.reach[owIdx] === 1;
+      const owObjId = owInb && overworld ? overworld.objAt[owIdx] : -1;
+      const owObj = owObjId >= 0 && overworld ? overworld.objects[owObjId] : null;
+      const hasSubportal = !!(owObj && owObj.kind === 'subportal' && owObj.submapId === id);
+      if (!owReachable || !hasSubportal) {
+        allEntrancesReachable = false;
+        unreachable.push(id + ':entrance@' + ent.x + ',' + ent.y);
+      }
+
+      // 2. Entry and exit walkability & reachability
+      const entryOk = smInb(sm.entry.x, sm.entry.y) && sm.reach[smI(sm.entry.x, sm.entry.y)] === 1;
+      const exitOk = smInb(sm.exit.x, sm.exit.y) && sm.reach[smI(sm.exit.x, sm.exit.y)] === 1;
+      if (!entryOk || !exitOk) {
+        allEntriesWalkable = false;
+        unreachable.push(id + ':entry_or_exit');
+      }
+
+      // 3. Chests, NPCs, Boss reachability
+      for (const c of sm.chests) {
+        const adj = DIRS4.some(([dx, dy]) => smInb(c.x + dx, c.y + dy) && sm.reach[smI(c.x + dx, c.y + dy)] === 1);
+        if (!adj) unreachable.push(id + ':chest@' + c.x + ',' + c.y);
+      }
+      for (const n of sm.npcs) {
+        const adj = DIRS4.some(([dx, dy]) => smInb(n.x + dx, n.y + dy) && sm.reach[smI(n.x + dx, n.y + dy)] === 1);
+        if (!adj) unreachable.push(id + ':npc:' + n.id);
+      }
+      if (sm.boss) {
+        const bReach = (smInb(sm.boss.x, sm.boss.y) && sm.reach[smI(sm.boss.x, sm.boss.y)] === 1) ||
+          DIRS4.some(([dx, dy]) => smInb(sm.boss.x + dx, sm.boss.y + dy) && sm.reach[smI(sm.boss.x + dx, sm.boss.y + dy)] === 1);
+        if (!bReach) unreachable.push(id + ':boss:' + sm.boss.sp);
+      } else {
+        errors.push(id + ':missing_boss');
+      }
+
+      // 4. Schema & content checks
+      if (sm.chests.length < 2) errors.push(id + ':fewer_than_2_chests');
+      if (sm.npcs.length < 1) errors.push(id + ':missing_npc');
+      if (!sm.boss || !D.SP[sm.boss.sp]) errors.push(id + ':invalid_boss_species:' + (sm.boss && sm.boss.sp));
+      if (!sm.wildPool || !Array.isArray(sm.wildPool.table) || sm.wildPool.table.length < 3) {
+        errors.push(id + ':invalid_wildPool');
+      } else {
+        for (const [sp, w] of sm.wildPool.table) {
+          if (!D.SP[sp] || !(w > 0)) errors.push(id + ':invalid_wild_species:' + sp);
+        }
+      }
+      if (!Array.isArray(sm.spawnTiles) || sm.spawnTiles.length < 8) {
+        errors.push(id + ':insufficient_spawnTiles:' + (sm.spawnTiles ? sm.spawnTiles.length : 0));
+      }
+
+      // 5. Context switch round-trip check
+      setActiveSubmap(id);
+      if (W !== sm.W || H !== sm.H || activeSubmapId !== id) roundTripOk = false;
+      setActiveSubmap(null);
+      if (W !== OW_W || H !== OW_H || activeSubmapId !== null) roundTripOk = false;
+
+      let reachCount = 0;
+      for (let i = 0; i < sm.N; i++) if (sm.reach[i]) reachCount++;
+      perMap[id] = {
+        name: sm.name,
+        zoneId: sm.zoneId,
+        size: sm.W + 'x' + sm.H,
+        chests: sm.chests.length,
+        npcs: sm.npcs.length,
+        boss: sm.boss ? sm.boss.sp : null,
+        spawnTiles: sm.spawnTiles.length,
+        reachable: reachCount
+      };
+    }
+
+    setActiveSubmap(prevId);
+    const ok = ids.length === 20 && allEntriesWalkable && allEntrancesReachable && roundTripOk && unreachable.length === 0 && errors.length === 0;
+    return {
+      count: ids.length,
+      allEntriesWalkable,
+      allEntrancesReachable,
+      roundTripOk,
+      unreachable,
+      errors,
+      perMap,
+      ok
     };
   }
 
   return {
-    W, H, H0, N, T, T_NAMES, WALK, SOLID, DEC, KIND, I, inb,
-    ground, zone, decal, road, edge, objAt, anchorAt, npcAt, reach, front,
+    get W() { return W; }, get H() { return H; }, H0, get N() { return N; },
+    T, T_NAMES, WALK, SOLID, DEC, KIND, I, inb,
+    get ground() { return ground; }, get zone() { return zone; }, get decal() { return decal; },
+    get road() { return road; }, get edge() { return edge; }, get objAt() { return objAt; },
+    get anchorAt() { return anchorAt; }, get npcAt() { return npcAt; }, get reach() { return reach; }, get front() { return front; },
     get objects() { return objects; }, get npcs() { return npcs; }, get specials() { return specials; },
     get chests() { return chests; }, get berryTrees() { return berryTrees; }, get waypoints() { return waypoints; },
     get fountains() { return fountains; }, get spawnTiles() { return spawnTiles; },
-    start, generate, audit, objectAt, npcAtTile, hideNPC, walkable, groundAt, zoneAt, isOpen,
+    get overworld() { return overworld; }, get submaps() { return submaps; }, get submapList() { return Object.values(submaps); }, get submapOrder() { return Object.keys(submaps).sort(); },
+    get activeSubmapId() { return activeSubmapId; }, get activeSubmap() { return activeSubmapId ? submaps[activeSubmapId] : null; },
+    start, generate, audit, auditSubmaps, buildSubmap, rebuildSubmaps, setActiveSubmap,
+    objectAt, npcAtTile, hideNPC, walkable, groundAt, zoneAt, isOpen,
   };
 })();
+if (typeof window !== 'undefined') window.World = World;
+
+
