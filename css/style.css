@@ -362,17 +362,17 @@ body.in-dialog #controls, body.in-modal #controls { opacity: 0; visibility: hidd
 }
 .title-logo h2 { margin: 6px 0 0; font-size: clamp(16px, 2.4vmin + 8px, 30px); color: #fff8c6; text-shadow: 0 3px 0 rgba(40, 20, 80, .35); }
 .title-sub { font-size: clamp(16px, 1.8vmin + 10px, 26px); font-weight: 900; color: #fff; text-shadow: 0 2px 0 rgba(40, 20, 80, .3); margin: 14px 0 10px; }
-.starters { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 2vmin, 18px); }
+.starters { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(6px, 1.4vmin, 12px); }
 .starter {
-  position: relative; background: #fff; border: 5px solid var(--c); border-radius: 22px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  box-shadow: 0 8px 0 rgba(40, 20, 80, .3); transition: transform .15s;
+  position: relative; background: #fff; border: 4px solid var(--c); border-radius: 20px; padding: 8px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  box-shadow: 0 6px 0 rgba(40, 20, 80, .3); transition: transform .15s;
 }
 .starter:hover { transform: translateY(-4px) rotate(-1deg); }
 .starter:active { transform: translateY(3px); }
-.starter img { width: clamp(70px, 16vmin, 140px); height: clamp(70px, 16vmin, 140px); border-radius: 50%; border: 5px solid var(--c); object-fit: cover; }
-.starter b { font-size: clamp(15px, 1.6vmin + 10px, 24px); }
-.starter small { font-weight: 800; color: #7a5cc4; font-size: clamp(12px, 1vmin + 8px, 16px); }
-.starter em { font-style: normal; font-size: clamp(11px, .8vmin + 8px, 14px); color: #6b5a8a; font-weight: 600; line-height: 1.3; }
+.starter img { width: clamp(54px, 10.5vmin, 92px); height: clamp(54px, 10.5vmin, 92px); border-radius: 50%; border: 4px solid var(--c); object-fit: cover; }
+.starter b { font-size: clamp(14px, 1.3vmin + 9px, 20px); }
+.starter small { font-weight: 800; color: #7a5cc4; font-size: clamp(11px, .8vmin + 8px, 14px); }
+.starter em { font-style: normal; font-size: clamp(10.5px, .6vmin + 7.5px, 12.5px); color: #6b5a8a; font-weight: 600; line-height: 1.25; }
 .sk { position: absolute; left: 10px; top: 8px; font-weight: 900; font-size: 12px; background: var(--c); color: #fff; border-radius: 8px; padding: 1px 7px; }
 .title-hint { color: #fff; font-weight: 800; text-shadow: 0 2px 0 rgba(40, 20, 80, .3); font-size: clamp(12px, 1vmin + 9px, 16px); }
 

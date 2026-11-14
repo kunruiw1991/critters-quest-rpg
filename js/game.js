@@ -17,7 +17,7 @@ const Game = (() => {
     return DV[d] ? d : 'down';
   }
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
-  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9 };
+  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9, 17: 10, 18: 10, 19: 10 };
 
   let canvas, ctx, dpr = 1, zoom = 1, viewW = 0, viewH = 0;
   const cam = { x: 0, y: 0 };
@@ -46,7 +46,7 @@ const Game = (() => {
       chests: {}, subChests: {}, trees: {}, gifts: {}, pots: {}, bosses: {}, subVisited: {}, submap: null,
       visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
-      news: { honmoon: true, southlands: true, gen234: true },
+      news: { honmoon: true, southlands: true, gen234: true, maizen: true },
     };
   }
   function validate(s) {
@@ -843,6 +843,8 @@ const Game = (() => {
         if (o.kind === 'ramen') { addFx('text', fx0, o.y * TS - 10, '🍜 Slurp slurp!'); UI.toast('🍜 Slurp slurp! Yummy Honmoon ramen — all your Critters are full of energy! 💖'); }
         else if (o.kind === 'bathhouse') { addFx('text', fx0, o.y * TS - 10, '♨️ Ahh~'); UI.toast('♨️ Jjimjilbang Bathhouse: warm herbal steam healed all your Critters! 💖'); }
         else if (o.kind === 'pokecenter') { addFx('text', fx0, o.y * TS - 10, '❤️ Ding-ding-ding!'); UI.toast('❤️ Ding-ding-ding-ding-ding! Welcome to the Pokémon Center — your team is fighting fit!'); }
+        else if (o.kind === 'mcdonalds') { addFx('text', fx0, o.y * TS - 10, '🍔🍟 Yum yum!'); UI.toast('🍔🍟 Noob vs Pro Burger Diner: hot golden burgers & crispy fries healed your whole team! 💖'); }
+        else if (o.kind === 'craftlab') { addFx('text', fx0, o.y * TS - 10, '🧪✨ Eureka!'); UI.toast("🧪✨ Dr. Craft's Giant Potion Lab: emerald regen fizz healed your whole team! 💖"); }
         else UI.toast('💖 ' + (o.name || 'Healing Fountain') + ': all your Critters are full of energy!');
         UI.updateHUD();
         save('heal');
@@ -1068,7 +1070,7 @@ const Game = (() => {
     for (const o of World.objects) if (o.shakeT > 0) o.shakeT -= dt;
     // ambient particles
     const z = curZone;
-    const want = z === 7 ? 'snow' : (z === 8 || z === 12) ? 'firefly' : (z === 4 || z === 16) ? 'sparkle' : (z === 2 || z === 13 || z === 14) ? 'leaf' : z === 6 ? 'dust' : (z === 3 || z === 15) ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
+    const want = z === 7 ? 'snow' : (z === 8 || z === 12 || z === 19) ? 'firefly' : (z === 4 || z === 16 || z === 18) ? 'sparkle' : (z === 2 || z === 13 || z === 14 || z === 17) ? 'leaf' : z === 6 ? 'dust' : (z === 3 || z === 15) ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
     if (want && parts.length < 46 && rng() < dt * 22) {
       parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' || want === 'petal' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20 + (want === 'petal' ? 14 : 0), vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' || want === 'petal' ? 22 + rng() * 16 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
     }
@@ -1485,41 +1487,24 @@ const Game = (() => {
       if (reg0) Sound.music(reg0.music, true);
     }
     UI.updateHUD();
+    const profLook = (D.NPCS.find(n => n.id === 'prof') || D.NPCS[0]).look;
     if (isNew) {
       save('new');
       const sp = D.SP[s.starter];
-      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
+      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
         'Wonderful choice, Chuyu! ' + sp.name + ' ' + sp.emoji + ' is so happy to be your partner!',
         sp.name + ' will follow you everywhere you go. 🐾',
-        'Tap anywhere to walk, or use the ▲▼◄► pad. Rustle through tall grass and walk into wild Critters to meet them!',
-        'Come visit me at the Critter Lab ➡ for a present! Now go explore Rainbow Island! 🌈',
+        'Look right here in Sunshine Village — Mikey 🐢, JJ 🌊, and Carrie 🐱 from the Maizen Show are waiting to join your team and give you presents!',
+        'And open the 🗺️ World Map any time to teleport to JJ & Mikey\'s Security Mansion 🏰, Dr. Craft\'s Science Lab 🧪, or Maizen Skyblock 👑 to catch all 96 Critters! 🌈',
       ]);
-    } else if (!s.news || !s.news.honmoon) {
-      // One-time announcement for adventures saved before Honmoon Island existed.
-      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true });
+    } else if (!s.news || !s.news.maizen) {
+      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true, maizen: true });
       save('auto-quiet');
-      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! I have HUGE news! 🎤🐯⚡👑',
-        'Golden bridges now connect Rainbow Island to Honmoon Island, the Southern Continent, AND the Grand Pokémon Continent!',
-        'Meet the K-Pop Demon Hunters, Derpy\'s Minhwa Sanctum 🐯, Nightmare Critters 🎪, Kanto Classics Bay ⚡ (Gen 1), Johto Bell-Tower Groves 🔔 (Gen 2), Hoenn Sky-Pillar Tropics 🌴 (Gen 3), and Sinnoh Spear-Pillar Peaks 👑 (Gen 4)!',
-        'Open the 🗺️ World Map and tap any of the 15 lands to teleport. Have fun catching all 80 Critters! 🌟',
-      ]);
-    } else if (!s.news.southlands) {
-      s.news = Object.assign({}, s.news, { southlands: true, gen234: true });
-      save('auto-quiet');
-      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! Six brand-new lands just opened south of Honmoon Island! 🐯🎪⚡🔔🌴👑',
-        'Explore Derpy\'s Minhwa Sanctum 🐯, Nightmare Critters Carnival 🎪, and Kanto Classics Bay ⚡ (Gen 1) — plus three Grand Pokémon Regions for Generations 2, 3 & 4!',
-        'Catch Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Lugia in Johto 🔔; Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Rayquaza in Hoenn 🌴; and Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Arceus in Sinnoh 👑!',
-      ]);
-    } else if (!s.news.gen234) {
-      s.news = Object.assign({}, s.news, { gen234: true });
-      save('auto-quiet');
-      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: D.NPCS[1].look }, [
-        'Welcome back, Chuyu! A third huge map just opened south of the Southern Continent — the Grand Pokémon Continent! 🔔🌴👑',
-        '1️⃣ Johto Bell-Tower Groves 🔔 (Gen 2) — visit Ecruteak Bell Tower, Kurt\'s Apricorn Workshop & Whirl Island Roost to catch Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Legendary Lugia!',
-        '2️⃣ Hoenn Sky-Pillar Tropics 🌴 (Gen 3) — explore Sootopolis Lagoon, Secret Base Treehouse & Sky Pillar to catch Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Legendary Rayquaza!',
-        '3️⃣ Sinnoh Spear-Pillar Peaks 👑 (Gen 4) — visit Professor Rowan\'s Lab, Champion Cynthia & Spear Pillar Temple to catch Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Mythical Arceus!',
+      UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
+        'Welcome back, Chuyu! HUGE Maizen Show news — JJ, Mikey, Carrie & Friends have arrived! 🐢🌊🐱👑',
+        'Right here in Sunshine Village, Mikey 🐢, JJ 🌊, and Carrie 🐱 are waiting to join your team!',
+        'Three brand-new Maizen Lands & 6 dungeons just opened in the south (Zones 17–19): JJ & Mikey\'s 100-Layer Security Mansion & Burger Blvd 🍔, Maizen Laser Bank Vault & Dr. Craft\'s Giant Potion Lab 🧪, and Maizen Skyblock & Hacker Glitch Arena 💻!',
+        'Catch all 16 new Maizen characters — Carrie 🐱, Pro Diamond JJ 💎, Noob Dirt Mikey 🪨, Burger Chef JJ 🍔, Crispy Fries Mikey 🍟, Bolt the Wolf 🐕, Banana Cat 🍌, Officer Chief 🚓, Sneaky Robber 🦹, Dr. Craft 🧪, Redstone Golem 🤖, Super Mutant Mikey 🐢, Masked Hacker 💻, Herobrine ⚡, King Golden JJ 👑 & Ender Dragon Mikey 🌌 (96 Critters total)!',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');

@@ -5,10 +5,10 @@
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const OW_W = D.MAP_W, OW_H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, OW_N = OW_W * OW_H;
+  const OW_W = D.MAP_W, OW_H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, H3 = D.MAP_H3 || 230, OW_N = OW_W * OW_H;
   let W = OW_W, H = OW_H, N = OW_N;
   const HZ = 10; // Honmoon Island zone id
-  const MAX_Z = 16; // Highest zone id (Zones 14..16 on the Grand Pokémon Continent)
+  const MAX_Z = 19; // Highest zone id (Zones 17..19 on the Maizen Block Continent)
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
   const T_NAMES = Object.keys(T);
   const WALK = new Uint8Array([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]);
@@ -43,6 +43,11 @@ const World = (() => {
     belltower: { block: 1, act: 'sign' }, lugiaroost: { block: 1, act: 'sign' }, apricornshop: { block: 1, act: 'sign' },
     skypillar: { block: 1, act: 'sign' }, secretbase: { block: 1, act: 'sign' },
     spearpillar: { block: 1, act: 'sign' }, rowanlab: { block: 1, act: 'sign' },
+    // Maizen Block Continent (Zones 17..19: JJ & Mikey Security Mansion, Maizen Lab & Vault, Maizen Skyblock)
+    securityhouse: { block: 1, act: 'sign' }, noobhouse: { block: 1, act: 'sign' },
+    mcdonalds: { block: 1, act: 'heal' }, bankvault: { block: 1, act: 'sign' },
+    craftlab: { block: 1, act: 'heal' }, glitcharena: { block: 1, act: 'sign' },
+    skyblockthrone: { block: 1, act: 'sign' },
     // Sub-Map Portals & Interior Props
     subportal: { block: 0, act: 'subportal' }, exitmat: { block: 0, act: 'exitmat' },
     table: { block: 1, act: 'sign' }, bookshelf: { block: 1, act: 'sign' }, bed: { block: 1, act: 'heal' },
@@ -81,6 +86,12 @@ const World = (() => {
     return Math.hypot(dx, dy);
   }
   function zoneOf(x, y) {
+    if (y >= H3) {
+      const jx = x + (U.vnoise(x * 0.16, y * 0.16, 45) - 0.5) * 3;
+      if (jx < 44) return 17;
+      if (jx < 76) return 18;
+      return 19;
+    }
     if (y >= H2) {
       const jx = x + (U.vnoise(x * 0.17, y * 0.17, 25) - 0.5) * 3;
       if (jx < 44) return 14;
@@ -104,11 +115,16 @@ const World = (() => {
     }
     return best;
   }
-  /* Honmoon Island outline (rows H0..H1-1), Southern Continent (rows H1..H2-1), and Grand Pokémon Continent (rows H2..H-1). */
+  /* Honmoon Island outline (rows H0..H1-1), Southern Continent (rows H1..H2-1), Grand Pokémon Continent (rows H2..H3-1), and Maizen Block Continent (rows H3..H-1). */
   const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H1 - 1 };
   const SOUTH = { x0: 5, x1: 115, y0: H1 + 1, y1: H2 - 1 };
-  const GEN234 = { x0: 5, x1: 115, y0: H2 + 1, y1: H - 1 };
+  const GEN234 = { x0: 5, x1: 115, y0: H2 + 1, y1: H3 - 1 };
+  const MAIZEN = { x0: 5, x1: 115, y0: H3 + 1, y1: H - 1 };
   function coastVal(x, y) {
+    if (y >= H3) {
+      const d = Math.min(x - MAIZEN.x0, MAIZEN.x1 - x, y - MAIZEN.y0, MAIZEN.y1 - y);
+      return d + (U.fbm(x * 0.09, y * 0.09, 41) - 0.5) * 4;
+    }
     if (y >= H2) {
       const d = Math.min(x - GEN234.x0, GEN234.x1 - x, y - GEN234.y0, GEN234.y1 - y);
       return d + (U.fbm(x * 0.09, y * 0.09, 31) - 0.5) * 4;
@@ -149,7 +165,7 @@ const World = (() => {
           if (z === 3 && x < 77 + U.vnoise(x * 0.2, y * 0.2, 9) * 3) g = T.GRASS;
           ground[i] = g;
           if (z !== 1) {
-            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58, 14: 0.58, 15: 0.58, 16: 0.58 }[z];
+            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58, 14: 0.58, 15: 0.58, 16: 0.58, 17: 0.58, 18: 0.58, 19: 0.58 }[z];
             if (U.fbm(x * 0.13, y * 0.13, 100 + z) > thr) ground[i] = T.TALL;
             else if (z === 4 && U.fbm(x * 0.11, y * 0.11, 300) > 0.6) ground[i] = T.FLOWERS;
             else if (z >= HZ && U.fbm(x * 0.12, y * 0.12, 300 + z) > 0.64) ground[i] = T.FLOWERS;
@@ -931,7 +947,7 @@ const World = (() => {
     const r4 = U.mulberry32(20261025);
 
     // 1. Two scenic channels separating Zone 14 (Johto) | Zone 15 (Hoenn) | Zone 16 (Sinnoh)
-    for (let y = H2; y < H; y++) {
+    for (let y = H2; y < H3; y++) {
       for (const base of [44, 76]) {
         const xc = base + Math.round(Math.sin(y * 0.21) * 0.8);
         for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
@@ -1003,8 +1019,8 @@ const World = (() => {
     berryTree(82, 182, 'frost'); berryTree(110, 204, 'gold');
 
     // 7. NPCs, Special Critter Spots, and Signs for Zones 14..16
-    D.NPCS.forEach((def, k) => { if (def.zone >= 14) placeNPC(def, k); });
-    D.SPECIAL_SPOTS.forEach(s => { if (s.zone >= 14) addSpecial(s); });
+    D.NPCS.forEach((def, k) => { if (def.zone >= 14 && def.zone <= 16) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone >= 14 && s.zone <= 16) addSpecial(s); });
     for (const [x, y, text] of [
       [23, 160, '⬇ Goldenrod Magnet Bridge → 🔔 Johto Bell-Tower Groves & Ecruteak Lake (Gen 2 Pokémon!)'],
       [63, 160, '⬇ Slateport Ocean Bridge → 🌴 Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Gen 3 Pokémon!)'],
@@ -1015,10 +1031,10 @@ const World = (() => {
     ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
 
     // 8. Scatter trees, bushes & rocks across Zones 14..16
-    for (let y = H2; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    for (let y = H2; y < H3 - 1; y++) for (let x = 1; x < W - 1; x++) {
       const i = I(x, y);
       const z = zone[i];
-      if (z < 14 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      if (z < 14 || z > 16 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
       const r = r4();
       let kind = null, variant = null;
       if (z === 14) {
@@ -1054,7 +1070,7 @@ const World = (() => {
     bfs(start.x, start.y);
     for (const z of [14, 15, 16]) {
       const list = [];
-      for (let y = H2 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+      for (let y = H2 + 1; y < H3 - 2; y++) for (let x = 2; x < W - 2; x++) {
         const i = I(x, y);
         if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
         let blocked = 0;
@@ -1076,9 +1092,9 @@ const World = (() => {
     }
 
     // 10. Decals across Zones 14..16
-    for (let y = H2; y < H; y++) for (let x = 0; x < W; x++) {
+    for (let y = H2; y < H3; y++) for (let x = 0; x < W; x++) {
       const i = I(x, y);
-      if (zone[i] < 14 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      if (zone[i] < 14 || zone[i] > 16 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
       const z = zone[i], g = ground[i], r = r4();
       let d = 0;
       if (z === 14) {
@@ -1091,6 +1107,182 @@ const World = (() => {
       } else if (z === 16) {
         if (g === T.GRASS) d = r < 0.04 ? DEC.SHARD : r < 0.07 ? DEC.FLOWER_W : r < 0.1 ? DEC.SPARKLE : 0;
         else if (g === T.FLOOR) d = r < 0.08 ? DEC.SPARKLE : 0;
+      }
+      decal[i] = d;
+    }
+  }
+
+  /* ---------------- Zones 17..19: Maizen Block Continent (JJ, Mikey, Carrie & Friends) ----------------
+   * Built AFTER buildGen234Continent() with its own RNG stream (r5 = U.mulberry32(20261114)),
+   * so all 86 existing chests in Zones 1..16 remain 100% untouched! */
+  function buildMaizenContinent() {
+    const r5 = U.mulberry32(20261114);
+
+    // 1. Two scenic canals separating Zone 17 (Mansion & Burger Blvd) | Zone 18 (Vault & Science Lab) | Zone 19 (Skyblock & Hacker Arena)
+    for (let y = H3; y < H; y++) {
+      for (const base of [44, 76]) {
+        const xc = base + Math.round(Math.sin(y * 0.21) * 0.8);
+        for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
+      }
+    }
+
+    // 2. Plazas & Courtyards for Zones 17, 18, 19
+    // Zone 17: Security Mansion Courtyard (north) & Noob vs Pro Burger Diner Plaza (south)
+    for (let y = 238; y <= 249; y++) for (let x = 16; x <= 35; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 256; y <= 268; y++) for (let x = 15; x <= 35; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Zone 18: Maizen City Bank & Police Plaza (north) & Dr. Craft's Science Lab Plaza (south)
+    for (let y = 238; y <= 249; y++) for (let x = 50; x <= 69; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 256; y <= 268; y++) for (let x = 52; x <= 70; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Zone 19: Skyblock Golden Citadel Floor (north) & Hacker Glitch Arena / Herobrine Shrine Plaza (south)
+    for (let y = 237; y <= 249; y++) for (let x = 88; x <= 106; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    for (let y = 256; y <= 268; y++) for (let x = 83; x <= 109; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+
+    // 3. Three Sea Bridges south from Zones 14, 15, 16 (y = 200..254) + Grand Maizen Boulevard (y = 254)
+    for (const bx of [24, 60, 95]) {
+      for (let y = 200; y <= 240; y++) for (let x = bx; x <= bx + 1; x++) {
+        const i = I(x, y);
+        if (objAt[i] >= 0 && objects[objAt[i]].rm) removeObj(objects[objAt[i]]);
+      }
+      roadSeg(bx, 200, bx, 260, 0);
+    }
+    // East-West Grand Maizen Boulevard connecting Zone 17 <-> Zone 18 <-> Zone 19
+    roadSeg(15, 254, 106, 254, 0);
+
+    // 4. Zone 17 Landmarks (JJ & Mikey's Security Mansion & Burger Blvd)
+    landmark('securityhouse', 23, 241, 6, 4, {
+      name: "JJ & Mikey's 100-Layer Security Mansion",
+      text: "🏰 JJ & Mikey's 100-Layer Redstone Security Mansion! Diamond turrets, laser doors, and secret trap buttons guard the entrance to Sub-Map #21!"
+    }, { ground: T.PLAZA, fx: 25 });
+    landmark('noobhouse', 30, 242, 3, 3, {
+      name: "Mikey's Noob Dirt House",
+      text: "🪨 Mikey's Noob Dirt House! A green sprout grows on the roof, and a secret trapdoor leads straight to the Crispy Fries kitchen!"
+    }, { ground: T.PLAZA, fx: 31 });
+    fountains[17] = landmark('mcdonalds', 23, 259, 5, 4, {
+      name: 'Noob vs Pro Burger & Fries Diner'
+    }, { ground: T.PLAZA, fx: 25 });
+    waypoints[17] = landmark('waypoint', 18, 246, 1, 1, { region: 17 }, { ground: T.PLAZA, front: true, ring: true });
+    for (const [x, y] of [[17, 253], [34, 253]]) {
+      ensureWalk(x, y, true);
+      if (objAt[I(x, y)] < 0) addObj('trampoline', x, y, 1, 1);
+    }
+    berryTree(13, 244, 'apple'); berryTree(38, 265, 'gold');
+
+    // 5. Zone 18 Landmarks (Maizen Bank Vault & Dr. Craft's Science Lab)
+    landmark('bankvault', 54, 241, 5, 4, {
+      name: 'Maizen City Diamond Bank Vault',
+      text: '🏦 The Maizen City Diamond Bank Vault! Officer Chief 🚓 patrols the front while Sneaky Robber 🦹 schemes inside Sub-Map #23!'
+    }, { ground: T.PLAZA, fx: 56 });
+    fountains[18] = landmark('craftlab', 62, 259, 5, 4, {
+      name: "Dr. Craft's Giant Potion & Portal Lab"
+    }, { ground: T.PLAZA, fx: 64 });
+    waypoints[18] = landmark('waypoint', 62, 246, 1, 1, { region: 18 }, { ground: T.PLAZA, front: true, ring: true });
+    berryTree(49, 244, 'plum'); berryTree(71, 265, 'crystal');
+
+    // 6. Zone 19 Landmarks (Maizen Skyblock, Hacker Arena & Herobrine Keep)
+    landmark('skyblockthrone', 94, 240, 5, 4, {
+      name: 'Maizen Skyblock Golden Throne & Dragon Sanctum',
+      text: '👑 The 100-Million Subscriber Golden Throne & Ender Dragon Sanctum! Legendary King Golden JJ and Ender Dragon Mikey watch over the entire Maizen Continent!'
+    }, { ground: T.FLOOR, fx: 96 });
+    landmark('glitcharena', 87, 259, 5, 4, {
+      name: "Hacker's Command-Block Glitch Arena",
+      text: '💻 The Masked Glitch Hacker\'s Command-Block Arena! Matrix code pillars and `/gamemode creative` portals shimmer inside Sub-Map #25!'
+    }, { ground: T.PLAZA, fx: 89 });
+    landmark('demongate', 103, 259, 4, 3, {
+      name: 'Herobrine Obsidian Lightning Shrine',
+      text: '⚡ The Herobrine Obsidian Shrine! White lightning crackles where Cursed Herobrine waits for a friendly showdown!'
+    }, { ground: T.PLAZA, fx: 105 });
+    fountains[19] = landmark('fountain', 90, 245, 2, 2, { style: 8, name: 'Skyblock Golden Apple Fountain' }, { ground: T.FLOOR });
+    waypoints[19] = landmark('waypoint', 102, 246, 1, 1, { region: 19 }, { ground: T.FLOOR });
+    berryTree(81, 244, 'moon'); berryTree(111, 265, 'gold');
+
+    // 7. NPCs, Special Critter Spots, and Signs for Zones 17..19
+    D.NPCS.forEach((def, k) => { if (def.zone >= 17 && def.zone <= 19) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone >= 17 && s.zone <= 19) addSpecial(s); });
+    for (const [x, y, text] of [
+      [23, 218, "⬇ Redstone Security Bridge → 🐢 JJ & Mikey's Security Mansion & Burger Blvd!"],
+      [59, 218, "⬇ Maizen City Bridge → 🧪 Maizen Bank Vault & Dr. Craft's Science Lab!"],
+      [94, 218, '⬇ Skyblock Obsidian Bridge → 👑 Maizen Skyblock, Hacker Arena & Herobrine Keep!'],
+      [22, 253, "🐢 JJ & Mikey's Security Mansion & Burger Blvd — ⬆ 100-Layer Mansion (Pro JJ) · ⬇ Burger Diner & Noob House (Noob Mikey)"],
+      [58, 253, "🧪 Maizen City & Science Lab — ⬆ Diamond Bank Vault · ⬇ Dr. Craft's Giant Potion Lab (Super Mutant Mikey)"],
+      [93, 253, '👑 Maizen Skyblock & Hacker Keep — ⬆ Golden Throne (King JJ & Ender Dragon Mikey) · ⬇ Glitch Arena (Hacker & Herobrine)'],
+    ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
+
+    // 8. Scatter trees, bushes & rocks across Zones 17..19
+    for (let y = H3; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = I(x, y);
+      const z = zone[i];
+      if (z < 17 || z > 19 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      const r = r5();
+      let kind = null, variant = null;
+      if (z === 17) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.024 ? 'oak' : 'blossom'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      } else if (z === 18) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.025 ? 'crystal' : 'oak'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      } else if (z === 19) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.026 ? 'moon' : 'crystal'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      }
+      if (!kind || !safeToBlock(x, y)) continue;
+      addObj(kind, x, y, 1, 1, { variant: variant || (r5() * 3) | 0 });
+    }
+
+    // 9. Treasure chests: 1 special Master Star chest + 4 hidden chests per new zone (15 new chests -> 101 total)
+    for (const [x, y, where] of [
+      [14, 272, 'Redstone Secret Garden'],
+      [58, 273, 'Emerald Lab Courtyard'],
+      [108, 272, 'Skyblock Obsidian Bluff'],
+    ]) {
+      const i = I(x, y);
+      if (objAt[i] >= 0) removeObj(objects[objAt[i]]);
+      road[i] = 0;
+      if (!WALK[ground[i]] || ground[i] === T.SHALLOW) ground[i] = T.GRASS;
+      chests.push(addObj('chest', x, y, 1, 1, { loot: { master: 1, gold: 120 }, where, special: true }));
+      clearRect(x - 1, y - 1, 3, 3); ensureWalk(x, y + 1, true);
+    }
+    bfs(start.x, start.y);
+    for (const z of [17, 18, 19]) {
+      const list = [];
+      for (let y = H3 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+        const i = I(x, y);
+        if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+        let blocked = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && !isOpen(x + dx, y + dy)) blocked++;
+        if (blocked >= 2) list.push([x, y, blocked]);
+      }
+      for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(r5() * (k + 1)); const tmp = list[k]; list[k] = list[j]; list[j] = tmp; }
+      list.sort((a, b) => b[2] - a[2] + (r5() - 0.5) * 3);
+      let placed = 0;
+      for (const [x, y] of list) {
+        if (placed >= 4) break;
+        if (chests.some(c => Math.abs(c.x - x) + Math.abs(c.y - y) < 7)) continue;
+        if (objAt[I(x, y)] >= 0 || !safeToBlock(x, y)) continue;
+        const kind = U.weighted(r5, D.CHEST_LOOT);
+        const loot = kind === 'gold' ? { gold: 45 + 5 * U.randInt(r5, 0, 14) } : kind === 'berry' ? { berry: U.randInt(r5, 3, 6) } : kind === 'rainbow' ? { rainbow: U.randInt(r5, 1, 3) } : { master: 1 };
+        chests.push(addObj('chest', x, y, 1, 1, { loot }));
+        placed++;
+      }
+    }
+
+    // 10. Decals across Zones 17..19
+    for (let y = H3; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = I(x, y);
+      if (zone[i] < 17 || zone[i] > 19 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      const z = zone[i], g = ground[i], r = r5();
+      let d = 0;
+      if (z === 17) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.FLOWER_Y : r < 0.08 ? DEC.CLOVER : r < 0.1 ? DEC.SPARKLE : 0;
+        else if (g === T.PLAZA || g === T.PATH) d = r < 0.06 ? DEC.CONFETTI : 0;
+      } else if (z === 18) {
+        if (g === T.GRASS) d = r < 0.04 ? DEC.CRYSTAL_GLOW : r < 0.07 ? DEC.FLOWER_B : r < 0.09 ? DEC.SPARKLE : 0;
+        else if (g === T.PLAZA) d = r < 0.06 ? DEC.SPARKLE : 0;
+      } else if (z === 19) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.RUNE : r < 0.08 ? DEC.SHARD : r < 0.11 ? DEC.SPARKLE : 0;
+        else if (g === T.FLOOR) d = r < 0.08 ? DEC.SPARKLE : r < 0.12 ? DEC.RUNE : 0;
       }
       decal[i] = d;
     }
@@ -1624,6 +1816,7 @@ const World = (() => {
     if (H > H0) buildHonmoon();
     if (H > H1) buildSouthContinent();
     if (H > H2) buildGen234Continent();
+    if (H > H3) buildMaizenContinent();
     placeSubmapEntrances();
     repairs = repair();
     bfs(start.x, start.y);
@@ -1695,9 +1888,10 @@ const World = (() => {
     const unreachable = [];
     const errors = [];
     const perMap = {};
-    let allEntriesWalkable = ids.length === 20;
-    let allEntrancesReachable = ids.length === 20;
-    let roundTripOk = ids.length === 20;
+    const expectedCount = (D.SUBMAPS && D.SUBMAPS.length) || 26;
+    let allEntriesWalkable = ids.length === expectedCount;
+    let allEntrancesReachable = ids.length === expectedCount;
+    let roundTripOk = ids.length === expectedCount;
 
     for (const id of ids) {
       const sm = submaps[id];
@@ -1779,7 +1973,7 @@ const World = (() => {
     }
 
     setActiveSubmap(prevId);
-    const ok = ids.length === 20 && allEntriesWalkable && allEntrancesReachable && roundTripOk && unreachable.length === 0 && errors.length === 0;
+    const ok = ids.length === expectedCount && allEntriesWalkable && allEntrancesReachable && roundTripOk && unreachable.length === 0 && errors.length === 0;
     return {
       count: ids.length,
       allEntriesWalkable,

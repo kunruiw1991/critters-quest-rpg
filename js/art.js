@@ -37,6 +37,12 @@ const Art = (() => {
     15: { g: '#68d68b', gd: '#4cb870', gl: '#92ebae', t1: '#10b981', t2: '#38bdf8', t3: '#f472b6', p: '#e6d8b5', pd: '#c4b48c', pl: '#f7efda', sand: '#faeaad', sandd: '#e6d18a', tree: '#2ea866', treed: '#1e7d49', treel: '#5cd692', plaza: '#e8f5ee', plazad: '#c2ded0', plazal: '#f7fcf9' },
     // Zone 16 (Sinnoh Spear-Pillar Peaks & Twinleaf Glade — Gen 4): crisp alpine meadow grass, celestial indigo-and-gold tall grass, white marble Hall of Origin floor.
     16: { g: '#7dc9a6', gd: '#5ead8a', gl: '#a3e2c4', t1: '#6366f1', t2: '#facc15', t3: '#60a5fa', p: '#dce3f0', pd: '#b8c3d8', pl: '#f0f4fc', sand: '#e8eef7', sandd: '#cbd5e6', tree: '#3b7a6b', treed: '#27594d', treel: '#5ca391', floor: '#e8ecf7', floord: '#c7d0e6', plaza: '#eef2fa', plazad: '#cdd6e8', plazal: '#ffffff' },
+    // Zone 17 (JJ & Mikey's Security Mansion & Burger Blvd): blocky emerald grass, cyan-diamond & golden-burger tall grass, redstone-trimmed paths.
+    17: { g: '#6bd968', gd: '#4fb84d', gl: '#94ec8e', t1: '#38bdf8', t2: '#facc15', t3: '#ef4444', p: '#e2d9c8', pd: '#c2b59e', pl: '#f5efe4', sand: '#f7e5a6', sandd: '#e3cc84', tree: '#3ca842', treed: '#267d2c', treel: '#68cf68', floor: '#dbeafe', floord: '#bfdbfe', plaza: '#fef3c7', plazad: '#fde68a', plazal: '#fffbeb' },
+    // Zone 18 (Maizen Bank Vault & Dr. Craft's Science Lab): bright emerald-mint lab lawn, potion-green & police-blue tall grass, quartz lab paths.
+    18: { g: '#68d69c', gd: '#4cb880', gl: '#92ebb8', t1: '#10b981', t2: '#3b82f6', t3: '#f59e0b', p: '#dce6f2', pd: '#b8c8dc', pl: '#f0f6fc', sand: '#eef5fc', sandd: '#d6e5f2', tree: '#2ea872', treed: '#1e7d52', treel: '#5cd69e', floor: '#d1fae5', floord: '#a7f3d0', plaza: '#ecfdf5', plazad: '#d1fae5', plazal: '#ffffff' },
+    // Zone 19 (Maizen Skyblock, Hacker Arena & Herobrine Keep): skyblock golden-emerald turf, matrix-green & royal-gold tall grass, obsidian-gold plaza.
+    19: { g: '#7cd665', gd: '#5eb548', gl: '#a2e887', t1: '#eab308', t2: '#22c55e', t3: '#a855f7', p: '#e8dfc5', pd: '#c9bc98', pl: '#faf4e4', sand: '#f5e2ad', sandd: '#dec68a', tree: '#429e38', treed: '#2b7523', treel: '#70c85c', floor: '#312e81', floord: '#1e1b4b', plaza: '#fef9c3', plazad: '#fde047', plazal: '#ffffff' },
   };
   const GREY_CLIFF = { cliff: '#a3a39b', cliffd: '#76766e', cliffl: '#cfcfc6' };
 
@@ -1635,6 +1641,14 @@ const Art = (() => {
     secretbase: { box: [-16, -68, 224, 220], draw: drawSecretBase },
     spearpillar: { box: [-20, -96, 280, 248], draw: drawSpearPillar, anim: animSpearPillar },
     rowanlab: { box: [-16, -60, 272, 212], draw: drawRowanLab },
+    // Maizen Block Continent (Zones 17..19: JJ & Mikey Show)
+    securityhouse: { box: [-16, -68, 224, 220], draw: drawSecurityHouse, anim: animSecurityHouse },
+    noobhouse: { box: [-12, -48, 168, 152], draw: drawNoobHouse },
+    mcdonalds: { box: [-16, -64, 224, 216], draw: drawMcDonalds },
+    bankvault: { box: [-16, -64, 224, 216], draw: drawBankVault, anim: animBankVault },
+    craftlab: { box: [-16, -68, 224, 220], draw: drawCraftLab, anim: animCraftLab },
+    glitcharena: { box: [-16, -68, 224, 220], draw: drawGlitchArena, anim: animGlitchArena },
+    skyblockthrone: { box: [-20, -96, 280, 248], draw: drawSkyblockThrone, anim: animSkyblockThrone },
     // Sub-Map Portals & Interior Props
     subportal: { box: [-8, -28, 64, 78], draw: drawSubportal, anim: animSubportal },
     exitmat: { box: [-6, -12, 60, 62], draw: drawExitmat, anim: animExitmat },
@@ -2075,6 +2089,219 @@ const Art = (() => {
     for (const wx of [26, 62, 152, 188]) { rr(c, wx, 64, 26, 34, 4); c.fill(); }
   }
 
+  /* --- Maizen Block Continent Landmark Drawers (Zones 17..19: JJ & Mikey Show) --- */
+  function drawSecurityHouse(c) {
+    // JJ & Mikey's 100-Layer Redstone & Diamond Security Mansion (4x3 tiles = 192x144)
+    shadow(c, 96, 138, 92, 12, 0.26);
+    // Iron & quartz fortified walls
+    c.fillStyle = '#e2e8f0'; rr(c, 10, 32, 172, 102, 8); c.fill();
+    c.fillStyle = '#94a3b8'; c.fillRect(10, 32, 172, 8); c.fillRect(10, 124, 172, 10);
+    // Cyan Enchanted Diamond Roof
+    c.fillStyle = '#0284c7'; rr(c, 4, 2, 184, 38, 10); c.fill();
+    c.fillStyle = '#38bdf8'; rr(c, 10, 6, 172, 24, 8); c.fill();
+    c.fillStyle = '#bae6fd'; rr(c, 18, 10, 156, 8, 4); c.fill();
+    // Twin Redstone Laser Turrets on roof corners
+    for (const tx of [24, 156]) {
+      c.fillStyle = '#475569'; rr(c, tx - 8, -14, 20, 20, 4); c.fill();
+      c.fillStyle = '#ef4444'; circ(c, tx + 2, -4, 5.5); c.fill();
+      c.fillStyle = '#fecaca'; circ(c, tx + 2, -4, 2.5); c.fill();
+    }
+    // Redstone Laser Security Door in center + keypad
+    c.fillStyle = '#1e293b'; rr(c, 72, 68, 48, 66, 4); c.fill();
+    c.strokeStyle = '#ef4444'; c.lineWidth = 2.5;
+    for (let ly = 78; ly <= 124; ly += 11) {
+      c.beginPath(); c.moveTo(75, ly); c.lineTo(117, ly); c.stroke();
+    }
+    // Security Keypad beside door
+    c.fillStyle = '#334155'; rr(c, 126, 84, 16, 22, 3); c.fill();
+    c.fillStyle = '#22c55e'; c.fillRect(129, 87, 10, 5);
+    // Armored cyan windows with JJ & Mikey emblem
+    for (const wx of [24, 146]) {
+      c.fillStyle = '#0ea5e9'; rr(c, wx, 62, 26, 30, 4); c.fill();
+      c.strokeStyle = '#475569'; c.lineWidth = 2.5; rr(c, wx, 62, 26, 30, 4); c.stroke();
+    }
+    // Diamond & Turtle shield crest above door
+    c.fillStyle = '#facc15'; circ(c, 96, 48, 13); c.fill();
+    c.fillStyle = '#38bdf8'; star(c, 96, 48, 9, 4.5, 4); c.fill();
+  }
+  function animSecurityHouse(c, o, t) {
+    const x = o.x * 48, y = o.y * 48;
+    const pulse = 0.45 + 0.45 * Math.abs(Math.sin(t * 4));
+    c.save();
+    c.fillStyle = 'rgba(239,68,68,' + pulse + ')';
+    circ(c, x + 26, y - 4, 8); c.fill();
+    circ(c, x + 158, y - 4, 8); c.fill();
+    c.restore();
+  }
+  function drawNoobHouse(c) {
+    // Mikey's Hilarious Noob Dirt-Block House (3x2 tiles = 144x96)
+    shadow(c, 72, 90, 64, 10, 0.24);
+    c.fillStyle = '#854d0e'; rr(c, 14, 18, 116, 72, 6); c.fill();
+    c.fillStyle = '#a16207'; rr(c, 20, 24, 104, 62, 4); c.fill();
+    // Blocky dirt pixels
+    c.fillStyle = '#713f12';
+    for (const [px, py] of [[28, 36], [46, 52], [96, 40], [108, 62], [34, 68]]) c.fillRect(px, py, 10, 10);
+    // Lush green grass block top roof + little yellow dandelion on top!
+    c.fillStyle = '#16a34a'; rr(c, 10, 4, 124, 22, 6); c.fill();
+    c.fillStyle = '#4ade80'; rr(c, 14, 6, 116, 12, 4); c.fill();
+    c.fillStyle = '#15803d'; c.fillRect(70, -10, 3, 14);
+    c.fillStyle = '#facc15'; circ(c, 71.5, -12, 5); c.fill();
+    // Crooked wooden door
+    c.fillStyle = '#d97706'; rr(c, 56, 44, 32, 46, 3); c.fill();
+    c.fillStyle = '#451a03'; rr(c, 61, 50, 10, 12, 2); c.fill(); rr(c, 73, 50, 10, 12, 2); c.fill();
+  }
+  function drawMcDonalds(c) {
+    // JJ & Mikey's Noob vs Pro Golden-Arch Burger & Fries Diner (4x3 tiles = 192x144)
+    shadow(c, 96, 138, 92, 12, 0.25);
+    c.fillStyle = '#fef2f2'; rr(c, 10, 36, 172, 98, 8); c.fill();
+    c.fillStyle = '#dc2626'; rr(c, 4, 8, 184, 38, 10); c.fill();
+    c.fillStyle = '#ef4444'; rr(c, 10, 12, 172, 18, 6); c.fill();
+    // Yellow & white striped awning
+    for (let k = 0; k < 10; k++) {
+      c.fillStyle = k % 2 ? '#facc15' : '#ffffff';
+      rr(c, 14 + k * 16.4, 38, 16.5, 14, 3); c.fill();
+    }
+    // Giant Golden Arches "M" & Giant Cheeseburger on the roof!
+    c.strokeStyle = '#facc15'; c.lineWidth = 6; c.lineCap = 'round';
+    c.beginPath();
+    c.moveTo(42, 12); c.quadraticCurveTo(52, -24, 62, 12);
+    c.quadraticCurveTo(72, -24, 82, 12);
+    c.stroke();
+    // Giant Cheeseburger sculpture on right side of roof
+    c.fillStyle = '#d97706'; ell(c, 134, 8, 22, 8); c.fill();
+    c.fillStyle = '#22c55e'; ell(c, 134, 4, 24, 4); c.fill();
+    c.fillStyle = '#facc15'; ell(c, 134, 1, 23, 4); c.fill();
+    c.fillStyle = '#78350f'; ell(c, 134, -2, 22, 5); c.fill();
+    c.fillStyle = '#f59e0b'; c.beginPath(); c.arc(134, -4, 22, Math.PI, 0); c.fill();
+    // Order counter & glass doors
+    c.fillStyle = '#38bdf8'; rr(c, 74, 74, 44, 60, 4); c.fill();
+    c.fillStyle = '#fde047'; rr(c, 22, 68, 40, 34, 4); c.fill(); rr(c, 130, 68, 40, 34, 4); c.fill();
+  }
+  function drawBankVault(c) {
+    // Maizen City Diamond Bank Vault & Police HQ (4x3 tiles = 192x144)
+    shadow(c, 96, 138, 92, 12, 0.26);
+    c.fillStyle = '#cbd5e1'; rr(c, 8, 32, 176, 102, 8); c.fill();
+    c.fillStyle = '#f8fafc'; rr(c, 14, 38, 164, 90, 6); c.fill();
+    // Four classical bank columns
+    for (const px of [20, 52, 128, 160]) {
+      c.fillStyle = '#e2e8f0'; rr(c, px, 38, 12, 90, 2); c.fill();
+    }
+    // Navy & Gold Pediment Roof
+    c.fillStyle = '#1e3a8a'; rr(c, 4, 6, 184, 34, 8); c.fill();
+    c.fillStyle = '#eab308'; rr(c, 10, 32, 172, 6, 2); c.fill();
+    // Giant Steel & Gold Circular Bank Vault Door in center!
+    c.fillStyle = '#475569'; circ(c, 96, 94, 30); c.fill();
+    c.fillStyle = '#94a3b8'; circ(c, 96, 94, 24); c.fill();
+    c.strokeStyle = '#eab308'; c.lineWidth = 3.5; circ(c, 96, 94, 16); c.stroke();
+    for (let k = 0; k < 4; k++) {
+      const a = k * Math.PI / 4;
+      c.beginPath(); c.moveTo(96 - Math.cos(a) * 15, 94 - Math.sin(a) * 15);
+      c.lineTo(96 + Math.cos(a) * 15, 94 + Math.sin(a) * 15); c.stroke();
+    }
+    // Golden Dollar / Diamond Crest on roof
+    c.fillStyle = '#facc15'; circ(c, 96, 18, 14); c.fill();
+    c.fillStyle = '#38bdf8'; star(c, 96, 18, 9, 4.5, 4); c.fill();
+  }
+  function animBankVault(c, o, t) {
+    const x = o.x * 48, y = o.y * 48;
+    const redOn = Math.sin(t * 6) > 0;
+    c.save();
+    c.fillStyle = redOn ? 'rgba(239,68,68,0.75)' : 'rgba(59,130,246,0.75)';
+    circ(c, x + 32, y + 10, 7); c.fill();
+    c.fillStyle = !redOn ? 'rgba(239,68,68,0.75)' : 'rgba(59,130,246,0.75)';
+    circ(c, x + 160, y + 10, 7); c.fill();
+    c.restore();
+  }
+  function drawCraftLab(c) {
+    // Dr. Craft's Giant Potion & Portal Science Lab (4x3 tiles = 192x144)
+    shadow(c, 96, 138, 92, 12, 0.25);
+    c.fillStyle = '#ecfdf5'; rr(c, 10, 34, 172, 100, 10); c.fill();
+    c.fillStyle = '#047857'; rr(c, 4, 6, 184, 34, 10); c.fill();
+    c.fillStyle = '#10b981'; rr(c, 12, 10, 168, 16, 6); c.fill();
+    // Giant Bubbling Green Potion Vat on the roof!
+    c.fillStyle = 'rgba(167,243,208,0.85)'; rr(c, 74, -32, 44, 40, 8); c.fill();
+    c.fillStyle = '#22c55e'; rr(c, 78, -18, 36, 24, 6); c.fill();
+    c.fillStyle = '#475569'; rr(c, 70, -36, 52, 7, 3); c.fill();
+    // Glowing Purple Nether Portal Archway entrance!
+    c.fillStyle = '#312e81'; rr(c, 72, 64, 48, 70, 6); c.fill();
+    c.fillStyle = '#9333ea'; rr(c, 78, 70, 36, 58, 4); c.fill();
+    c.fillStyle = '#e879f9'; ell(c, 96, 98, 12, 20); c.fill();
+    // Lab windows with green & cyan flasks
+    for (const wx of [24, 136]) {
+      c.fillStyle = '#a7f3d0'; rr(c, wx, 66, 32, 32, 5); c.fill();
+      c.fillStyle = '#10b981'; circ(c, wx + 16, 86, 8); c.fill();
+    }
+  }
+  function animCraftLab(c, o, t) {
+    const x = o.x * 48 + 96, y = o.y * 48 - 10;
+    c.save();
+    for (let k = 0; k < 4; k++) {
+      const ph = (t * 0.5 + k / 4) % 1;
+      c.fillStyle = k % 2 ? '#4ade80' : '#a7f3d0';
+      circ(c, x + Math.sin(t * 3 + k) * 10, y - ph * 22, 3.5 * (1 - ph) + 1); c.fill();
+    }
+    c.restore();
+  }
+  function drawGlitchArena(c) {
+    // Masked Hacker's Command-Block Glitch Citadel (4x3 tiles = 192x144)
+    shadow(c, 96, 138, 92, 12, 0.28);
+    c.fillStyle = '#111827'; rr(c, 10, 32, 172, 102, 8); c.fill();
+    c.strokeStyle = '#22c55e'; c.lineWidth = 2.5; rr(c, 12, 34, 168, 98, 6); c.stroke();
+    // Neon Matrix circuit lines
+    c.fillStyle = '#16a34a';
+    for (let k = 0; k < 6; k++) c.fillRect(24 + k * 26, 42, 4, 24 + (k % 3) * 12);
+    // Giant Floating Minecraft Command Block above roof!
+    c.fillStyle = '#c2410c'; rr(c, 68, -28, 56, 56, 6); c.fill();
+    c.strokeStyle = '#fb923c'; c.lineWidth = 3; rr(c, 72, -24, 48, 48, 4); c.stroke();
+    c.fillStyle = '#fde047';
+    for (let gy = -14; gy <= 10; gy += 12) for (let gx = 82; gx <= 106; gx += 12) c.fillRect(gx, gy, 6, 6);
+    // Glowing Neon Hacker Mask Doorway
+    c.fillStyle = '#052e16'; rr(c, 74, 70, 44, 64, 6); c.fill();
+    c.strokeStyle = '#4ade80'; c.lineWidth = 2.5; rr(c, 74, 70, 44, 64, 6); c.stroke();
+  }
+  function animGlitchArena(c, o, t) {
+    const x = o.x * 48 + 96, y = o.y * 48;
+    c.save();
+    for (let k = 0; k < 5; k++) {
+      const a = t * 1.8 + k * (PI2 / 5);
+      c.fillStyle = k % 2 ? '#4ade80' : '#fde047';
+      c.fillRect(x + Math.cos(a) * 38 - 3, y + Math.sin(a) * 14 - 3, 6, 6);
+    }
+    c.restore();
+  }
+  function drawSkyblockThrone(c) {
+    // Maizen Skyblock 100M Golden Throne & Ender Dragon Sanctum (5x3 tiles = 240x144)
+    shadow(c, 120, 138, 114, 14, 0.26);
+    // Golden & Obsidian Skyblock Sanctuary Base
+    c.fillStyle = '#fef08a'; rr(c, 8, 96, 224, 42, 8); c.fill();
+    c.fillStyle = '#facc15'; rr(c, 14, 90, 212, 36, 6); c.fill();
+    // Twin Left (Golden JJ) & Right (Ender Dragon Mikey) Pillars
+    for (const [px, col, topCol] of [[24, '#eab308', '#ef4444'], [66, '#eab308', '#38bdf8'], [154, '#581c87', '#a855f7'], [196, '#581c87', '#22c55e']]) {
+      c.fillStyle = col; rr(c, px, 8, 20, 86, 4); c.fill();
+      c.fillStyle = topCol; circ(c, px + 10, 4, 8); c.fill();
+    }
+    // Giant Royal Golden Crown & Ender Dragon Wings in the center!
+    c.fillStyle = '#7e22ce';
+    c.beginPath(); c.moveTo(120, 40); c.quadraticCurveTo(64, -10, 48, 36); c.quadraticCurveTo(84, 48, 120, 56); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(120, 40); c.quadraticCurveTo(176, -10, 192, 36); c.quadraticCurveTo(156, 48, 120, 56); c.closePath(); c.fill();
+    // Royal Golden Crown centerpiece
+    c.fillStyle = '#facc15';
+    c.beginPath();
+    c.moveTo(88, 52); c.lineTo(84, 10); c.lineTo(102, 28); c.lineTo(120, -4); c.lineTo(138, 28); c.lineTo(156, 10); c.lineTo(152, 52);
+    c.closePath(); c.fill();
+    c.strokeStyle = '#b45309'; c.lineWidth = 3; c.stroke();
+    c.fillStyle = '#ef4444'; circ(c, 120, 34, 6); c.fill();
+    c.fillStyle = '#38bdf8'; circ(c, 100, 36, 4.5); c.fill(); circ(c, 140, 36, 4.5); c.fill();
+  }
+  function animSkyblockThrone(c, o, t) {
+    const x = o.x * 48 + 120, y = o.y * 48 + 24;
+    c.save();
+    c.strokeStyle = 'rgba(250,204,21,' + (0.5 + 0.35 * Math.sin(t * 3)) + ')';
+    c.lineWidth = 3;
+    circ(c, x, y, 44 + Math.sin(t * 2.2) * 5); c.stroke();
+    c.restore();
+  }
+
   /* --- Sub-Map Portals, Exit Mats & Interior Props --- */
   function drawSubportal(c, o) {
     const st = (o && o.style) || 'door';
@@ -2234,7 +2461,13 @@ const Art = (() => {
     guard: { skin: '#f1c29b', hair: '#991b1b', hairStyle: 'spiky', shirt: '#dc2626', pants: '#1e293b', hat: 'bandana', hatColor: '#f97316' },
     elm: { skin: '#ffdcbc', hair: '#78350f', hairStyle: 'short', shirt: '#d97706', pants: '#451a03', coat: true, glasses: true },
     steven: { skin: '#fde6d2', hair: '#94a3b8', hairStyle: 'spiky', shirt: '#0f766e', pants: '#1e293b', glow: '#34d399' },
-    cynthia: { skin: '#fde6d2', hair: '#fde047', hairStyle: 'long', shirt: '#1e1b4b', pants: '#0f172a', crown: true, glow: '#facc15' }
+    cynthia: { skin: '#fde6d2', hair: '#fde047', hairStyle: 'long', shirt: '#1e1b4b', pants: '#0f172a', crown: true, glow: '#facc15' },
+    jj_npc: { skin: '#f5cfa5', hair: '#1f2937', hairStyle: 'spiky', shirt: '#38bdf8', pants: '#1e3a8a', hat: 'helmet', glow: '#38bdf8' },
+    mikey_npc: { skin: '#4ade80', hair: '#16a34a', hairStyle: 'short', shirt: '#22c55e', pants: '#15803d', hat: 'shell' },
+    carrie_npc: { skin: '#ffe0c8', hair: '#f472b6', hairStyle: 'long', shirt: '#facc15', pants: '#3b82f6', hat: 'cat' },
+    police_npc: { skin: '#f2c49b', hair: '#1e293b', hairStyle: 'short', shirt: '#2563eb', pants: '#1e3a8a', hat: 'cap2' },
+    scientist_npc: { skin: '#f5d0b5', hair: '#e5e7eb', hairStyle: 'spiky', shirt: '#ffffff', pants: '#065f46', coat: true, glasses: true },
+    hacker_npc: { skin: '#e2e8f0', hair: '#10b981', hairStyle: 'spiky', shirt: '#111827', pants: '#064e3b', hat: 'visor', glow: '#22c55e' }
   };
   function drawPerson(c, look, dir, frame, opts) {
     look = typeof look === 'string' ? (LOOK_PRESETS[look] || LOOK_PRESETS.scholar) : (look || CHUYU_LOOK);
@@ -2537,6 +2770,18 @@ const Art = (() => {
         c.fillStyle = '#1b1b24'; ell(c, 0, hy - 7, 15, 3.6); c.fill();
         rr(c, -6.5, hy - 19, 13, 12, 3); c.fill();
         break;
+      case 'shell':
+        c.fillStyle = '#16a34a'; c.beginPath(); c.arc(0, hy - 2, 11.5, Math.PI, 0); c.fill();
+        c.strokeStyle = '#14532d'; c.lineWidth = 1.5; c.beginPath(); c.arc(0, hy - 2, 11.5, Math.PI, 0); c.stroke();
+        break;
+      case 'cat':
+        c.fillStyle = '#facc15';
+        c.beginPath(); c.moveTo(-10, hy - 5); c.lineTo(-7, hy - 15); c.lineTo(-2, hy - 8); c.closePath(); c.fill();
+        c.beginPath(); c.moveTo(10, hy - 5); c.lineTo(7, hy - 15); c.lineTo(2, hy - 8); c.closePath(); c.fill();
+        c.fillStyle = '#f472b6';
+        c.beginPath(); c.moveTo(-8, hy - 7); c.lineTo(-6.5, hy - 13); c.lineTo(-3.5, hy - 8); c.closePath(); c.fill();
+        c.beginPath(); c.moveTo(8, hy - 7); c.lineTo(6.5, hy - 13); c.lineTo(3.5, hy - 8); c.closePath(); c.fill();
+        break;
       default: break;
     }
   }
@@ -2574,6 +2819,9 @@ const Art = (() => {
     baba: '#3b3b4f', icky: '#49b84c', rabie: '#ff5ca8', allister: '#3b9c4c', simon: '#e03e3e', poe: '#554296', touille: '#8c7b70', maggie: '#3a9fe8',
     pikachu: '#f7d02c', bulbasaur: '#49a86b', charmander: '#ff7f32', squirtle: '#58b4f5', jigglypuff: '#ff9ecf', eevee: '#c88a4b',
     psyduck: '#f5c842', meowth: '#f0d27f', gengar: '#7a52b8', snorlax: '#3b7a8c', charizard: '#ff6b2b', mew: '#ff94c8',
+    carrie: '#facc15', projj: '#38bdf8', noobmikey: '#a16207', burgerjj: '#ef4444', burgermikey: '#f59e0b',
+    maizenwolf: '#94a3b8', bananacat: '#facc15', policechief: '#2563eb', maizenrobber: '#475569', scientist: '#10b981',
+    redstonegolem: '#dc2626', mutantmikey: '#16a34a', maizenhacker: '#22c55e', herobrine: '#6366f1', kingjj: '#eab308', dragonmikey: '#9333ea',
   };
   // accessories with a layer drawn OVER the portrait (hat brims, chin strings)
   const FRONT_EARS = { gat: 1, gatderpy: 1, magpie: 1, horns: 1, towel: 1, cap: 1 };
@@ -3031,7 +3279,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg?v=r14';
+      img.src = 'icons/' + icon + '.jpg?v=r15';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {
@@ -3111,6 +3359,11 @@ const Art = (() => {
         else if (ob.kind === 'belltower' || ob.kind === 'apricornshop') col = [245, 158, 11];
         else if (ob.kind === 'skypillar' || ob.kind === 'secretbase') col = [16, 185, 129];
         else if (ob.kind === 'spearpillar') col = [250, 204, 21];
+        else if (ob.kind === 'securityhouse' || ob.kind === 'bankvault') col = [56, 189, 248];
+        else if (ob.kind === 'noobhouse') col = [161, 98, 7];
+        else if (ob.kind === 'mcdonalds') col = [239, 68, 68];
+        else if (ob.kind === 'craftlab' || ob.kind === 'glitcharena') col = [16, 185, 129];
+        else if (ob.kind === 'skyblockthrone') col = [234, 179, 8];
         else if (ob.kind === 'subportal') col = [253, 224, 71];
       }
       for (let yy = 0; yy < px; yy++) for (let xx = 0; xx < px; xx++) {
@@ -3133,6 +3386,9 @@ const Art = (() => {
     14: ['#f59e0b', '#fef3c7', '#a3d165'],
     15: ['#38bdf8', '#d1fae5', '#68d68b'],
     16: ['#312e81', '#818cf8', '#7dc9a6'],
+    17: ['#38bdf8', '#e0f2fe', '#6bd968'],
+    18: ['#059669', '#d1fae5', '#68d69c'],
+    19: ['#ca8a04', '#fef9c3', '#7cd665'],
   };
   // Seoul skyline for the Honmoon battle backdrop: [x, width, height] as fractions of w / h (built once)
   let SKYLINE = null;
@@ -3296,6 +3552,15 @@ const Art = (() => {
       // Sinnoh Mount Coronet & Spear Pillar golden wheel
       c.fillStyle = '#4338ca'; c.beginPath(); c.moveTo(0, hz); c.lineTo(w * 0.18, hz - h * 0.25); c.lineTo(w * 0.38, hz); c.closePath(); c.fill();
       c.strokeStyle = '#fbbf24'; c.lineWidth = 3; circ(c, w * 0.18, hz - h * 0.28, h * 0.06); c.stroke();
+    } else if (z === 17 || z === 18 || z === 19) {
+      // Maizen Block Continent: blocky diamond fortress, golden arches & floating skyblock silhouette
+      c.fillStyle = z === 19 ? '#eab308' : z === 18 ? '#10b981' : '#0284c7';
+      c.fillRect(w * 0.08, hz - h * 0.18, w * 0.14, h * 0.18);
+      c.fillStyle = '#facc15';
+      c.fillRect(w * 0.1, hz - h * 0.22, w * 0.1, h * 0.05);
+      // Floating skyblock cube in the sky
+      c.fillStyle = '#854d0e'; c.fillRect(w * 0.78, hz - h * 0.32, w * 0.1, h * 0.07);
+      c.fillStyle = '#22c55e'; c.fillRect(w * 0.78, hz - h * 0.34, w * 0.1, h * 0.03);
     }
     else { c.fillStyle = 'rgba(80,160,80,.35)'; ell(c, w * 0.2, hz, w * 0.3, h * 0.08); c.fill(); ell(c, w * 0.75, hz, w * 0.35, h * 0.1); c.fill(); }
     c.restore();

@@ -206,11 +206,11 @@ const UI = (() => {
     if (!s || Game.mode === 'battle') return;
     if (!minimap) minimap = Art.renderMinimap(6);
     const ow = World.overworld || World;
-    const owW = ow.W || 120, owH = ow.H || 230;
+    const owW = ow.W || 120, owH = ow.H || 286;
     const pct = (x, y) => 'left:' + ((x + 0.5) / owW * 100).toFixed(2) + '%;top:' + ((y + 0.5) / owH * 100).toFixed(2) + '%';
     let labels = '';
-    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105], 11: [22, 136], 12: [60, 158], 13: [98, 136], 14: [22, 192], 15: [60, 214], 16: [98, 192] };
-    for (let z = 1; z < 17; z++) {
+    const labelAt = { 1: [60, 74], 2: [26, 66], 3: [94, 66], 4: [24, 44], 5: [94, 41], 6: [25, 17], 7: [95, 17], 8: [59, 23], 9: [60, 50], 10: [44, 105], 11: [22, 136], 12: [60, 158], 13: [98, 136], 14: [22, 192], 15: [60, 214], 16: [98, 192], 17: [25, 250], 18: [60, 250], 19: [96, 250] };
+    for (let z = 1; z < 20; z++) {
       const reg = D.REGIONS[z], st = regionStats(z);
       if (!reg || !labelAt[z]) continue;
       const habs = st.ids.map(id => '<img src="' + Art.portraitURL(id) + '" class="' + (s.team[id] ? 'got' : 'nope') + '" alt="" title="' + esc(D.SP[id].name) + '">').join('');
@@ -245,7 +245,7 @@ const UI = (() => {
     }
     const caught = Object.keys(s.team).length;
     const subVisitedCount = s.subVisited ? Object.keys(s.subVisited).filter(k => s.subVisited[k]).length : 0;
-    const totalSubs = (World.submapList && World.submapList.length) || 20;
+    const totalSubs = (World.submapList && World.submapList.length) || 26;
     const locLabel = World.activeSubmap
       ? (World.activeSubmap.emoji || '🚪') + ' ' + esc(World.activeSubmap.name) + ' (' + esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island') + ')'
       : esc(D.REGIONS[Game.zone] ? D.REGIONS[Game.zone].name : 'Rainbow Island');
@@ -318,7 +318,7 @@ const UI = (() => {
     const s = Game.state;
     if (!s || Game.mode === 'battle') return;
     const caught = Object.keys(s.team).length, seen = D.SPECIES.filter(sp => s.seen[sp.id]).length, total = D.SPECIES.length;
-    let html = (caught >= total ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + '/' + total + ' Critters across all 15 Lands! 🌈👑</div>' : '') +
+    let html = (caught >= total ? '<div class="dex-trophy">🏆 Master Critter Trainer! Chuyu caught all ' + total + '/' + total + ' Critters across all 18 Lands! 🌈👑</div>' : '') +
       '<div class="dex-head"><span>📖 <b>' + caught + '/' + total + '</b> caught</span><span>👀 ' + seen + '/' + total + ' seen</span><span>⭐ Partner: <b>' + esc(D.SP[s.partner].name) + '</b></span><span class="dex-tip">Tap 🤝 to choose who follows Chuyu!</span></div><div class="dex-grid">';
     for (const sp of D.SPECIES) {
       const t = s.team[sp.id], seenIt = !!s.seen[sp.id];
@@ -486,7 +486,7 @@ const UI = (() => {
     const st = s.stats;
     const subVisitedCount = s.subVisited ? Object.keys(s.subVisited).filter(k => s.subVisited[k]).length : 0;
     const bossesCount = s.bosses ? Object.keys(s.bosses).filter(k => s.bosses[k]).length : 0;
-    const totalSubs = (World.submapList && World.submapList.length) || 20;
+    const totalSubs = (World.submapList && World.submapList.length) || 26;
     const html = '<div class="menu-grid">' +
       '<button class="big-btn" id="mSound">' + (Sound.muted ? '🔇 Sound is OFF — turn on' : '🔊 Sound is ON — turn off') + '</button>' +
       '<button class="big-btn green" id="mSave">💾 Save now</button>' +
@@ -512,7 +512,7 @@ const UI = (() => {
       '<h4>🅰️ A button</h4><p>Talk, open, shake, catch! (Keys: Enter, Space or Z)</p>' +
       '<h4>🅱️ B button</h4><p>⚡ Roller-skate dash on/off! (Keys: B or X · hold Shift)</p>' +
       '<h4>🐾 Catching Critters</h4><p>Walk into a wild Critter or rustle through tall grass. In battle:<br>1️⃣ ⚡ Attack — makes them dizzy (never knocks them out!)<br>2️⃣ 🎯 Throw Capsule — catch them!<br>3️⃣ 🍓 Feed Treat — heals your Critter and +45% catch chance<br>4️⃣ 🔄 Switch / 🏃 Run</p>' +
-      '<h4>🎤 Honmoon Island, Southern Continent & Grand Pokémon Continent</h4><p>Walk south from Sunshine Village to Honmoon Island (Rumi, Mira & Zoey join your team, plus the 🍜 Ramen Shop & Gwi-Ma!), cross to the Southern Continent:<br>• 🐯 <b>Derpy\'s Minhwa Sanctum</b> — pat knocked-over flowerpots 🪴 upright, steam at the ♨️ Jjimjilbang Bathhouse, and find Gat-Hat Derpy!<br>• 🎪 <b>Nightmare Critters Carnival</b> — meet all 8 Nightmare Critters (Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Simon Smoke, Poe, Touille & Maggie Mako)!<br>• ⚡ <b>Kanto Classics Bay (Gen 1)</b> — visit Professor Oak\'s Lab & the ❤️ Pokémon Center and catch 12 Original Gen-1 Pokémon!<br>Then cross the southern sea bridges to the <b>Grand Pokémon Continent (Generations 2–4)</b>:<br>• 🔔 <b>Johto Bell-Tower Groves (Gen 2)</b> — Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Legendary Lugia!<br>• 🌴 <b>Hoenn Sky-Pillar Tropics (Gen 3)</b> — Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Legendary Rayquaza!<br>• 👑 <b>Sinnoh Spear-Pillar Peaks (Gen 4)</b> — Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Mythical Arceus!</p>' +
+      '<h4>🎤 Honmoon Island, Southern Continent, Pokémon Continent & Maizen Lands</h4><p>Walk south from Sunshine Village to Honmoon Island (Rumi, Mira & Zoey join your team, plus the 🍜 Ramen Shop & Gwi-Ma!), cross to the Southern Continent:<br>• 🐯 <b>Derpy\'s Minhwa Sanctum</b> — pat knocked-over flowerpots 🪴 upright, steam at the ♨️ Jjimjilbang Bathhouse, and find Gat-Hat Derpy!<br>• 🎪 <b>Nightmare Critters Carnival</b> — meet all 8 Nightmare Critters (Baba Chops, Icky Licky, Rabie Baby, Allister Gator, Simon Smoke, Poe, Touille & Maggie Mako)!<br>• ⚡ <b>Kanto Classics Bay (Gen 1)</b> — visit Professor Oak\'s Lab & the ❤️ Pokémon Center and catch 12 Original Gen-1 Pokémon!<br>Cross the southern sea bridges to the <b>Grand Pokémon Continent (Generations 2–4)</b>:<br>• 🔔 <b>Johto Bell-Tower Groves (Gen 2)</b> — Chikorita, Cyndaquil, Totodile, Togepi, Marill, Umbreon, Suicune & Legendary Lugia!<br>• 🌴 <b>Hoenn Sky-Pillar Tropics (Gen 3)</b> — Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol, Metagross & Legendary Rayquaza!<br>• 👑 <b>Sinnoh Spear-Pillar Peaks (Gen 4)</b> — Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp & Mythical Arceus!<br>And explore the <b>Maizen Block Continent (JJ, Mikey, Carrie & Friends — Zones 17–19)</b>:<br>• 🐢 <b>JJ & Mikey\'s Security Mansion & Burger Blvd</b> — Pro Diamond JJ, Noob Dirt Mikey, Burger Chef JJ, Crispy Fries Mikey, Carrie, Bolt the Wolf & Banana Cat!<br>• 🧪 <b>Maizen Bank Vault & Dr. Craft\'s Science Lab</b> — Officer Chief, Sneaky Robber, Dr. Craft, Redstone Golem & Super Mutant Mikey!<br>• 👑 <b>Maizen Skyblock, Hacker Arena & Herobrine Keep</b> — Masked Glitch Hacker, Cursed Herobrine, King Golden JJ & Ender Dragon Mikey!</p>' +
       '<h4>🗺️ Map (M) · 📖 Dex (C) · 🎒 Bag (I)</h4><p>Teleport to any land, choose your partner, and shop for capsules. Your adventure saves automatically! 💾</p></div>';
     openModal('help', '❓ How to Play', html);
   }
@@ -525,10 +525,11 @@ const UI = (() => {
   }
 
   /* ---------------- title & starters ---------------- */
+  const STARTER_IDS = ['dogday', 'catnap', 'hoppy', 'mikey', 'jj', 'carrie'];
   function showTitle(cb) {
     titleCb = cb;
     const box = $('starters');
-    box.innerHTML = ['dogday', 'catnap', 'hoppy'].map((id, k) => {
+    box.innerHTML = STARTER_IDS.map((id, k) => {
       const sp = D.SP[id];
       return '<button class="starter" data-id="' + id + '" style="--c:' + sp.color + '"><span class="sk">' + (k + 1) + '</span><img src="' + Art.portraitURL(id) + '" alt=""><b>' + esc(sp.name) + ' ' + sp.emoji + '</b><small>⚡ ' + esc(sp.move) + '</small><em>' + esc(sp.desc) + '</em></button>';
     }).join('');
@@ -625,7 +626,7 @@ const UI = (() => {
       return true;
     }
     if (titleCb) {
-      if (k === '1' || k === '2' || k === '3') { pickStarter(['dogday', 'catnap', 'hoppy'][+k - 1]); return true; }
+      if (k >= '1' && k <= '6') { pickStarter(STARTER_IDS[+k - 1]); return true; }
       if (k.startsWith('Arrow')) {
         e.preventDefault();
         const bs = Array.from(document.querySelectorAll('#starters .starter'));

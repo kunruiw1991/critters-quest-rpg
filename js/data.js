@@ -5,10 +5,11 @@
 const CQData = (() => {
   const TILE = 48;
   const MAP_W = 120;
-  const MAP_H = 230;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13), rows 174..229 = Grand Champion Continent (Zones 14..16: Johto, Hoenn, Sinnoh)
+  const MAP_H = 286;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13), rows 174..229 = Grand Champion Continent (Zones 14..16), rows 230..285 = Maizen Block Continent (Zones 17..19: JJ & Mikey Show)
   const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay 100% identical)
   const MAP_H1 = 118;  // height of Rainbow + Honmoon Islands (Honmoon layout & RNG stay 100% intact)
   const MAP_H2 = 174;  // height of Rainbow + Honmoon + Southern Continent (Zones 11..13 layout & RNG stay 100% intact)
+  const MAP_H3 = 230;  // height of Rainbow + Honmoon + Southern + Grand Champion Continent (Zones 14..16 layout & RNG stay 100% intact)
   const MAP_VERSION = 1;
 
   /* Elemental "types" are pure flavor: they pick the attack visual + colors. */
@@ -56,12 +57,12 @@ const CQData = (() => {
     { id: 'bobby', name: 'Bobby BearHug', emoji: '❤️', icon: 'bobby', type: 'heart', rarity: 'common', color: '#e8485f', ears: 'bear',
       move: 'Heart Wave', bubbles: ['❤️', 'Hug?', '🤗', '💕'], hpB: 3, atkB: 1,
       desc: 'A cuddly red bear whose Heart Wave makes everyone smile.' },
-    { id: 'mikey', name: 'Mikey', emoji: '🌿', icon: 'mikey', type: 'leaf', rarity: 'common', color: '#3fa34d', ears: 'shell',
-      move: 'Leaf Twirl', bubbles: ['🌿', 'Hi!', '🐢', '🍃'], hpB: 2, atkB: 1,
-      desc: 'A friendly explorer in a turtle hoodie who loves the quiet Emerald Woods.' },
+    { id: 'mikey', name: 'Mikey', emoji: '🐢', icon: 'mikey', type: 'leaf', rarity: 'common', color: '#3fa34d', ears: 'shell',
+      move: 'Leaf Twirl', bubbles: ['🐢', 'Hi JJ!', '🍔', '🍃'], hpB: 2, atkB: 2, starter: true, hero: true,
+      desc: 'The playful green turtle star of the Maizen show! He loves wild adventures with JJ, building secret traps, and munching golden burgers.' },
     { id: 'jj', name: 'JJ', emoji: '🌊', icon: 'jj', type: 'water', rarity: 'common', color: '#3b82f6', ears: 'none',
-      move: 'Wave Splash', bubbles: ['🌊', 'Splash!', '😄', '🐚'], hpB: 1, atkB: 2,
-      desc: 'A cheerful builder who splashes in the lagoon and collects shiny seashells.' },
+      move: 'Wave Splash', bubbles: ['🌊', 'Mikey!!', '💎', '😄'], hpB: 2, atkB: 2, starter: true, hero: true,
+      desc: 'Mikey\'s best friend and master builder from the Maizen show! He builds 100-layer security mansions, diamond armor, and epic obstacle courses.' },
     { id: 'poppy', name: 'Poppy Dash', emoji: '🌸', icon: 'poppydash', type: 'flower', rarity: 'common', color: '#ff7fbf', ears: 'skunk',
       move: 'Petal Dash', bubbles: ['🌸', '🍿', 'Zoom!', '💨'], hpB: 0, atkB: 3,
       desc: 'A speedy little skunk who dashes through flowers with a bucket of popcorn.' },
@@ -290,6 +291,55 @@ const CQData = (() => {
     { id: 'arceus', name: 'Arceus', emoji: '👑', icon: 'arceus', type: 'golden', rarity: 'legendary', color: '#ffd23b', ears: 'crown',
       move: 'Judgment Star', bubbles: ['👑', 'AR-CE-US!', '🌟', '🌌'], hpB: 6, atkB: 5,
       desc: 'The Mythical Alpha Pokémon of Sinnoh! Crowned with a golden wheel of a thousand stars, it waits atop Spear Pillar Temple.' },
+    /* ---- Zones 17–19: Maizen Block Continent — JJ, Mikey & Friends from the Maizen Show! ---- */
+    { id: 'carrie', name: 'Carrie', emoji: '🐱', icon: 'carrie', type: 'heart', rarity: 'common', color: '#f472b6', ears: 'cat',
+      move: 'Cat-Hoodie Hug', bubbles: ['🐱', '💖', 'Yay!', '✨'], hpB: 2, atkB: 2, starter: true, hero: true,
+      desc: 'JJ & Mikey\'s sweet pink-haired friend in a yellow cat-ear hoodie! She judges build battles, bakes treats, and rescues Mikey from his own traps.' },
+    { id: 'projj', name: 'Pro Diamond JJ', emoji: '💎', icon: 'projj', type: 'golden', rarity: 'common', color: '#38bdf8', ears: 'helmet', hero: true,
+      move: 'Diamond Sword Slash', bubbles: ['💎', '⚔️', 'Pro Build!', '✨'], hpB: 3, atkB: 3,
+      desc: 'JJ suited up in full enchanted Diamond Armor! He can build a 100-layer security fortress in ten minutes flat.' },
+    { id: 'noobmikey', name: 'Noob Dirt Mikey', emoji: '🪨', icon: 'noobmikey', type: 'leaf', rarity: 'common', color: '#a16207', ears: 'shell', hero: true,
+      move: 'Dirt Block Bonk', bubbles: ['🪨', '🐢', 'Hehe!', '🌱'], hpB: 3, atkB: 2,
+      desc: 'Mikey in his hilarious Noob dirt-block helmet! His dirt house might be tiny, but it has the coziest secret tunnel underneath.' },
+    { id: 'burgerjj', name: 'Burger Chef JJ', emoji: '🍔', icon: 'burgerjj', type: 'sun', rarity: 'common', color: '#ef4444', ears: 'cap',
+      move: 'Golden Burger Toss', bubbles: ['🍔', '🧀', 'Order up!', '☀️'], hpB: 3, atkB: 2,
+      desc: 'Head chef of the Pro Burger Tycoon Restaurant! His triple-decker golden cheeseburgers heal the whole squad.' },
+    { id: 'burgermikey', name: 'Crispy Fries Mikey', emoji: '🍟', icon: 'burgermikey', type: 'fruit', rarity: 'common', color: '#f59e0b', ears: 'shell',
+      move: 'Crispy Fries Barrage', bubbles: ['🍟', '😋', 'Yum!', '🐢'], hpB: 2, atkB: 3,
+      desc: 'Mikey working the fry station at the Burger Diner! Well... mostly snacking on the golden french fries himself.' },
+    { id: 'maizenwolf', name: 'Bolt the Pet Wolf', emoji: '🐕', icon: 'maizenwolf', type: 'spirit', rarity: 'common', color: '#94a3b8', ears: 'dog',
+      move: 'Loyal Wolf Pounce', bubbles: ['🐕', 'Woof!', '❤️', '🐾'], hpB: 2, atkB: 3,
+      desc: 'JJ & Mikey\'s faithful tamed Minecraft wolf puppy with a bright red collar! He guards their mansion door day and night.' },
+    { id: 'bananacat', name: 'Banana Cat', emoji: '🍌', icon: 'bananacat', type: 'star', rarity: 'common', color: '#facc15', ears: 'cat',
+      move: 'Happy Banana Boogie', bubbles: ['🍌', '🐱', 'Happy~!', '🎵'], hpB: 3, atkB: 2,
+      desc: 'A tiny kitten in a bright yellow banana suit who dances to "Happy Happy Happy!" whenever Mikey shares a snack.' },
+    { id: 'policechief', name: 'Officer Chief', emoji: '🚓', icon: 'policechief', type: 'thunder', rarity: 'uncommon', color: '#2563eb', ears: 'cap',
+      move: 'Siren Dash Patrol', bubbles: ['🚓', '🚨', 'Freeze!', '⭐'], hpB: 3, atkB: 3,
+      desc: 'The friendly Police Chief of Maizen City! He patrols the Diamond Bank Vault and always catches sneaky pranksters.' },
+    { id: 'maizenrobber', name: 'Sneaky Robber', emoji: '🦹', icon: 'maizenrobber', type: 'moon', rarity: 'uncommon', color: '#475569', ears: 'beanie',
+      move: 'Grapple Hook Swipe', bubbles: ['🦹', '💰', 'Ti-ptoe~', '👀'], hpB: 2, atkB: 3,
+      desc: 'A goofy cartoon burglar in a striped shirt who tries to tiptoe past JJ\'s laser traps — and always bounces into a slime pad instead!' },
+    { id: 'scientist', name: 'Dr. Craft', emoji: '🧪', icon: 'scientist', type: 'rainbow', rarity: 'uncommon', color: '#10b981', ears: 'fluff',
+      move: 'Fizzing Potion Splash', bubbles: ['🧪', '🫧', 'Eureka!', '🔬'], hpB: 3, atkB: 3,
+      desc: 'Maizen\'s wacky lab scientist! He brews bubbling Giant Potions, Shrink Rays, and portal elixirs for JJ & Mikey\'s experiments.' },
+    { id: 'redstonegolem', name: 'Redstone Security Golem', emoji: '🤖', icon: 'redstonegolem', type: 'thunder', rarity: 'uncommon', color: '#dc2626', ears: 'helmet',
+      move: 'Laser Turret Beam', bubbles: ['🤖', '🔴', 'BEEP-BOOP!', '🌼'], hpB: 4, atkB: 3,
+      desc: 'JJ\'s custom-built Iron & Redstone Security Golem! It looks super tough, but it gently holds out a yellow flower to friends.' },
+    { id: 'mutantmikey', name: 'Super Mutant Mikey', emoji: '🐢', icon: 'mutantmikey', type: 'leaf', rarity: 'rare', color: '#16a34a', ears: 'shell', hero: true,
+      move: 'Mega Shell Quake', bubbles: ['🐢', '💪', 'TURTLE POWER!', '💚'], hpB: 5, atkB: 4,
+      desc: 'After drinking Dr. Craft\'s glowing green Mega-Potion, Mikey powered up into Super Mutant Mikey with an indestructible emerald shell!' },
+    { id: 'maizenhacker', name: 'Masked Glitch Hacker', emoji: '💻', icon: 'maizenhacker', type: 'galaxy', rarity: 'rare', color: '#22c55e', ears: 'horns',
+      move: 'Command Block Glitch', bubbles: ['💻', '0101!', '⚡', '🟢'], hpB: 3, atkB: 5,
+      desc: 'The mysterious neon-masked Hacker from Noob vs Pro vs Hacker! He summons floating Command Blocks and matrix sparkles.' },
+    { id: 'herobrine', name: 'Cursed Herobrine', emoji: '⚡', icon: 'herobrine', type: 'demon', rarity: 'rare', color: '#6366f1', ears: 'flame',
+      move: 'White-Eye Lightning', bubbles: ['⚡', '👀', 'ZAP!', '🌩️'], hpB: 4, atkB: 5,
+      desc: 'The legendary glowing-eyed mystery of Minecraft! Once you befriend him with a Sweet Berry, he uses his lightning to protect your base.' },
+    { id: 'kingjj', name: 'King Golden JJ', emoji: '👑', icon: 'kingjj', type: 'golden', rarity: 'legendary', color: '#eab308', ears: 'crown', hero: true,
+      move: '100-Million Gold Rain', bubbles: ['👑', '💛', 'GOLDEN JJ!', '🌟'], hpB: 6, atkB: 5,
+      desc: 'Legendary Royal JJ wearing the 100-Million Subscriber Golden Crown! Every swing of his scepter showers the sky with golden stars.' },
+    { id: 'dragonmikey', name: 'Ender Dragon Mikey', emoji: '🌌', icon: 'dragonmikey', type: 'galaxy', rarity: 'legendary', color: '#9333ea', ears: 'dragon', hero: true,
+      move: 'Ender Turtle Nova', bubbles: ['🌌', '🐉', 'ENDER MIKEY!', '🐢'], hpB: 6, atkB: 5,
+      desc: 'Mikey in his ultimate Legendary Ender Dragon armor! He soars across Maizen Skyblock on glowing purple dragon wings.' },
   ];
   SPECIES.forEach((s, i) => { s.num = i + 1; s.rate = RARITY[s.rarity].rate; });
   const SP = {};
@@ -301,9 +351,9 @@ const CQData = (() => {
     { id: 1, key: 'village', name: 'Sunshine Village', short: 'Village', emoji: '🏡', rect: [50, 62, 70, 80], lv: [2, 4],
       color: '#ffcf4d', music: 'village', table: [] },
     { id: 2, key: 'orchard', name: 'Whispering Apple Orchard & Emerald Woods', short: 'Orchard', emoji: '🍎', rect: [8, 56, 46, 84], lv: [2, 5],
-      color: '#5cc45a', music: 'nature', table: [['picky', 40], ['bobby', 30], ['mikey', 30]] },
+      color: '#5cc45a', music: 'nature', table: [['picky', 30], ['bobby', 22], ['mikey', 32], ['noobmikey', 16]] },
     { id: 3, key: 'lagoon', name: 'Sapphire Coral Lagoon & Beach Boardwalk', short: 'Lagoon', emoji: '🌊', rect: [72, 56, 114, 84], lv: [3, 6],
-      color: '#3fc1e8', music: 'lagoon', table: [['jj', 40], ['poppy', 30], ['bubba', 30]] },
+      color: '#3fc1e8', music: 'lagoon', table: [['jj', 32], ['poppy', 26], ['bubba', 26], ['projj', 16]] },
     { id: 4, key: 'meadow', name: 'Rainbow Crystal Meadow & Unicorn Shrine', short: 'Meadow', emoji: '🌈', rect: [6, 28, 44, 54], lv: [5, 9],
       color: '#f59fd0', music: 'meadow', table: [['crafty', 34], ['bobby', 28], ['poppy', 28], ['prism', 10]] },
     { id: 5, key: 'windmill', name: 'Thunder Windmill Ridge & Bamboo Grove', short: 'Windmill', emoji: '⚡', rect: [74, 28, 114, 54], lv: [6, 10],
@@ -315,7 +365,7 @@ const CQData = (() => {
     { id: 8, key: 'castle', name: 'Starlight Lavender Sanctuary & Moon Castle', short: 'Castle', emoji: '🏰', rect: [45, 4, 73, 32], lv: [12, 16],
       color: '#a98bf0', music: 'castle', table: [['catnap', 46], ['luna', 44], ['galaxy', 5], ['solar', 5]] },
     { id: 9, key: 'cross', name: 'Rainbow Crossroads Park', short: 'Crossroads', emoji: '🌳', rect: [45, 33, 73, 61], lv: [2, 5],
-      color: '#7fd36a', music: 'nature', table: [['dogday', 25], ['catnap', 25], ['hoppy', 25], ['picky', 25]] },
+      color: '#7fd36a', music: 'nature', table: [['dogday', 18], ['catnap', 18], ['hoppy', 18], ['mikey', 18], ['jj', 16], ['carrie', 12]] },
     { id: 10, key: 'honmoon', name: 'Honmoon Island (K-Pop Demon Hunters)', short: 'Honmoon', emoji: '🎤', rect: [22, 92, 97, 113], lv: [9, 13],
       color: '#ff6fb5', music: 'honmoon', isNew: true,
       table: [['derpy', 18], ['sussie', 16], ['imp', 16], ['baby', 12], ['abby', 12], ['mystery', 10], ['romance', 10], ['jinu', 6]] },
@@ -337,9 +387,18 @@ const CQData = (() => {
     { id: 16, key: 'sinnoh', name: 'Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Gen 4)', short: 'Sinnoh', emoji: '👑', rect: [78, 178, 114, 223], lv: [20, 26],
       color: '#6366f1', music: 'sinnoh', isNew: true,
       table: [['turtwig', 20], ['chimchar', 20], ['piplup', 20], ['shinx', 20], ['buneary', 20]] },
+    { id: 17, key: 'maizen_mansion', name: "JJ & Mikey's Security Mansion & Burger Blvd", short: 'JJ & Mikey', emoji: '🐢', rect: [8, 234, 42, 279], lv: [14, 20],
+      color: '#38bdf8', music: 'maizen', isNew: true,
+      table: [['mikey', 16], ['jj', 16], ['carrie', 16], ['noobmikey', 14], ['projj', 14], ['burgerjj', 12], ['burgermikey', 12]] },
+    { id: 18, key: 'maizen_city', name: "Maizen Bank Vault & Dr. Craft's Science Lab", short: 'Maizen Lab', emoji: '🧪', rect: [45, 234, 75, 279], lv: [18, 24],
+      color: '#10b981', music: 'maizen', isNew: true,
+      table: [['maizenwolf', 18], ['bananacat', 18], ['policechief', 16], ['maizenrobber', 16], ['scientist', 16], ['redstonegolem', 16]] },
+    { id: 19, key: 'maizen_skyblock', name: 'Maizen Skyblock, Hacker Arena & Herobrine Keep', short: 'Skyblock', emoji: '👑', rect: [78, 234, 114, 279], lv: [22, 28],
+      color: '#eab308', music: 'maizen', isNew: true,
+      table: [['projj', 18], ['noobmikey', 16], ['carrie', 16], ['redstonegolem', 14], ['mutantmikey', 12], ['maizenhacker', 12], ['herobrine', 12]] },
   ];
   /* The official lands (fast-travel destinations); Crossroads is a bonus park. */
-  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16];
+  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
   /* Where each rare / legendary always waits (until caught) — so 100% CritterDex completion is always possible. */
   const SPECIAL_SPOTS = [
@@ -363,6 +422,13 @@ const CQData = (() => {
     { sp: 'lucario', zone: 16, at: [86, 212], lv: 26, place: 'the Aura Training Dojo' },
     { sp: 'garchomp', zone: 16, at: [106, 212], lv: 27, place: "Cynthia's Champion Cliff" },
     { sp: 'arceus', zone: 16, at: [104, 185], lv: 30, place: 'Spear Pillar Temple' },
+    { sp: 'projj', zone: 17, at: [20, 245], lv: 20, place: "JJ & Mikey's Security Mansion" },
+    { sp: 'noobmikey', zone: 17, at: [32, 266], lv: 19, place: 'the Noob vs Pro Burger Diner' },
+    { sp: 'mutantmikey', zone: 18, at: [66, 266], lv: 25, place: "Dr. Craft's Giant Potion Lab" },
+    { sp: 'maizenhacker', zone: 19, at: [86, 266], lv: 27, place: 'the Command-Block Glitch Arena' },
+    { sp: 'herobrine', zone: 19, at: [106, 266], lv: 28, place: 'the Herobrine Obsidian Shrine' },
+    { sp: 'kingjj', zone: 19, at: [92, 242], lv: 30, place: 'the 100-Million Golden Throne' },
+    { sp: 'dragonmikey', zone: 19, at: [102, 242], lv: 30, place: 'Maizen Skyblock Dragon Sanctum' },
   ];
 
   const ITEMS = {
@@ -374,12 +440,24 @@ const CQData = (() => {
 
   /* Friendly villagers. look = sprite palette. gift is given once. */
   const NPCS = [
+    { id: 'mikey_village', name: 'Mikey (Maizen)', zone: 1, at: [57, 71], join: 'mikey', joinLv: 5,
+      look: { skin: '#4ade80', hair: '#16a34a', hairStyle: 'short', shirt: '#22c55e', pants: '#15803d', hat: 'shell' },
+      lines: ['Hiii Chuyu!! I\'m Mikey from the Maizen show! 🐢🍔', 'JJ and I built a HUGE 100-Layer Security Mansion, a Noob vs Pro Burger Diner, a Laser Bank Vault, and even a Skyblock Sanctum down in the Maizen Block Continent!', 'Open your 🗺️ Map and tap 🐢 JJ & Mikey, 🧪 Maizen Lab, or 👑 Skyblock to visit our world any time — and let me join your team right now! 🌟'],
+      gift: { berry: 5, rainbow: 2 }, after: ['Yay!! Let\'s go prank JJ and eat golden burgers together! 🐢🍟'] },
+    { id: 'jj_village', name: 'JJ (Maizen)', zone: 1, at: [62, 71], join: 'jj', joinLv: 5,
+      look: { skin: '#f5cfa5', hair: '#1f2937', hairStyle: 'spiky', shirt: '#2563eb', pants: '#1e3a8a', hat: 'none', scarf: '#ef4444' },
+      lines: ['Hey Chuyu! I\'m JJ! 🌊💎 Mikey already pressed the secret button in our Security Mansion, didn\'t he?!', 'Down south in the Maizen Lands (Zones 17–19), you can catch Carrie 🐱, Pro Diamond JJ 💎, Noob Dirt Mikey 🪨, Bolt the Wolf 🐕, Banana Cat 🍌, Dr. Craft 🧪, Masked Hacker 💻, Herobrine ⚡, King Golden JJ 👑 and Ender Dragon Mikey 🌌!', 'Here are some Rainbow Capsules for our build battle — and count me in on your team!'],
+      gift: { rainbow: 3, gold: 100 }, after: ['Mikey, don\'t touch the redstone laser switch!! 😄💎'] },
+    { id: 'carrie_village', name: 'Carrie (Maizen)', zone: 1, at: [58, 68], join: 'carrie', joinLv: 5,
+      look: { skin: '#ffe0c8', hair: '#f472b6', hairStyle: 'long', shirt: '#facc15', pants: '#3b82f6', hat: 'cat' },
+      lines: ['Hi Chuyu! I\'m Carrie! 🐱💖 I\'m the judge for JJ and Mikey\'s Noob vs Pro Build Challenges!', 'Whenever Mikey gets stuck in a trap or Dr. Craft\'s Giant Potion goes boom, I help everyone out with a Cat-Hoodie Hug!', 'Let\'s explore Rainbow Island and the Maizen Block Continent together! ✨'],
+      gift: { berry: 4, rainbow: 2 }, after: ['Team Maizen is ready for adventure! 🐱🐢🌊'] },
     { id: 'mom', name: 'Mom', zone: 1, at: [55, 68], look: { skin: '#ffd6b3', hair: '#7a4a2a', hairStyle: 'bun', shirt: '#ff8fb1', pants: '#7c5cd6', hat: 'none', apron: '#ffffff' },
       lines: ['Good morning, Chuyu! 🌞 Did you sleep well?', 'If your Critters get sleepy, splash them at a 💖 Healing Fountain — or come home for a nap!', 'Here, take some snacks for your adventure! I love you! 💕'],
       gift: { berry: 5 }, after: ['Be careful and have fun, sweetie! Come home any time for a nap. 🏡'] },
     { id: 'prof', name: 'Professor Bubba', zone: 1, at: [63, 69], look: { skin: '#f5cfa5', hair: '#d9d9d9', hairStyle: 'short', shirt: '#ffffff', pants: '#5a7bd6', hat: 'elephant', coat: true, glasses: true },
-      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Eighty different Critters live across Rainbow Island, Honmoon Island, the Southern Lands, and the Grand Pokémon Continent (Johto, Hoenn & Sinnoh)!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
-      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the southern bridges to explore Johto 🔔, Hoenn 🌴, and Sinnoh 👑 for Generations 2, 3, and 4 Pokémon!'] },
+      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Ninety-six different Critters live across Rainbow Island, Honmoon Island, the Southern Lands, the Pokémon Continent, and the Maizen Block Continent!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
+      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the southern bridges to explore Johto 🔔, Hoenn 🌴, Sinnoh 👑, and JJ & Mikey\'s Maizen Lands 🐢!'] },
     { id: 'shopkeeper', name: 'Shopkeeper Penny', zone: 1, at: [54, 76], look: { skin: '#e8b48a', hair: '#2b2b2b', hairStyle: 'ponytail', shirt: '#2fb39a', pants: '#3c4a6b', hat: 'none', apron: '#fff3c4' },
       lines: ['Welcome to the Capsule & Berry Shop! 🛒'], shop: true },
     { id: 'timmy', name: 'Timmy', zone: 1, at: [57, 74], look: { skin: '#ffe0c2', hair: '#e8b84a', hairStyle: 'spiky', shirt: '#ffb020', pants: '#3b6fd6', hat: 'none' },
@@ -500,6 +578,35 @@ const CQData = (() => {
     { id: 'dawn', name: 'Dawn', zone: 16, at: [84, 206],
       look: { skin: '#ffd8ba', hair: '#2563eb', hairStyle: 'pigtails', shirt: '#ec4899', pants: '#1f2937', hat: 'beanie2' },
       lines: ['No need to worry! 🐧✨ Piplup, Buneary and I are practicing for the Sinnoh Super Contest!', 'Look right beside the Aura Dojo — ✨ Lucario 💠 is meditating by the crystal torches!'] },
+    /* ---- Zone 17: JJ & Mikey's Security Mansion & Burger Blvd ---- */
+    { id: 'mansion_jj', name: 'Pro Builder JJ', zone: 17, at: [25, 247], join: 'projj', joinLv: 18,
+      look: { skin: '#f5cfa5', hair: '#1f2937', hairStyle: 'spiky', shirt: '#38bdf8', pants: '#1e3a8a', hat: 'helmet', scarf: '#ef4444' },
+      lines: ['Welcome to our 100-Layer Redstone Security Mansion, Chuyu! 🏰💎', 'I built laser doors, diamond turrets, and a secret underground bunker — and Mikey built a tiny dirt house right next door! 🪨', 'Step inside the Security Bunker door or the Burger Tycoon Diner for special Maizen quests, and let Pro Diamond JJ join your squad!'],
+      gift: { rainbow: 3, gold: 150 }, after: ['Full Diamond Armor activated! Let\'s go! 💎⚔️'] },
+    { id: 'mansion_mikey', name: 'Noob Mikey', zone: 17, at: [30, 262], join: 'noobmikey', joinLv: 18,
+      look: { skin: '#4ade80', hair: '#16a34a', hairStyle: 'short', shirt: '#a16207', pants: '#15803d', hat: 'beanie' },
+      lines: ['Hehehe! JJ thinks my Noob Dirt House is silly, but I dug a secret tunnel straight to the Crispy Fries kitchen! 🪨🍟', 'Burger Chef JJ 🍔 and Crispy Fries Mikey 🍟 love hanging out by our Golden Arch Burger Diner!', 'Here, take a big stack of berries and let Noob Dirt Mikey join your team! 🐢'],
+      gift: { berry: 6, rainbow: 2 }, after: ['Never underestimate the power of a dirt block! 🪨🐢'] },
+    { id: 'mansion_carrie', name: 'Judge Carrie', zone: 17, at: [16, 258],
+      look: { skin: '#ffe0c8', hair: '#f472b6', hairStyle: 'long', shirt: '#facc15', pants: '#3b82f6', hat: 'cat' },
+      lines: ['Welcome to the Noob vs Pro Build Battle Boulevard! 🐱🏆', 'JJ built a high-tech Security Mansion in the north, and Mikey opened a Giant Burger & Fries Diner in the south!', 'Tap the Burger Counter any time to heal your whole team with hot golden burgers and crispy fries! 🍔💖'] },
+    /* ---- Zone 18: Maizen Bank Vault & Dr. Craft's Science Lab ---- */
+    { id: 'chief_npc', name: 'Officer Chief', zone: 18, at: [53, 247],
+      look: { skin: '#f2c49b', hair: '#1e293b', hairStyle: 'short', shirt: '#2563eb', pants: '#1e3a8a', hat: 'cap2' },
+      lines: ['Freeze—oh, it\'s Chuyu! Welcome to Maizen City Bank & Police Plaza! 🚓🚨', 'Sneaky Robber 🦹 keeps trying to tiptoe into the Diamond Bank Vault, while Bolt the Pet Wolf 🐕 and Banana Cat 🍌 patrol the streets!', 'Take these Police Chief supplies to help keep the peace!'],
+      gift: { rainbow: 3, berry: 4 }, after: ['Step inside the Maizen Laser Bank Vault if you want to test the security lasers! 🚓💎'] },
+    { id: 'drcraft_npc', name: 'Dr. Craft', zone: 18, at: [67, 263],
+      look: { skin: '#f5d0b5', hair: '#e5e7eb', hairStyle: 'spiky', shirt: '#ffffff', pants: '#065f46', hat: 'none', coat: true, glasses: true },
+      lines: ['EUREKA!! Welcome to my Science & Potion Lab, Chuyu! 🧪🔬', 'Mikey accidentally drank my experimental Emerald Mega-Potion and transformed into ✨ Super Mutant Mikey 🐢 right beside the lab!', 'And my friendly Redstone Security Golems 🤖 are guarding the portal — take these capsules for your research!'],
+      gift: { rainbow: 4 }, after: ['Enter my Giant Potion Lab sub-map to meet the boss inside! 🧪✨'] },
+    /* ---- Zone 19: Maizen Skyblock, Hacker Arena & Herobrine Keep ---- */
+    { id: 'kingjj_npc', name: 'Royal Herald Alex', zone: 19, at: [96, 246],
+      look: { skin: '#fde2c8', hair: '#eab308', hairStyle: 'long', shirt: '#7c2d12', pants: '#1f2937', hat: 'crown' },
+      lines: ['All hail the Maizen Skyblock Citadel! 👑🌌', 'On the Western Golden Throne stands Legendary 👑 King Golden JJ, and on the Eastern Ender Sanctum rests Legendary 👑 Ender Dragon Mikey!', 'Down south, ✨ Masked Glitch Hacker 💻 and ✨ Cursed Herobrine ⚡ await brave trainers — take this Master Star Capsule!'],
+      gift: { master: 1, rainbow: 3 }, after: ['You can catch all 96 Critters across the 18 lands! 🌟'] },
+    { id: 'hacker_npc', name: 'Friendly Coder Kai', zone: 19, at: [92, 263],
+      look: { skin: '#e2e8f0', hair: '#10b981', hairStyle: 'spiky', shirt: '#111827', pants: '#064e3b', hat: 'visor' },
+      lines: ['01001000 01001001! That means "HI" in binary! 💻🟢', 'In the Noob vs Pro vs Hacker challenge, the ✨ Masked Glitch Hacker built a Command-Block Arena right here, and ✨ Herobrine ⚡ guards the Obsidian Shrine to the east!', 'Step inside the Glitch Arena or the Skyblock Sanctum doors for two epic boss dungeons!'] },
   ];
 
   /* Chest contents are decided by world generation; these are the reward tiers. */
@@ -509,13 +616,14 @@ const CQData = (() => {
 
   const TIPS = [
     'Tip: Tap anywhere on the map to walk there — tap a chest, tree or Critter to use it!',
+    'Tip: Talk to Mikey 🐢, JJ 🌊 & Carrie 🐱 right in Sunshine Village to add them to your team!',
+    'Tip: Open the 🗺️ Map to teleport to JJ & Mikey\'s Security Mansion, Maizen Lab, or Skyblock! 👑',
     'Tip: Feed a 🍓 berry before throwing a capsule: +45% catch chance!',
     'Tip: Attacks never knock a wild Critter out — they just get dizzy 🎯 and easier to catch!',
     'Tip: Press B for ⚡ roller-skate dash!',
-    'Tip: The 🗺️ Map can teleport you to any of the 15 lands in one tap!',
     'Tip: Cross the Golden Honmoon Bridge south of Sunshine Village to meet the K-Pop Demon Hunters! 🎤',
     'Tip: Tap knocked-over flowerpots 🪴 in Derpy\'s Sanctum to pat them upright like Derpy Tiger!',
-    'Tip: Explore Johto 🔔, Hoenn 🌴 & Sinnoh 👑 in the far south to catch Gen 2, Gen 3 & Gen 4 Pokémon!',
+    'Tip: Explore Johto 🔔, Hoenn 🌴, Sinnoh 👑 & the Maizen Lands 🐢 to collect all 96 Critters!',
   ];
 
   window.CQSubmaps = window.CQSubmaps || [];
@@ -532,6 +640,6 @@ const CQData = (() => {
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_VERSION, TYPES, RARITY, SPECIES, SP, BY_ID: SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, SUBMAPS, registerSubmap, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_H3, MAP_VERSION, TYPES, RARITY, SPECIES, SP, BY_ID: SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, SUBMAPS, registerSubmap, maxHp, attackPower, expToNext };
 })();
 window.CQData = CQData;

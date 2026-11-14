@@ -82,6 +82,10 @@ const Sound = (() => {
     sinnoh: { bpm: 118, lw: 'triangle', bw: 'triangle', drums: 'k.h.s.h.',
       lead: 'A4 . E5 A5 B5 . C6 B5 | A5 . G5 E5 G5 . . - | F5 . A5 C6 E6 . D6 C6 | B5 . A5 G#5 E5 . . - | A5 . B5 C6 D6 . C6 B5 | A5 . E5 C5 D5 . E5 . | F5 G5 A5 B5 C6 D6 E6 . | A5 . E5 . A5 . . -',
       bass: 'A2 . E3 . A2 . E3 . | C3 . G3 . C3 . G3 . | F2 . C3 . D3 . A3 . | E2 . B2 . E2 . B2 . | A2 . E3 . G2 . D3 . | F2 . C3 . D3 . A3 . | F2 . C3 . E2 . B2 . | A2 . E3 . A2 . - -' },
+    /* Maizen Block Continent: bouncy upbeat JJ & Mikey craft-and-prank chiptune! */
+    maizen: { bpm: 130, lw: 'square', bw: 'triangle', drums: 'k.hsk.hs',
+      lead: 'C5 E5 G5 C6 A5 G5 E5 G5 | F5 A5 C6 D6 C6 A5 G5 . | E5 G5 C6 E6 D6 C6 A5 G5 | D5 F#5 A5 D6 B5 G5 . - | C6 . G5 E5 A5 . F5 D5 | G5 . E5 C5 F5 . D5 B4 | C5 D5 E5 F5 G5 A5 B5 D6 | C6 . G5 . C6 . . -',
+      bass: 'C3 . G3 . C3 . G3 . | F2 . C3 . F2 . C3 . | C3 . G3 . A2 . E3 . | D3 . A3 . G2 . D3 . | C3 . G3 . F2 . C3 . | E2 . B2 . G2 . D3 . | F2 . C3 . G2 . D3 . | C3 . G2 . C3 . - -' },
   };
   for (const k in TRACKS) {
     const t = TRACKS[k];

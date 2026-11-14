@@ -3,13 +3,38 @@
 🎮 **Play Live (GitHub Pages):** **[https://kunruiw1991.github.io/critters-quest-rpg/](https://kunruiw1991.github.io/critters-quest-rpg/)**
 
 A cozy, kid-friendly **2D classic RPG** — a Pokémon-style adventure where **Chuyu** explores a huge
-**120 × 230 tile world (27,600 tiles)** across **15 hand-themed lands + Rainbow Crossroads Park (`Zones 1..16`)** and **20 enterable embedded small maps** (cozy village halls, mushroom grottos, crystal caverns, sea-bottom coral cities, pirate shipwrecks, pharaoh tombs, glacier caves, moon dungeons, secret treehouses, K-Pop backstage lounges, underworld sanctums, Minhwa tiger dens, bathhouse steam grottos, funhouse mazes, and legendary Pokémon sanctums),
-makes friends with villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, battles 20 sub-map Bosses/Guardians, and
-**catches all 80 Critters** for the CritterDex!
+**120 × 286 tile world (34,320 tiles)** across **18 hand-themed lands + Rainbow Crossroads Park (`Zones 1..19`)** and **26 enterable embedded small maps** (including **JJ & Mikey's 100-Layer Security Bunker**, **Noob vs Pro Burger Tycoon Kitchen**, **Maizen Laser Bank Vault**, **Dr. Craft's Giant Potion Lab**, **Hacker's Command-Block Glitch Arena**, and **Maizen Skyblock Dragon & Golden Throne Sanctum**, plus village halls, mushroom grottos, crystal caverns, coral cities, pirate shipwrecks, pharaoh tombs, glacier caves, moon dungeons, secret treehouses, K-Pop backstage lounges, underworld sanctums, Minhwa tiger dens, bathhouse steam grottos, funhouse mazes, and legendary Pokémon sanctums),
+makes friends with **JJ, Mikey, Carrie & their Maizen Show friends**, villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, battles 26 sub-map Bosses/Guardians, and
+**catches all 96 Critters** for the CritterDex!
 
 ![Chuyu's Critter Quest screenshot](screenshot.jpg)
 
-## 🚪🏰 NEW: 20 Enterable Embedded Small Maps Across All 16 Regions!
+## 🐢🌊🐱 NEW: JJ, Mikey, Carrie & the Maizen Show Expansion (18 Maizen Characters + 3 Maizen Lands + 6 Maizen Dungeons!)
+
+- **6 Starters on the Title Screen**: Pick **DogDay ☀️**, **CatNap 🌙**, **Hoppy Hopscotch ⚡**, **Mikey 🐢**, **JJ 🌊**, or **Carrie 🐱** right on the Title Screen — and talk to **Mikey**, **JJ**, and **Carrie** right inside **Sunshine Village (Zone 1)** to recruit all three onto your team immediately!
+- **18 Total Maizen Show Characters in the CritterDex** (`#09` **Mikey** 🐢, `#10` **JJ** 🌊, plus 16 brand-new Maizen characters `#81–#96`):
+  - `#81` 🐱 **Carrie** (*Star* — *Cat-Hoodie Hug*)
+  - `#82` 💎 **Pro Diamond JJ** (`★ Rare` *Thunder* — *Diamond Sword Slash*)
+  - `#83` 🪨 **Noob Dirt Mikey** (`★ Rare` *Leaf* — *Mega Dirt Block Toss*)
+  - `#84` 🍔 **Burger Chef JJ** (*Sun* — *Golden Burger Flip*)
+  - `#85` 🍟 **Crispy Fries Mikey** (*Pop* — *Super Fry Rain*)
+  - `#86` 🐕 **Bolt the Pet Wolf** (*Water* — *Loyal Wolf Pounce*)
+  - `#87` 🍌 **Banana Cat** (*Rainbow* — *Happy Banana Boogie*)
+  - `#88` 🚓 **Officer Chief** (*Thunder* — *Siren Flash Dash*)
+  - `#89` 🦹 **Sneaky Robber** (*Moon* — *Money Bag Boomerang*)
+  - `#90` 🧪 **Dr. Craft** (*Spirit* — *Rainbow Potion Splash*)
+  - `#91` 🤖 **Redstone Security Golem** (*Golden* — *Laser Guard Beam*)
+  - `#92` 🐢 **Super Mutant Mikey** (`★ Rare` *Leaf* — *Giant Shell Slam*)
+  - `#93` 💻 **Masked Glitch Hacker** (`★ Rare` *Galaxy* — *Command Block Beam*)
+  - `#94` ⚡ **Cursed Herobrine** (`★ Rare` *Thunder* — *Obsidian Lightning*)
+  - `#95` 👑 **King Golden JJ** (`👑 Legendary` *Golden* — *100-Million Crown Beam*)
+  - `#96` 🌌 **Ender Dragon Mikey** (`👑 Legendary` *Galaxy* — *Ender Burger Nova*)
+- **3 New Maizen Overworld Lands (`Zones 17..19`, `rows 230..285`) + 6 New Maizen Sub-Maps (`submap_21`..`submap_26`)**:
+  - **Zone 17: 🐢 JJ & Mikey's Security Mansion & Burger Blvd** — 100-Layer Redstone Security Mansion, Mikey's Noob Dirt House, and the healing **Noob vs Pro Burger & Fries Diner** 🍔 (`submap_21`: *JJ & Mikey's 100-Layer Security Bunker*, `submap_22`: *Noob vs Pro Burger Tycoon Kitchen*).
+  - **Zone 18: 🧪 Maizen Bank Vault & Dr. Craft's Science Lab** — Maizen City Diamond Bank Vault and the healing **Dr. Craft's Giant Potion & Portal Lab** 🧪 (`submap_23`: *Maizen Laser Bank Vault & Escape Tunnel*, `submap_24`: *Dr. Craft's Giant Potion & Portal Lab*).
+  - **Zone 19: 👑 Maizen Skyblock, Hacker Arena & Herobrine Keep** — 100-Million Golden Throne & Ender Dragon Sanctum, Hacker's Command-Block Glitch Arena, and Herobrine Obsidian Shrine (`submap_25`: *Hacker's Command-Block Glitch Arena*, `submap_26`: *Maizen Skyblock Dragon & Golden Throne Sanctum*).
+
+## 🚪🏰 26 Enterable Embedded Small Maps Across All 19 Regions!
 
 | 🏡 Sunshine Cozy Village Hall (`submap_01`) | 🐚 Sea-Bottom Coral City (`submap_04`) | 🎤 Honmoon Backstage Idol Lounge (`submap_10`) | 🔥 Gwi-Ma's Underworld Sanctum (`submap_11`) |
 |---|---|---|---|
@@ -44,6 +69,12 @@ Every region across the `120 × 230` overworld now features interactive **Sub-Ma
 | 18 | `submap_18` | 🔔 **Bell Tower Sacred Attic** | Zone 14 | `(30, 188)` | `22 × 18` | **Bell Keeper Eusine** (`3 🌈, 4 ⭐, 200 🪙`) | Chikorita, Cyndaquil, Togepi, Umbreon, Suicune | **Sacred Bell Guardian Suicune** (`suicune`, Lv 27) |
 | 19 | `submap_19` | 🏛️ **Hoenn Sootopolis Underwater Temple** | Zone 15 | `(64, 204)` | `24 × 18` | **Champion Steven** (`1 👑, 4 🌈, 250 🪙`) | Treecko, Torchic, Mudkip, Gardevoir, Milotic, Absol | **Sky-Temple Guardian Rayquaza** (`rayquaza`, Lv 30) |
 | 20 | `submap_20` | ✨ **Sinnoh Hall of Origin Sanctum** | Zone 16 | `(103, 184)` | `26 × 20` | **Champion Cynthia** (`2 👑, 5 🌈, 300 🪙`) | Turtwig, Chimchar, Piplup, Shinx, Buneary, Lucario, Garchomp | **Alpha Creator Arceus** (`arceus`, Lv 32) |
+| 21 | `submap_21` | 🛡️ **JJ & Mikey's 100-Layer Security Bunker** | Zone 17 | `(25, 245)` | `22 × 16` | **Security Engineer JJ** (`3 🌈, 4 🍓, 180 🪙`) | Pro Diamond JJ, Mikey, JJ, Carrie, Bolt the Wolf, Redstone Golem | **Chief Redstone Security Golem** (`redstonegolem`, Lv 23) |
+| 22 | `submap_22` | 🍔 **Noob vs Pro Burger Tycoon Kitchen** | Zone 17 | `(25, 263)` | `22 × 16` | **Head Chef Carrie** (`5 🍓, 3 🌈, 175 🪙`) | Burger Chef JJ, Crispy Fries Mikey, Noob Dirt Mikey, Carrie, Banana Cat | **Master Burger Chef JJ** (`burgerjj`, Lv 24) |
+| 23 | `submap_23` | 🏦 **Maizen Laser Bank Vault & Escape Tunnel** | Zone 18 | `(56, 245)` | `24 × 18` | **Police Chief** (`3 🌈, 4 🍓, 210 🪙`) | Officer Chief, Sneaky Robber, Bolt the Wolf, Banana Cat, Noob Mikey | **Mastermind Sneaky Robber** (`maizenrobber`, Lv 26) |
+| 24 | `submap_24` | 🧪 **Dr. Craft's Giant Potion & Portal Lab** | Zone 18 | `(64, 263)` | `24 × 18` | **Dr. Craft** (`4 🌈, 4 🍓, 220 🪙`) | Dr. Craft, Super Mutant Mikey, Redstone Golem, Mikey, JJ, Carrie | **Titan Super Mutant Mikey** (`mutantmikey`, Lv 27) |
+| 25 | `submap_25` | 💻 **Hacker's Command-Block Glitch Arena** | Zone 19 | `(89, 263)` | `24 × 18` | **White-Hat Pro JJ** (`1 👑, 3 🌈, 250 🪙`) | Masked Hacker, Herobrine, Pro Diamond JJ, Noob Mikey, Redstone Golem | **Grand Masked Glitch Hacker** (`maizenhacker`, Lv 29) |
+| 26 | `submap_26` | 👑 **Maizen Skyblock Dragon & Golden Throne Sanctum** | Zone 19 | `(96, 244)` | `26 × 20` | **Skyblock Queen Carrie** (`2 👑, 5 🌈, 350 🪙`) | King Golden JJ, Ender Dragon Mikey, Herobrine, Masked Hacker, Pro JJ, Mutant Mikey | **Skyblock Sovereign Ender Dragon Mikey** (`dragonmikey`, Lv 32) |
 
 ---
 
@@ -131,19 +162,19 @@ Three bridges lead south from **Honmoon Island** (`x = 34`, `x = 59`, `x = 90`) 
 | 🏡 Sunshine Village | 🌈 Crystal Meadow | ⚔️ Catching a rare Prism CraftyCorn |
 |---|---|---|
 | ![Village](screenshots/village.jpg) | ![Meadow](screenshots/meadow.jpg) | ![Battle](screenshots/battle.jpg) |
-| **🗺️ World Map / Fast Travel (15 Lands)** | **📖 CritterDex (80 Critters)** | |
+| **🗺️ World Map / Fast Travel (18 Lands)** | **📖 CritterDex (96 Critters)** | |
 | ![World Map](screenshots/worldmap.jpg) | ![CritterDex](screenshots/critterdex.jpg) | |
 
 ---
 
 ## ✨ Highlights
 
-- **Huge 120 × 230 world (27,600 tiles, 48 px tiles)**: Rainbow Island (`rows 0..89`), Honmoon Island (`rows 90..117`), the Southern Continent (`rows 118..173`), and the Grand Pokémon Continent (`rows 174..229`), generated deterministically. Every chest, flowerpot, tree, NPC, fountain, crystal and rare spot is verified reachable on foot (`World.audit().unreachable` is always `[]` and `repairs === 0`).
-- **15 main lands + Rainbow Crossroads Park**, each with its own tile palette, landmarks, chiptune music, weather particles and Critters:
+- **Huge 120 × 286 world (34,320 tiles, 48 px tiles)**: Rainbow Island (`rows 0..89`), Honmoon Island (`rows 90..117`), the Southern Continent (`rows 118..173`), the Grand Pokémon Continent (`rows 174..229`), and the Maizen Prank & Craft Continent (`rows 230..285`), generated deterministically. Every chest, flowerpot, tree, NPC, fountain, crystal and rare spot is verified reachable on foot (`World.audit().unreachable` is always `[]` and `repairs === 0`).
+- **18 main lands + Rainbow Crossroads Park**, each with its own tile palette, landmarks, chiptune music, weather particles and Critters:
 
   | # | Region | Landmarks | Critters |
   |---|--------|-----------|----------|
-  | 1 | 🏡 **Sunshine Village** | Chuyu's house, Professor Bubba's Lab, Shop, Healing Fountain, south gate | *(safe town)* |
+  | 1 | 🏡 **Sunshine Village** | Chuyu's house, Professor Bubba's Lab, Shop, Healing Fountain, Mikey 🐢, JJ 🌊 & Carrie 🐱, south gate | *(safe town)* |
   | 2 | 🍎 **Whispering Apple Orchard & Emerald Woods** | Apple rows, streams, bridges, fairy mushroom ring | PickyPiggy 🍎, Bobby BearHug ❤️, Mikey 🌿 |
   | 3 | 🌊 **Sapphire Coral Lagoon & Beach Boardwalk** | Golden beach, boardwalk, lighthouse pier, coral stepping stones | JJ 🌊, Poppy Dash 🌸, Bubba Bubbaphant 💡 |
   | 4 | 🌈 **Rainbow Crystal Meadow & Unicorn Shrine** | Pastel flower fields, crystal pillars, Unicorn Gazebo | CraftyCorn 🌈, Bobby ❤️, Poppy 🌸, ✨ **Prism CraftyCorn** |
@@ -156,12 +187,15 @@ Three bridges lead south from **Honmoon Island** (`x = 34`, `x = 59`, `x = 90`) 
   | 11 | 🐯 **Derpy's Minhwa Sanctum & Bathhouse Valley** | Derpy's Tiger Pavilion, Tipped Flowerpots 🪴, Jjimjilbang Bathhouse ♨️, Healer Han's Clinic, Soda Pop Truck | Derpy Tiger, Sussie, Water Demon 💧, Flight Dokkaebi ✈️, Jeoseung Saja 🏮, ★ **Gat-Hat Derpy** 🎩 |
   | 12 | 🎪 **Nightmare Critters Carnival & Twilight Hollow** | Carnival Tent 🎪, Dragon Smoke Cauldron 🔥, Gator Swamp, Sweet-Tooth Fountain | Baba Chops 🐑, Icky Licky 🐸, Rabie Baby 🦇, Allister Gator 🐊, Poe 🐦‍⬛, Touille 🐀, Maggie Mako 🦈, ★ **Simon Smoke** 🐉 |
   | 13 | ⚡ **Kanto Classics Bay & Pallet Meadow (Gen 1)** | Pokémon Center ❤️, Professor Oak's Lab, Snorlax Bridge, Ember Volcano, Cerulean Mew Shrine | Pikachu ⚡, Bulbasaur 🌱, Charmander 🔥, Squirtle 💦, Jigglypuff 🎤, Eevee 🌟, Psyduck 🦆, Meowth 🪙, Gengar 👻, ★ **Snorlax**, ★ **Charizard**, 👑 **Mew** |
-  | 14 🆕 | 🔔 **Johto Bell-Tower Groves & Ecruteak Lake (Gen 2)** | Ecruteak Bell Tower 🔔, Whirl Island Lugia Roost 🌊, Johto Pokémon Center ❤️, Kurt's Apricorn Workshop 🌰 | Chikorita 🍃, Cyndaquil 🔥, Totodile 🐊, Togepi 🥚, Marill 🫧, Umbreon 🌙, ★ **Suicune** 💎, 👑 **Lugia** 🪶 |
-  | 15 🆕 | 🌴 **Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Gen 3)** | Sky Pillar Tower 🐉, Hoenn Pokémon Center ❤️, Secret Base Treehouse 🌴, Steven's Meteor Crater | Treecko 🦎, Torchic 🐥, Mudkip 💦, Gardevoir 💖, Milotic 🌈, Absol 🌙, ★ **Metagross** ⚡, 👑 **Rayquaza** 🐉 |
-  | 16 🆕 | 👑 **Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Gen 4)** | Spear Pillar Temple 👑, Sinnoh Pokémon Center ❤️, Professor Rowan's Sandgem Lab 🔬, Aura Dojo, Champion Cliff | Turtwig 🌱, Chimchar 🔥, Piplup 🐧, Shinx ⚡, Buneary 🎀, ★ **Lucario** 💠, ★ **Garchomp** 🦈, 👑 **Arceus** 👑 |
+  | 14 | 🔔 **Johto Bell-Tower Groves & Ecruteak Lake (Gen 2)** | Ecruteak Bell Tower 🔔, Whirl Island Lugia Roost 🌊, Johto Pokémon Center ❤️, Kurt's Apricorn Workshop 🌰 | Chikorita 🍃, Cyndaquil 🔥, Totodile 🐊, Togepi 🥚, Marill 🫧, Umbreon 🌙, ★ **Suicune** 💎, 👑 **Lugia** 🪶 |
+  | 15 | 🌴 **Hoenn Sky-Pillar Tropics & Sootopolis Lagoon (Gen 3)** | Sky Pillar Tower 🐉, Hoenn Pokémon Center ❤️, Secret Base Treehouse 🌴, Steven's Meteor Crater | Treecko 🦎, Torchic 🐥, Mudkip 💦, Gardevoir 💖, Milotic 🌈, Absol 🌙, ★ **Metagross** ⚡, 👑 **Rayquaza** 🐉 |
+  | 16 | 👑 **Sinnoh Spear-Pillar Peaks & Twinleaf Glade (Gen 4)** | Spear Pillar Temple 👑, Sinnoh Pokémon Center ❤️, Professor Rowan's Sandgem Lab 🔬, Aura Dojo, Champion Cliff | Turtwig 🌱, Chimchar 🔥, Piplup 🐧, Shinx ⚡, Buneary 🎀, ★ **Lucario** 💠, ★ **Garchomp** 🦈, 👑 **Arceus** 👑 |
+  | 17 🆕 | 🐢 **JJ & Mikey's Maizen Prank Valley (Noob vs Pro)** | 100-Layer Security Mansion 🏰, Mikey's Noob Dirt House 🏡, Maizen McDonald's 🍔 | Mikey 🐢, JJ 🌊, Carrie 🐱, Noob Mikey 🧱, Maizen Wolf 🐺, Banana Cat 🍌, ★ **Pro JJ** 💎, ★ **Burger JJ** 🍔, ★ **Burger Mikey** 🍟 |
+  | 18 🆕 | 🏦 **Maizen Cops & Robbers City & Secret Bunker** | Maizen Golden Bank Vault 🏦, Secret Craft Lab 🔬, Police HQ 🚓 | Police Chief 🚓, Maizen Robber 💰, Maizen Scientist 🔬, ★ **Redstone Golem** ⚙️, ★ **Mutant Mikey** 💪 |
+  | 19 🆕 | 👑 **Maizen Skyblock Lucky-Block Islands & Hacker Arena** | Glitch Arena 💻, Skyblock Golden Throne 👑, Lucky Block Bridge 🎲 | ★ **Maizen Hacker** 💻, ★ **Herobrine** ⚡, 👑 **Golden King JJ** 👑, 👑 **Ender Dragon Mikey** 🐉 |
 
-- **80 Critters**: 20 Rainbow Island Critters + 16 *KPop Demon Hunters* heroes/spirits/demons + 8 *Nightmare Critters* + 36 *Pokémon across Generations 1, 2, 3 & 4* (12 Kanto + 8 Johto + 8 Hoenn + 8 Sinnoh). Every rare/legendary **always waits at its landmark until caught**, so `80/80` is always achievable.
-- **86 treasure chests 🎁, 38 shakeable fruit trees 🌳, 5 interactive knocked-over flowerpots 🪴, 16 healing spots 💖 (fountains, hot springs, ramen shop, Jjimjilbang bathhouse, and 4 regional Pokémon Centers) and 15 Rainbow Waypoint Crystals 🔮**, plus 40 friendly villagers, mentors, Professors, and Champions.
+- **96 Critters**: 20 Rainbow Island Critters (including `#09` **Mikey** 🐢 & `#10` **JJ** 🌊) + 16 *KPop Demon Hunters* heroes/spirits/demons + 8 *Nightmare Critters* + 36 *Pokémon across Generations 1, 2, 3 & 4* + **16 *Maizen Show* heroes, pranksters, cops, robbers, bosses & legendaries (`#81–#96`)**. Every rare/legendary **always waits at its landmark until caught**, so `96/96` is always achievable.
+- **101 treasure chests 🎁, 44 shakeable fruit trees 🌳, 5 interactive knocked-over flowerpots 🪴, 18 healing spots 💖 (fountains, hot springs, ramen shop, Jjimjilbang bathhouse, regional Pokémon Centers, and Maizen healing fountains), 18 Rainbow Waypoint Crystals 🔮, and 26 handcrafted Sub-Maps**, plus 50 friendly villagers, mentors, Professors, Champions, and Maizen friends.
 
 ---
 

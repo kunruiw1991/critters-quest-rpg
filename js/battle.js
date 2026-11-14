@@ -61,7 +61,7 @@ const Battle = (() => {
     closeSub(true);
     setEnabled(false);
     renderCards(true);
-    const isBoss = !!(opts.entity && (opts.entity.isBoss || opts.entity.boss)) || sp.id === 'gwima' || sp.id === 'mew' || sp.id === 'lugia' || sp.id === 'rayquaza' || sp.id === 'arceus';
+    const isBoss = !!(opts.entity && (opts.entity.isBoss || opts.entity.boss)) || sp.id === 'gwima' || sp.id === 'mew' || sp.id === 'lugia' || sp.id === 'rayquaza' || sp.id === 'arceus' || sp.id === 'kingjj' || sp.id === 'dragonmikey' || sp.id === 'herobrine';
     st.isBoss = isBoss;
     Sound.music(isBoss ? 'boss' : 'battle', true);
     const rare = sp.rarity === 'rare' || sp.rarity === 'legendary' || isBoss;
@@ -71,6 +71,9 @@ const Battle = (() => {
       : sp.id === 'lugia' ? '🌊 WHOA! Legendary Pokémon Lugia soared up from the Whirl Islands with a silver aeroblast! 🪶✨'
       : sp.id === 'rayquaza' ? '🐉 WHOA! Legendary Pokémon Rayquaza descended from the ozone layer above Sky Pillar! 💚⚡'
       : sp.id === 'arceus' ? '👑 WHOA! Mythical Pokémon Arceus shone with a golden halo of a thousand stars at Spear Pillar! ✨🌟'
+      : sp.id === 'kingjj' ? '👑 WHOA! Legendary King Golden JJ stepped down from the 100-Million Golden Throne! 💎✨'
+      : sp.id === 'dragonmikey' ? '🌌 WHOA! Legendary Ender Dragon Mikey swooped down with purple dragon wings and a golden burger! 🐢🐉'
+      : sp.id === 'herobrine' ? '⚡ WHOA! Cursed Herobrine materialized in a flash of white obsidian lightning! 👀⚡'
       : (rare ? '✨ WOW! ' : '') + 'A wild ' + sp.name + ' ' + sp.emoji + ' appeared!' + (rare && D.RARITY[sp.rarity] ? ' (' + D.RARITY[sp.rarity].label + ')' : ''));
     (async () => {
       await tween(0.55, k => { st.wild.scale = U.easeOutBack(k); st.mine.scale = U.easeOutBack(k); });
