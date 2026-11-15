@@ -86,6 +86,18 @@ const Sound = (() => {
     maizen: { bpm: 130, lw: 'square', bw: 'triangle', drums: 'k.hsk.hs',
       lead: 'C5 E5 G5 C6 A5 G5 E5 G5 | F5 A5 C6 D6 C6 A5 G5 . | E5 G5 C6 E6 D6 C6 A5 G5 | D5 F#5 A5 D6 B5 G5 . - | C6 . G5 E5 A5 . F5 D5 | G5 . E5 C5 F5 . D5 B4 | C5 D5 E5 F5 G5 A5 B5 D6 | C6 . G5 . C6 . . -',
       bass: 'C3 . G3 . C3 . G3 . | F2 . C3 . F2 . C3 . | C3 . G3 . A2 . E3 . | D3 . A3 . G2 . D3 . | C3 . G3 . F2 . C3 . | E2 . B2 . G2 . D3 . | F2 . C3 . G2 . D3 . | C3 . G2 . C3 . - -' },
+    /* Playtime Toy Factory & Game Station: playful calliope music-box & toy parade march! */
+    playtime: { bpm: 124, lw: 'triangle', bw: 'triangle', drums: 'k.h.s.h.',
+      lead: 'F5 . A5 C6 D6 . C6 A5 | Bb5 . D6 F6 E6 . C6 . | A5 . C6 F6 G6 . F6 D6 | C6 A5 Bb5 G5 F5 . . - | D5 . F5 A5 Bb5 . A5 F5 | G5 . Bb5 D6 C6 . A5 . | Bb5 A5 G5 F5 E5 . G5 C6 | F5 . A5 . F5 . . -',
+      bass: 'F2 . C3 . F2 . C3 . | Bb2 . F3 . C3 . G2 . | F2 . C3 . Bb2 . D3 . | C3 . C3 . F2 . C3 . | D2 . A2 . Gm2 . D3 . | Gm2 . D3 . C3 . G2 . | Bb2 . F2 . C3 . G2 . | F2 . C3 . F2 . - -'.replace(/Gm2/g, 'G2') },
+    /* Nightmare Playcare & Red-Smoke Dome: dreamy lavender music-box mystery waltz! */
+    playcare: { bpm: 112, lw: 'triangle', bw: 'sine', drums: 'k...h.s.',
+      lead: 'E5 . G5 B5 C6 . B5 G5 | A5 . C6 E6 D#6 . B5 . | G5 . B5 E6 F#6 . E6 C6 | B5 . A5 G5 F#5 . . - | E5 G5 B5 . C6 B5 A5 . | F#5 A5 C6 . B5 . G5 . | A5 G5 F#5 E5 D#5 . F#5 B5 | E5 . B4 . E5 . . -',
+      bass: 'E2 . B2 . E2 . B2 . | A2 . E3 . B2 . F#3 . | E2 . B2 . C3 . G3 . | B2 . F#2 . B2 . F#2 . | E2 . B2 . A2 . E3 . | D3 . A3 . G2 . D3 . | A2 . E2 . B2 . F#2 . | E2 . B2 . E2 . - -' },
+    /* Prototype's Citadel & Verity's Last Stand: heroic high-energy chiptune showdown! */
+    prototype: { bpm: 138, lw: 'square', bw: 'triangle', drums: 'khshk.hs',
+      lead: 'D5 . F5 A5 D6 . C6 A5 | Bb5 . A5 G5 A5 . E5 . | F5 . A5 D6 F6 . E6 D6 | C#6 . E6 . A5 . . - | Bb5 . D6 F6 A5 . C6 F6 | G5 . Bb5 D6 F5 . A5 D6 | E5 F5 G5 A5 Bb5 C6 C#6 E6 | D6 . A5 . D5 . . -',
+      bass: 'D2 . D3 . D2 . D3 . | Bb1 . Bb2 . A1 . A2 . | D2 . D3 . D2 . D3 . | A1 . A2 . A1 . A2 . | Bb1 . Bb2 . F2 . F3 . | G2 . G3 . D2 . D3 . | A1 . A2 . A1 . E2 . | D2 . A2 . D2 . - -' },
   };
   for (const k in TRACKS) {
     const t = TRACKS[k];

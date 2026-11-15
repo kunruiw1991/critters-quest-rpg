@@ -61,7 +61,7 @@ const Battle = (() => {
     closeSub(true);
     setEnabled(false);
     renderCards(true);
-    const isBoss = !!(opts.entity && (opts.entity.isBoss || opts.entity.boss)) || sp.id === 'gwima' || sp.id === 'mew' || sp.id === 'lugia' || sp.id === 'rayquaza' || sp.id === 'arceus' || sp.id === 'kingjj' || sp.id === 'dragonmikey' || sp.id === 'herobrine';
+    const isBoss = !!(opts.entity && (opts.entity.isBoss || opts.entity.boss)) || sp.id === 'gwima' || sp.id === 'mew' || sp.id === 'lugia' || sp.id === 'rayquaza' || sp.id === 'arceus' || sp.id === 'kingjj' || sp.id === 'dragonmikey' || sp.id === 'herobrine' || sp.id === 'nmcatnap' || sp.id === 'nmdogday' || sp.id === 'mommylonglegs' || sp.id === 'prototype' || sp.id === 'drsawyer' || sp.id === 'infernotype';
     st.isBoss = isBoss;
     Sound.music(isBoss ? 'boss' : 'battle', true);
     const rare = sp.rarity === 'rare' || sp.rarity === 'legendary' || isBoss;
@@ -74,6 +74,12 @@ const Battle = (() => {
       : sp.id === 'kingjj' ? '👑 WHOA! Legendary King Golden JJ stepped down from the 100-Million Golden Throne! 💎✨'
       : sp.id === 'dragonmikey' ? '🌌 WHOA! Legendary Ender Dragon Mikey swooped down with purple dragon wings and a golden burger! 🐢🐉'
       : sp.id === 'herobrine' ? '⚡ WHOA! Cursed Herobrine materialized in a flash of white obsidian lightning! 👀⚡'
+      : sp.id === 'mommylonglegs' ? '🕷️ WHOA! Mommy Long Legs swung down on her stretchy neon-pink arms from the Game Station ceiling! 💗🎪'
+      : sp.id === 'nmcatnap' ? '🌙 WHOA! Legendary Nightmare CatNap stepped out of the lavender mist with glowing ring eyes & moon charm! 💜💤'
+      : sp.id === 'nmdogday' ? '☀️ WHOA! Giant Nightmare DogDay bounded forward with his shining golden sun pendant! 🧡🐾'
+      : sp.id === 'prototype' ? '🦾 WHOA! Legendary Experiment 1006 — The Prototype — skittered down in his Jester Hat & 6 spider legs! 🃏⚡'
+      : sp.id === 'drsawyer' ? '📺 WHOA! Dr. Harley Sawyer\'s purple CRT monitor eye locked onto your squad! 👁️🟢'
+      : sp.id === 'infernotype' ? '🔥 WHOA! Legendary INFERNOTYPE rose from the blast furnace wielding orange hellfire & blue cold-flame! 🔥❄️'
       : (rare ? '✨ WOW! ' : '') + 'A wild ' + sp.name + ' ' + sp.emoji + ' appeared!' + (rare && D.RARITY[sp.rarity] ? ' (' + D.RARITY[sp.rarity].label + ')' : ''));
     (async () => {
       await tween(0.55, k => { st.wild.scale = U.easeOutBack(k); st.mine.scale = U.easeOutBack(k); });

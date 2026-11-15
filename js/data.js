@@ -5,11 +5,12 @@
 const CQData = (() => {
   const TILE = 48;
   const MAP_W = 120;
-  const MAP_H = 286;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13), rows 174..229 = Grand Champion Continent (Zones 14..16), rows 230..285 = Maizen Block Continent (Zones 17..19: JJ & Mikey Show)
+  const MAP_H = 342;   // rows 0..89 = Rainbow Island, rows 90..117 = Honmoon Island, rows 118..173 = Southern Continent (Zones 11..13), rows 174..229 = Grand Champion Continent (Zones 14..16), rows 230..285 = Maizen Block Continent (Zones 17..19), rows 286..341 = Playtime Co., Nightmare Playcare & Prototype Continent (Zones 20..22)
   const MAP_H0 = 90;   // height of the original Rainbow Island (its coast + layout stay 100% identical)
   const MAP_H1 = 118;  // height of Rainbow + Honmoon Islands (Honmoon layout & RNG stay 100% intact)
   const MAP_H2 = 174;  // height of Rainbow + Honmoon + Southern Continent (Zones 11..13 layout & RNG stay 100% intact)
   const MAP_H3 = 230;  // height of Rainbow + Honmoon + Southern + Grand Champion Continent (Zones 14..16 layout & RNG stay 100% intact)
+  const MAP_H4 = 286;  // height of Rainbow..Maizen Continents (Zones 17..19 layout & RNG stay 100% intact)
   const MAP_VERSION = 1;
 
   /* Elemental "types" are pure flavor: they pick the attack visual + colors. */
@@ -79,8 +80,8 @@ const CQData = (() => {
       move: 'Sunny Spark', bubbles: ['🦊', '🔔', '☀️', 'Yip!'], hpB: 1, atkB: 3,
       desc: 'A clever fox with a jingly bell who explores the golden canyon ruins.' },
     { id: 'huggy', name: 'Huggy Wuggy', emoji: '🧸', icon: 'huggy', type: 'heart', rarity: 'uncommon', color: '#2f6fd6', ears: 'fluff',
-      move: 'Big Huggy Hug', bubbles: ['🧸', 'Hug!', '🔔', '💙'], hpB: 4, atkB: 0,
-      desc: 'A big fluffy blue friend who keeps everyone warm with gigantic hugs.' },
+      move: 'Big Huggy Hug', bubbles: ['🧸', 'Hug!', '🔔', '💙'], hpB: 4, atkB: 2, starter: true, hero: true,
+      desc: 'Playtime Co.\'s iconic tall fluffy blue mascot who gives the warmest, biggest bear-hugs in the whole factory!' },
     { id: 'luna', name: 'LunaBat', emoji: '🦇', icon: 'lunabat', type: 'moon', rarity: 'uncommon', color: '#6b4fb8', ears: 'bat',
       move: 'Night Flutter', bubbles: ['🦇', '🌙', 'Eee!', '✨'], hpB: 0, atkB: 3,
       desc: 'A starry little bat who flutters around the moon lanterns at the castle.' },
@@ -340,6 +341,96 @@ const CQData = (() => {
     { id: 'dragonmikey', name: 'Ender Dragon Mikey', emoji: '🌌', icon: 'dragonmikey', type: 'galaxy', rarity: 'legendary', color: '#9333ea', ears: 'dragon', hero: true,
       move: 'Ender Turtle Nova', bubbles: ['🌌', '🐉', 'ENDER MIKEY!', '🐢'], hpB: 6, atkB: 5,
       desc: 'Mikey in his ultimate Legendary Ender Dragon armor! He soars across Maizen Skyblock on glowing purple dragon wings.' },
+    /* ---- Zone 20: Playtime Toy Factory & Game Station (Poppy, Kissy Missy, Mommy Long Legs & Classic Playtime Toys) ---- */
+    { id: 'poppydoll', name: 'Poppy', emoji: '🎀', icon: 'poppydoll', type: 'flower', rarity: 'common', color: '#e11d48', ears: 'pigtails',
+      move: 'Porcelain Ribbon Beam', bubbles: ['🎀', 'Hi friend!', '💙', '✨'], hpB: 2, atkB: 3, starter: true, hero: true,
+      desc: 'Playtime Co.\'s original porcelain doll with bouncy cherry-red pigtails, sky-blue bows, and a brave, caring heart!' },
+    { id: 'kissymissy', name: 'Kissy Missy', emoji: '💗', icon: 'kissymissy', type: 'heart', rarity: 'uncommon', color: '#f472b6', ears: 'fluff', hero: true,
+      move: 'Fuzzy Pink Bear-Hug', bubbles: ['💗', 'Hug~!', '🎀', '💕'], hpB: 4, atkB: 2,
+      desc: 'Huggy Wuggy\'s sweet bubblegum-pink sister! She wears a baby-blue satin ribbon and always lifts heavy gates to help her friends.' },
+    { id: 'mommylonglegs', name: 'Mommy Long Legs', emoji: '🕷️', icon: 'mommylonglegs', type: 'rainbow', rarity: 'rare', color: '#ec4899', ears: 'pigtails',
+      move: 'Elastic Web Swing', bubbles: ['🕷️', 'Game time!', '💗', '🎪'], hpB: 4, atkB: 4,
+      desc: 'The stretchy neon-pink hostess of Playtime\'s Game Station! Her noodle arms can swing across three arcade rooms at once.' },
+    { id: 'bunzobunny', name: 'Bunzo Bunny', emoji: '🥁', icon: 'bunzobunny', type: 'star', rarity: 'common', color: '#facc15', ears: 'bunny',
+      move: 'Golden Cymbal Crash', bubbles: ['🥁', 'CLANG!', '🎉', '🐰'], hpB: 2, atkB: 3,
+      desc: 'A joyful yellow party bunny in a green birthday cone hat who claps his golden cymbals in Musical Memory!' },
+    { id: 'pjpug', name: 'PJ Pug-a-Pillar', emoji: '🐛', icon: 'pjpug', type: 'pop', rarity: 'common', color: '#6366f1', ears: 'dog',
+      move: 'Wiggly Pug Parade', bubbles: ['🐛', 'Arf-arf!', '🐾', '💜'], hpB: 3, atkB: 2,
+      desc: 'Half adorable pug puppy, half fuzzy blue-and-pink caterpillar! PJ wiggles happily through every obstacle course.' },
+    { id: 'boxyboo', name: 'Boxy Boo', emoji: '📦', icon: 'boxyboo', type: 'thunder', rarity: 'uncommon', color: '#0ea5e9', ears: 'crown',
+      move: 'Spring-Box Boing', bubbles: ['📦', 'BOING!!', '⭐', '🎵'], hpB: 3, atkB: 3,
+      desc: 'Playtime\'s spring-loaded jack-in-the-box! Wind his golden crank for a cheerful music-box tune and a bouncy surprise.' },
+    { id: 'missdelight', name: 'Miss Delight', emoji: '🏫', icon: 'missdelight', type: 'star', rarity: 'uncommon', color: '#fbbf24', ears: 'buns',
+      move: 'Sparkle Chalk Star', bubbles: ['🏫', 'Gold star!', '⭐', '📚'], hpB: 3, atkB: 3,
+      desc: 'Playcare Schoolhouse\'s enthusiastic teacher doll! Every correct answer earns a shower of golden chalk stars.' },
+    { id: 'doey', name: 'Doey the Doughman', emoji: '🎩', icon: 'doey', type: 'water', rarity: 'rare', color: '#38bdf8', ears: 'cap', hero: true,
+      move: 'Triple-Clay Stretch', bubbles: ['🎩', 'Howdy pal!', '🌈', '🫶'], hpB: 5, atkB: 4,
+      desc: 'Safe Haven\'s friendly three-color modeling-clay guardian in a dapper bowler hat! Blue, yellow, and red dough swirl together whenever he waves.' },
+    { id: 'yarnaby', name: 'Yarnaby', emoji: '🧶', icon: 'yarnaby', type: 'rainbow', rarity: 'uncommon', color: '#f97316', ears: 'fluff',
+      move: 'Rainbow Yarn Pounce', bubbles: ['🧶', 'Rawr-woof!', '🌈', '🐾'], hpB: 3, atkB: 3,
+      desc: 'A cuddly plush lion-puppy with a colorful rainbow yarn mane who loves belly rubs and chasing bouncy yarn balls!' },
+    { id: 'pianosaurus', name: 'Pianosaurus', emoji: '🎹', icon: 'pianosaurus', type: 'pop', rarity: 'uncommon', color: '#06b6d4', ears: 'gator',
+      move: 'Dino Key Melody', bubbles: ['🎹', 'Do-Re-Mi!', '🦖', '🎶'], hpB: 3, atkB: 3,
+      desc: 'Playtime\'s musical cyan dinosaur with rainbow crest spikes and piano-key teeth — finally getting his big spotlight!' },
+    /* ---- Zone 21: Nightmare Playcare & Red-Smoke Dome (All 8 Bigger Bodies / Nightmare Smiling Critters!) ---- */
+    { id: 'nmcatnap', name: 'Nightmare CatNap', emoji: '🌙', icon: 'nmcatnap', type: 'moon', rarity: 'legendary', color: '#5b21b6', ears: 'cat',
+      move: 'Lavender Dream Mist', bubbles: ['🌙', 'Prrrr...', '💜', '💤'], hpB: 6, atkB: 5,
+      desc: 'The towering Bigger Bodies Monster CatNap! With glowing white ring eyes and his golden crescent moon charm, he guards Playcare\'s dreamiest naps.' },
+    { id: 'nmdogday', name: 'Nightmare DogDay', emoji: '☀️', icon: 'nmdogday', type: 'sun', rarity: 'rare', color: '#ea580c', ears: 'dog', hero: true,
+      move: 'Giant Sun-Belt Howl', bubbles: ['☀️', 'My angel!', '🧡', '🐾'], hpB: 5, atkB: 4,
+      desc: 'Giant Bigger Bodies Monster DogDay! Even in his tall stitched monster form, his golden sun pendant shines with heroic warmth.' },
+    { id: 'nmhoppy', name: 'Nightmare Hoppy', emoji: '⚡', icon: 'nmhoppy', type: 'thunder', rarity: 'uncommon', color: '#16a34a', ears: 'bunny',
+      move: 'Monster Bolt Leap', bubbles: ['⚡', 'SUPER HOP!', '💚', '🦘'], hpB: 3, atkB: 4,
+      desc: 'Tall stitched Monster Hoppy Hopscotch! Her giant emerald spring legs can bound clear over the Playcare Dome in one leap.' },
+    { id: 'nmbobby', name: 'Nightmare Bobby', emoji: '❤️', icon: 'nmbobby', type: 'heart', rarity: 'uncommon', color: '#be123c', ears: 'bear',
+      move: 'Monster Bear-Hug', bubbles: ['❤️', 'BIG HUG!', '🧸', '💕'], hpB: 4, atkB: 3,
+      desc: 'Bigger Bodies Monster Bobby BearHug! Glowing ring eyes and stitched crimson paws mean ten-times-bigger cozy bear hugs.' },
+    { id: 'nmcrafty', name: 'Nightmare CraftyCorn', emoji: '🌈', icon: 'nmcrafty', type: 'rainbow', rarity: 'uncommon', color: '#0891b2', ears: 'unicorn',
+      move: 'Spectral Horn Prism', bubbles: ['🌈', 'Paint time!', '🦄', '✨'], hpB: 3, atkB: 4,
+      desc: 'Porcelain-white Monster CraftyCorn with a glowing cyan mane, spiral horn, and flower pendant who paints aurora murals across Playcare!' },
+    { id: 'nmpicky', name: 'Nightmare PickyPiggy', emoji: '🍎', icon: 'nmpicky', type: 'fruit', rarity: 'uncommon', color: '#db2777', ears: 'pig',
+      move: 'Monster Apple Chomp', bubbles: ['🍎', 'SNACK TIME!', '🐷', '🥧'], hpB: 4, atkB: 3,
+      desc: 'Tall rose-pink Monster PickyPiggy! That huge cavernous grin can gobble a whole basket of sweet orchard apples in one bite.' },
+    { id: 'nmbubba', name: 'Nightmare Bubba', emoji: '💡', icon: 'nmbubba', type: 'ice', rarity: 'uncommon', color: '#2563eb', ears: 'elephant',
+      move: 'Bright-Bulb Trunk', bubbles: ['💡', 'PAW-OOO!', '🐘', '✨'], hpB: 4, atkB: 3,
+      desc: 'Towering indigo Monster Bubba Bubbaphant! His bright lightbulb pendant illuminates every dark corridor in Playcare.' },
+    { id: 'nmkickin', name: 'Nightmare KickinChicken', emoji: '⭐', icon: 'nmkickin', type: 'star', rarity: 'uncommon', color: '#d97706', ears: 'comb',
+      move: 'Monster Star Kick', bubbles: ['⭐', 'BAWK-BOOM!', '🔥', '💛'], hpB: 3, atkB: 4,
+      desc: 'Spiky-crested Monster KickinChicken! He spins into a blazing golden star tornado whenever his friends need backup.' },
+    /* ---- Zone 22: The Prototype's Citadel & Verity's Last Stand (GameToons Poppy Playtime Expansion!) ---- */
+    { id: 'prototype', name: 'The Prototype', emoji: '🦾', icon: 'prototype', type: 'thunder', rarity: 'legendary', color: '#dc2626', ears: 'jester',
+      move: 'Jester Spider-Claw', bubbles: ['🦾', '1006!', '🃏', '⚡'], hpB: 6, atkB: 5, starter: true, hero: true,
+      desc: 'Experiment 1006 in his iconic jester hat & 6-legged spider chassis! Dramatic self-proclaimed King of Playtime Co. — and secretly a proud adoptive dad.' },
+    { id: 'verity', name: 'Verity', emoji: '🔵', icon: 'verity', type: 'spirit', rarity: 'rare', color: '#38bdf8', ears: 'crown', hero: true,
+      move: 'True-Heart Orb Beam', bubbles: ['🔵', 'Helper friend!', '✨', '💙'], hpB: 4, atkB: 4,
+      desc: 'Player\'s cheerful glowing sky-blue helper orb from Verity vs. Prototype! He teams up with you to outsmart Cruelty, Levity & Falsity.' },
+    { id: 'lilylovebraids', name: 'Lily Lovebraids', emoji: '💜', icon: 'lilylovebraids', type: 'flower', rarity: 'uncommon', color: '#9333ea', ears: 'pigtails', hero: true,
+      move: 'Braided Tea Whirl', bubbles: ['💜', 'Tea time!', '🫖', '⭐'], hpB: 3, atkB: 3,
+      desc: 'Hostess of the Lavender Dollhouse! With twin giant purple braided pigtails and warm crumpets, she invites even The Prototype to tea.' },
+    { id: 'chumchompkins', name: 'Chum Chompkins', emoji: '👹', icon: 'chumchompkins', type: 'leaf', rarity: 'common', color: '#dc2626', ears: 'horns',
+      move: 'Belly-Chomp Snack', bubbles: ['👹', 'Yum-yum!', '🍪', '🌿'], hpB: 4, atkB: 2,
+      desc: 'Playtime\'s lovable fluffy crimson monster buddy with a giant goofy belly-mouth who even powers up into Tree-Chompkins!' },
+    { id: 'giblet', name: 'Giblet', emoji: '🧷', icon: 'giblet', type: 'pop', rarity: 'common', color: '#14b8a6', ears: 'cap',
+      move: 'XL GrabPack Zap', bubbles: ['🧷', 'Gotcha!', '🧤', '🔧'], hpB: 2, atkB: 3,
+      desc: 'Lily & Chum\'s stitched patchwork prankster pal wearing oversized tinker goggles and miniature Red-and-Blue GrabPack hands!' },
+    { id: 'roryredcape', name: 'Rory Redcape', emoji: '🦸', icon: 'roryredcape', type: 'sun', rarity: 'uncommon', color: '#ef4444', ears: 'comb', hero: true,
+      move: 'Heroic Red-Cape Slash', bubbles: ['🦸', 'Have no fear!', '🍭', '✨'], hpB: 3, atkB: 4,
+      desc: 'Lily\'s heroic cyan-maned brother! His scarlet superhero cape regenerates instantly, and he saves the Super Toy Team with his lollipop sword.' },
+    { id: 'prototypejr', name: 'Prototype Jr.', emoji: '👶', icon: 'prototypejr', type: 'star', rarity: 'uncommon', color: '#f59e0b', ears: 'jester',
+      move: 'Mini-Claw Giggle', bubbles: ['👶', 'Goo-goo!', '🃏', '🍼'], hpB: 3, atkB: 3,
+      desc: 'Adorable toddler Baby Prototype wearing an oversized jester hat and a fluffy white diaper over tiny skittering spider legs!' },
+    { id: 'cascadecat', name: 'Cascade Candy Cat', emoji: '🌊', icon: 'cascadecat', type: 'water', rarity: 'rare', color: '#06b6d4', ears: 'cat',
+      move: 'Super Hydro Pump', bubbles: ['🌊', 'Meow-splash!', '🫧', '💦'], hpB: 4, atkB: 5,
+      desc: 'Candy Cat evolved with elemental ocean magic in The Last Stand! Her Bubble Beam and Hydro Pump are super effective against Infernotype!' },
+    { id: 'lunalovebraids', name: 'Cosmic Luna Lovebraids', emoji: '🌌', icon: 'lunalovebraids', type: 'galaxy', rarity: 'rare', color: '#c084fc', ears: 'pigtails', hero: true,
+      move: 'Starlight Braid Nova', bubbles: ['🌌', 'Call me Luna!', '🌙', '✨'], hpB: 4, atkB: 5,
+      desc: 'Empowered by the fallen star Globy, Lily transforms into Cosmic Luna Lovebraids with luminous white starlight braids!' },
+    { id: 'drsawyer', name: 'Dr. Harley Sawyer', emoji: '📺', icon: 'drsawyer', type: 'demon', rarity: 'rare', color: '#7c3aed', ears: 'helmet',
+      move: 'Omni-Eye Cyber Ray', bubbles: ['📺', 'Fascinating!', '👁️', '🟢'], hpB: 4, atkB: 5,
+      desc: 'The Doctor (aka Dr. Destroyer) with his retro purple single-eye CRT TV monitor head and emerald cyber-cloak!' },
+    { id: 'infernotype', name: 'Infernotype', emoji: '🔥', icon: 'infernotype', type: 'demon', rarity: 'legendary', color: '#f97316', ears: 'flame',
+      move: 'Twin Hellfire & Cold-Flame', bubbles: ['🔥', 'INFERNOTYPE!', '❄️', '🦾'], hpB: 6, atkB: 6,
+      desc: 'Reborn from the roaring Playtime blast furnace! Crowned in golden flames, Infernotype dual-wields molten fire and a blue cold-flame blade.' },
   ];
   SPECIES.forEach((s, i) => { s.num = i + 1; s.rate = RARITY[s.rarity].rate; });
   const SP = {};
@@ -396,9 +487,18 @@ const CQData = (() => {
     { id: 19, key: 'maizen_skyblock', name: 'Maizen Skyblock, Hacker Arena & Herobrine Keep', short: 'Skyblock', emoji: '👑', rect: [78, 234, 114, 279], lv: [22, 28],
       color: '#eab308', music: 'maizen', isNew: true,
       table: [['projj', 18], ['noobmikey', 16], ['carrie', 16], ['redstonegolem', 14], ['mutantmikey', 12], ['maizenhacker', 12], ['herobrine', 12]] },
+    { id: 20, key: 'playtime_factory', name: 'Playtime Toy Factory, Game Station & Safe Haven', short: 'Playtime', emoji: '🧸', rect: [8, 290, 42, 335], lv: [16, 23],
+      color: '#ef4444', music: 'playtime', isNew: true,
+      table: [['poppydoll', 14], ['huggy', 14], ['kissymissy', 13], ['bunzobunny', 14], ['pjpug', 13], ['boxyboo', 11], ['missdelight', 9], ['yarnaby', 6], ['pianosaurus', 6]] },
+    { id: 21, key: 'nightmare_playcare', name: 'Nightmare Playcare & Red-Smoke Moon Dome', short: 'Playcare', emoji: '🌙', rect: [45, 290, 75, 335], lv: [20, 27],
+      color: '#7c3aed', music: 'playcare', isNew: true,
+      table: [['nmhoppy', 16], ['nmbobby', 16], ['nmcrafty', 15], ['nmpicky', 15], ['nmbubba', 14], ['nmkickin', 14], ['nmdogday', 6], ['nmcatnap', 4]] },
+    { id: 22, key: 'prototype_citadel', name: "The Prototype's Citadel & Verity's Last Stand", short: 'Prototype', emoji: '🦾', rect: [78, 290, 114, 335], lv: [24, 31],
+      color: '#f97316', music: 'prototype', isNew: true,
+      table: [['lilylovebraids', 15], ['chumchompkins', 16], ['giblet', 15], ['roryredcape', 14], ['prototypejr', 14], ['verity', 8], ['cascadecat', 6], ['lunalovebraids', 6], ['drsawyer', 6]] },
   ];
   /* The official lands (fast-travel destinations); Crossroads is a bonus park. */
-  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  const MAIN_REGIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
   /* Where each rare / legendary always waits (until caught) — so 100% CritterDex completion is always possible. */
   const SPECIAL_SPOTS = [
@@ -429,6 +529,15 @@ const CQData = (() => {
     { sp: 'herobrine', zone: 19, at: [106, 266], lv: 28, place: 'the Herobrine Obsidian Shrine' },
     { sp: 'kingjj', zone: 19, at: [92, 242], lv: 30, place: 'the 100-Million Golden Throne' },
     { sp: 'dragonmikey', zone: 19, at: [102, 242], lv: 30, place: 'Maizen Skyblock Dragon Sanctum' },
+    { sp: 'mommylonglegs', zone: 20, at: [35, 302], lv: 24, place: "Mommy Long Legs' Game Station" },
+    { sp: 'doey', zone: 20, at: [20, 321], lv: 24, place: "Doey's Safe Haven Dough Lounge" },
+    { sp: 'nmcatnap', zone: 21, at: [52, 302], lv: 31, place: 'the Red-Smoke Moon Cathedral' },
+    { sp: 'nmdogday', zone: 21, at: [60, 321], lv: 28, place: 'the Playcare Sun-Belt Playhouse' },
+    { sp: 'prototype', zone: 22, at: [90, 301], lv: 31, place: "The Prototype's Jester-Claw Throne" },
+    { sp: 'infernotype', zone: 22, at: [101, 301], lv: 33, place: 'the Playtime Blast-Furnace Altar' },
+    { sp: 'cascadecat', zone: 22, at: [87, 304], lv: 27, place: "Cascade Candy Cat's Hydro Spring" },
+    { sp: 'lunalovebraids', zone: 22, at: [84, 321], lv: 28, place: "Lily's Starlight Dollhouse Garden" },
+    { sp: 'drsawyer', zone: 22, at: [106, 321], lv: 29, place: "Dr. Sawyer's Cyber-Destroyer Lab" },
   ];
 
   const ITEMS = {
@@ -440,6 +549,22 @@ const CQData = (() => {
 
   /* Friendly villagers. look = sprite palette. gift is given once. */
   const NPCS = [
+    { id: 'prototype_village', name: 'The Prototype (1006)', zone: 1, at: [61, 68], join: 'prototype', joinLv: 5,
+      look: { skin: '#f8fafc', hair: '#2563eb', hairStyle: 'short', shirt: '#2563eb', pants: '#991b1b', hat: 'jester', scarf: '#ef4444', glow: '#facc15' },
+      lines: ['AHEM!! Behold — I am The Prototype (Experiment 1006), jester-hatted King of Playtime Co.! 🦾🃏', 'Down south in the brand-new Poppy Playtime Continent (Zones 20–22), you can explore the Playtime Toy Factory 🧸, meet all 8 Nightmare Smiling Critters in Playcare 🌙, and battle Infernotype 🔥 & Dr. Sawyer 📺 in Verity vs. Prototype: The Last Stand!', 'Open your 🗺️ Map to teleport to 🧸 Playtime, 🌙 Playcare, or 🦾 Prototype — and allow me to join your squad right now!'],
+      gift: { master: 1, rainbow: 3 }, after: ['Playtime Co. — and Rainbow Island — are ours for the befriending!! 🦾🃏'] },
+    { id: 'poppy_village', name: 'Poppy Doll', zone: 1, at: [58, 72], join: 'poppydoll', joinLv: 5,
+      look: { skin: '#fff1f2', hair: '#e11d48', hairStyle: 'pigtails', shirt: '#38bdf8', pants: '#0284c7', hat: 'flower' },
+      lines: ['Hello, Chuyu! I\'m Poppy! 🎀💙 Thank you for opening my glass case!', 'Huggy Wuggy 🧸, Kissy Missy 💗, Mommy Long Legs 🕷️, Doey the Doughman 🎩, Lily Lovebraids 💜, Verity 🔵, and all 8 Nightmare Smiling Critters 🌙 are waiting to play!', 'Take these Sweet Berries and Rainbow Capsules — and let me join your team! ✨'],
+      gift: { berry: 5, rainbow: 2 }, after: ['Together with Huggy, Kissy & Verity, we can make every toy in Playtime Co. smile! 🎀💖'] },
+    { id: 'huggy_village', name: 'Huggy Wuggy', zone: 1, at: [61, 72], join: 'huggy', joinLv: 5,
+      look: { skin: '#3b82f6', hair: '#1d4ed8', hairStyle: 'spiky', shirt: '#2563eb', pants: '#1e40af', hat: 'none', scarf: '#ef4444' },
+      lines: ['Squeak-squeak!! Big blue Huggy Wuggy reporting for hug duty!! 🧸💙', 'My sister Kissy Missy 💗, Bunzo Bunny 🥁, PJ Pug-a-Pillar 🐛, Boxy Boo 📦, Yarnaby 🧶, and Pianosaurus 🎹 built a giant Game Station down in Zone 20!', 'Here are snacks for your bag — and I\'m joining your team for giant bear-hugs! 🤗'],
+      gift: { berry: 4, rainbow: 2 }, after: ['HUGGY HUGS FOR EVERYONE!! 🧸💙'] },
+    { id: 'kissy_village', name: 'Kissy Missy', zone: 1, at: [56, 70], join: 'kissymissy', joinLv: 5,
+      look: { skin: '#f9a8d4', hair: '#ec4899', hairStyle: 'pigtails', shirt: '#f472b6', pants: '#db2777', hat: 'flower', scarf: '#38bdf8' },
+      lines: ['Wave-wave~!! Kissy Missy is so happy to meet you, Chuyu! 💗🎀', 'Whenever heavy factory doors block the path or Nightmare CatNap needs a bedtime lullaby, Kissy Missy is right beside you!', 'Take this shiny gold & capsule gift, and let Kissy Missy join your team! 💕'],
+      gift: { gold: 120, rainbow: 2 }, after: ['Kissy Missy waves her fluffy pink paw with a giant smile! 💗🤗'] },
     { id: 'mikey_village', name: 'Mikey (Maizen)', zone: 1, at: [57, 71], join: 'mikey', joinLv: 5,
       look: { skin: '#4ade80', hair: '#16a34a', hairStyle: 'short', shirt: '#22c55e', pants: '#15803d', hat: 'shell' },
       lines: ['Hiii Chuyu!! I\'m Mikey from the Maizen show! 🐢🍔', 'JJ and I built a HUGE 100-Layer Security Mansion, a Noob vs Pro Burger Diner, a Laser Bank Vault, and even a Skyblock Sanctum down in the Maizen Block Continent!', 'Open your 🗺️ Map and tap 🐢 JJ & Mikey, 🧪 Maizen Lab, or 👑 Skyblock to visit our world any time — and let me join your team right now! 🌟'],
@@ -456,8 +581,8 @@ const CQData = (() => {
       lines: ['Good morning, Chuyu! 🌞 Did you sleep well?', 'If your Critters get sleepy, splash them at a 💖 Healing Fountain — or come home for a nap!', 'Here, take some snacks for your adventure! I love you! 💕'],
       gift: { berry: 5 }, after: ['Be careful and have fun, sweetie! Come home any time for a nap. 🏡'] },
     { id: 'prof', name: 'Professor Bubba', zone: 1, at: [63, 69], look: { skin: '#f5cfa5', hair: '#d9d9d9', hairStyle: 'short', shirt: '#ffffff', pants: '#5a7bd6', hat: 'elephant', coat: true, glasses: true },
-      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'Ninety-six different Critters live across Rainbow Island, Honmoon Island, the Southern Lands, the Pokémon Continent, and the Maizen Block Continent!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
-      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Cross the southern bridges to explore Johto 🔔, Hoenn 🌴, Sinnoh 👑, and JJ & Mikey\'s Maizen Lands 🐢!'] },
+      lines: ['Ah, Chuyu! Welcome to my Critter Lab! 🔬', 'One hundred twenty-five different Critters live across Rainbow Island, Honmoon Island, the Southern Lands, the Pokémon Continent, the Maizen Block Continent, and the Poppy Playtime & Prototype Continent!', 'Walk into a wild Critter, or rustle through tall grass, to meet one.', 'Feed it a 🍓 berry, then toss a capsule! Watch the 🎯 Catch Chance meter!', 'Take these Rainbow Capsules — they work 2.2x better! 🌈'],
+      gift: { rainbow: 3 }, after: ['Fill your 📖 CritterDex! Rare ✨ Critters wait at special landmarks in every land!', 'Open your 🗺️ Map to visit Playtime Factory 🧸, Nightmare Playcare 🌙, and The Prototype\'s Citadel 🦾!'] },
     { id: 'shopkeeper', name: 'Shopkeeper Penny', zone: 1, at: [54, 76], look: { skin: '#e8b48a', hair: '#2b2b2b', hairStyle: 'ponytail', shirt: '#2fb39a', pants: '#3c4a6b', hat: 'none', apron: '#fff3c4' },
       lines: ['Welcome to the Capsule & Berry Shop! 🛒'], shop: true },
     { id: 'timmy', name: 'Timmy', zone: 1, at: [57, 74], look: { skin: '#ffe0c2', hair: '#e8b84a', hairStyle: 'spiky', shirt: '#ffb020', pants: '#3b6fd6', hat: 'none' },
@@ -607,6 +732,37 @@ const CQData = (() => {
     { id: 'hacker_npc', name: 'Friendly Coder Kai', zone: 19, at: [92, 263],
       look: { skin: '#e2e8f0', hair: '#10b981', hairStyle: 'spiky', shirt: '#111827', pants: '#064e3b', hat: 'visor' },
       lines: ['01001000 01001001! That means "HI" in binary! 💻🟢', 'In the Noob vs Pro vs Hacker challenge, the ✨ Masked Glitch Hacker built a Command-Block Arena right here, and ✨ Herobrine ⚡ guards the Obsidian Shrine to the east!', 'Step inside the Glitch Arena or the Skyblock Sanctum doors for two epic boss dungeons!'] },
+    /* ---- Zone 20: Playtime Toy Factory, Game Station & Safe Haven ---- */
+    { id: 'poppy_factory', name: 'Poppy', zone: 20, at: [22, 302], join: 'poppydoll', joinLv: 20,
+      look: { skin: '#fff1f2', hair: '#e11d48', hairStyle: 'pigtails', shirt: '#38bdf8', pants: '#0284c7', hat: 'flower' },
+      lines: ['Welcome to the Playtime Co. Main Toy Factory & Game Station, Chuyu! 🎀🧸', 'Huggy Wuggy 🧸, Kissy Missy 💗, Bunzo Bunny 🥁, PJ Pug-a-Pillar 🐛, Boxy Boo 📦, Miss Delight 🏫, Yarnaby 🧶, and Pianosaurus 🎹 all live here!', 'Right beside the Game Station waits ✨ Mommy Long Legs 🕷️, and down at Safe Haven waits ✨ Doey the Doughman 🎩!'],
+      gift: { rainbow: 3, gold: 160 }, after: ['Step inside the GrabPack Assembly Hall or Mommy\'s Game Station doors for special dungeons! 🧸🕷️'] },
+    { id: 'ollie_factory', name: 'Safe Haven Scout Ollie', zone: 20, at: [17, 317],
+      look: { skin: '#fde2c8', hair: '#f97316', hairStyle: 'spiky', shirt: '#22c55e', pants: '#1e3a8a', hat: 'cap2' },
+      lines: ['Hey Chuyu! Welcome to Doey\'s Safe Haven Bakery & Lounge! 🎩🌈', 'Tap the Safe Haven Lounge any time to heal your whole squad with warm rainbow dough-buns, and say hi to ✨ Doey the Doughman right outside!', 'Take these Safe Haven berries for your trip into Nightmare Playcare!'],
+      gift: { berry: 6, rainbow: 2 }, after: ['Doey, Yarnaby and Pianosaurus are the friendliest trio in Safe Haven! 🎩🧶🎹'] },
+    /* ---- Zone 21: Nightmare Playcare & Red-Smoke Moon Dome ---- */
+    { id: 'nmdogday_npc', name: 'Playcare Captain Sunny', zone: 21, at: [65, 302],
+      look: { skin: '#fed7aa', hair: '#ea580c', hairStyle: 'spiky', shirt: '#f97316', pants: '#7c2d12', hat: 'crown', glow: '#facc15' },
+      lines: ['Welcome to Nightmare Playcare & the Red-Smoke Moon Dome! 🌙☀️', 'All 8 Bigger Bodies Nightmare Smiling Critters roam these misty courtyards: Nightmare CatNap 🌙, DogDay ☀️, Hoppy ⚡, Bobby ❤️, CraftyCorn 🌈, PickyPiggy 🍎, Bubba 💡, and KickinChicken ⭐!', 'Legendary 👑 Nightmare CatNap rests by the Moon Cathedral, and ✨ Nightmare DogDay guards the Playhouse! Take this Master Star Capsule!'],
+      gift: { master: 1, rainbow: 3 }, after: ['Step inside the Red-Smoke Moon Cathedral or the Playcare Playhouse to challenge both Guardians! 🌙☀️'] },
+    { id: 'dream_keeper', name: 'Dream Keeper Stella', zone: 21, at: [66, 318],
+      look: { skin: '#f5d0fe', hair: '#9333ea', hairStyle: 'long', shirt: '#7c3aed', pants: '#3b0764', hat: 'flower' },
+      lines: ['Sweet dreams, Chuyu! 💜💤 Don\'t be fooled by their tall monster stitches and glowing ring eyes — the Nightmare Smiling Critters love Sweet Berries and bedtime stories!', 'Splash at the Lavender Nap Fountain 💖 right beside me whenever your team gets sleepy!'],
+      gift: { berry: 6, rainbow: 3 }, after: ['Nightmare CraftyCorn painted those glowing stars on the Playhouse roof! 🌈🦄'] },
+    /* ---- Zone 22: The Prototype's Citadel & Verity's Last Stand ---- */
+    { id: 'verity_npc', name: 'Player & Helper Verity', zone: 22, at: [94, 303], join: 'verity', joinLv: 23,
+      look: { skin: '#fef08a', hair: '#facc15', hairStyle: 'short', shirt: '#fde047', pants: '#2563eb', hat: 'visor', glow: '#38bdf8' },
+      lines: ['Hello Chuyu! I\'m Verity, your personal helper friend — and this is Verity vs. Prototype: The Last Stand! 🔵🦾🔥', 'Up at the Citadel wait Legendary 👑 The Prototype 🦾 (in his jester hat!), Legendary 👑 Infernotype 🔥, Baby Prototype Jr. 👶, and ✨ Cascade Candy Cat 🌊 ("Use Bubble Beam & Hydro Pump!")!', 'Take this Master Star Capsule and let Verity join your team!'],
+      gift: { master: 1, rainbow: 4 }, after: ['Remember: Water-type Cascade Candy Cat is SUPER EFFECTIVE against Infernotype!! 🌊🔥'] },
+    { id: 'lily_npc', name: 'Lily Lovebraids', zone: 22, at: [91, 319], join: 'lilylovebraids', joinLv: 22,
+      look: { skin: '#fde2c8', hair: '#9333ea', hairStyle: 'pigtails', shirt: '#1e1b4b', pants: '#7e22ce', hat: 'crown', glow: '#c084fc' },
+      lines: ['More tea, mademoiselle?! Welcome to Lily Lovebraids\' Lavender Dollhouse! 💜🫖', 'Chum Chompkins 👹, Giblet 🧷, Baby Prototype Jr. 👶, and my star-powered form ✨ Cosmic Luna Lovebraids 🌌 all hang out around my tea garden — tap my Dollhouse any time to heal with warm crumpets!', 'Let me join your squad for the grand tea party! ✨'],
+      gift: { berry: 6, rainbow: 3 }, after: ['Promise you\'ll invite The Prototype to my next crumpet tea party! 💜🫖'] },
+    { id: 'rory_npc', name: 'Rory Redcape', zone: 22, at: [96, 319], join: 'roryredcape', joinLv: 22,
+      look: { skin: '#fde2c8', hair: '#06b6d4', hairStyle: 'spiky', shirt: '#14b8a6', pants: '#1e293b', hat: 'crown', scarf: '#ef4444' },
+      lines: ['HAVE NO FEAR — Rory Redcape is here!! 🦸🍭', 'Just east of here stands Dr. Harley Sawyer\'s Cyber-Destroyer Lab 📺 — step inside Sub-Map #31 to shut down his Kryptonite ray, or climb north into Sub-Map #32 for Infernotype\'s Blast-Furnace Sanctum!', 'Take this superhero gold & capsule pack, and count Rory Redcape in!'],
+      gift: { gold: 220, rainbow: 3 }, after: ['Super Toy Team, roll out!! My red cape always grows right back! 🦸❤️'] },
   ];
 
   /* Chest contents are decided by world generation; these are the reward tiers. */
@@ -616,14 +772,14 @@ const CQData = (() => {
 
   const TIPS = [
     'Tip: Tap anywhere on the map to walk there — tap a chest, tree or Critter to use it!',
-    'Tip: Talk to Mikey 🐢, JJ 🌊 & Carrie 🐱 right in Sunshine Village to add them to your team!',
-    'Tip: Open the 🗺️ Map to teleport to JJ & Mikey\'s Security Mansion, Maizen Lab, or Skyblock! 👑',
+    'Tip: Talk to The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸 & Kissy Missy 💗 right in Sunshine Village to recruit them!',
+    'Tip: Open the 🗺️ Map to teleport to Playtime Factory 🧸, Nightmare Playcare 🌙, or Prototype\'s Citadel 🦾!',
     'Tip: Feed a 🍓 berry before throwing a capsule: +45% catch chance!',
     'Tip: Attacks never knock a wild Critter out — they just get dizzy 🎯 and easier to catch!',
     'Tip: Press B for ⚡ roller-skate dash!',
-    'Tip: Cross the Golden Honmoon Bridge south of Sunshine Village to meet the K-Pop Demon Hunters! 🎤',
-    'Tip: Tap knocked-over flowerpots 🪴 in Derpy\'s Sanctum to pat them upright like Derpy Tiger!',
-    'Tip: Explore Johto 🔔, Hoenn 🌴, Sinnoh 👑 & the Maizen Lands 🐢 to collect all 96 Critters!',
+    'Tip: Meet all 8 Bigger Bodies Nightmare Smiling Critters in Nightmare Playcare (Zone 21)! 🌙☀️',
+    'Tip: Team up with Verity 🔵, Cosmic Luna Lovebraids 🌌 & Cascade Candy Cat 🌊 to befriend Infernotype 🔥!',
+    'Tip: Explore all 21 Lands & 32 Dungeons to collect all 125 Critters in your CritterDex! 🏆',
   ];
 
   window.CQSubmaps = window.CQSubmaps || [];
@@ -640,6 +796,6 @@ const CQData = (() => {
   function attackPower(sp, lv) { return 7 + lv * 2.4 + sp.atkB * lv * 0.3; }
   function expToNext(lv) { return 10 + lv * 10; }
 
-  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_H3, MAP_VERSION, TYPES, RARITY, SPECIES, SP, BY_ID: SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, SUBMAPS, registerSubmap, maxHp, attackPower, expToNext };
+  return { TILE, MAP_W, MAP_H, MAP_H0, MAP_H1, MAP_H2, MAP_H3, MAP_H4, MAP_VERSION, TYPES, RARITY, SPECIES, SP, BY_ID: SP, REGIONS, MAIN_REGIONS, SPECIAL_SPOTS, ITEMS, NPCS, CHEST_LOOT, TIPS, SUBMAPS, registerSubmap, maxHp, attackPower, expToNext };
 })();
 window.CQData = CQData;

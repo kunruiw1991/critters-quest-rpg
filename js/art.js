@@ -43,6 +43,12 @@ const Art = (() => {
     18: { g: '#68d69c', gd: '#4cb880', gl: '#92ebb8', t1: '#10b981', t2: '#3b82f6', t3: '#f59e0b', p: '#dce6f2', pd: '#b8c8dc', pl: '#f0f6fc', sand: '#eef5fc', sandd: '#d6e5f2', tree: '#2ea872', treed: '#1e7d52', treel: '#5cd69e', floor: '#d1fae5', floord: '#a7f3d0', plaza: '#ecfdf5', plazad: '#d1fae5', plazal: '#ffffff' },
     // Zone 19 (Maizen Skyblock, Hacker Arena & Herobrine Keep): skyblock golden-emerald turf, matrix-green & royal-gold tall grass, obsidian-gold plaza.
     19: { g: '#7cd665', gd: '#5eb548', gl: '#a2e887', t1: '#eab308', t2: '#22c55e', t3: '#a855f7', p: '#e8dfc5', pd: '#c9bc98', pl: '#faf4e4', sand: '#f5e2ad', sandd: '#dec68a', tree: '#429e38', treed: '#2b7523', treel: '#70c85c', floor: '#312e81', floord: '#1e1b4b', plaza: '#fef9c3', plazad: '#fde047', plazal: '#ffffff' },
+    // Zone 20 (Playtime Toy Factory, Game Station & Safe Haven): cheerful toy-park emerald lawn, GrabPack red/blue/yellow confetti tall grass, candy-striped paths.
+    20: { g: '#6ed48c', gd: '#4eb56c', gl: '#96ebb0', t1: '#ef4444', t2: '#3b82f6', t3: '#facc15', p: '#fde8d8', pd: '#eabfa4', pl: '#fff5ed', sand: '#fef3c7', sandd: '#fde047', tree: '#2ea86e', treed: '#1e7d50', treel: '#66d69c', floor: '#eff6ff', floord: '#dbeafe', plaza: '#fef9c3', plazad: '#fde047', plazal: '#ffffff' },
+    // Zone 21 (Nightmare Playcare & Red-Smoke Moon Dome): twilight lavender-sage turf, dreamy purple-and-sun-gold tall grass, amethyst cathedral floor.
+    21: { g: '#68b89e', gd: '#4a967e', gl: '#8fd6be', t1: '#9333ea', t2: '#f97316', t3: '#ec4899', p: '#e9d5ff', pd: '#c084fc', pl: '#f5f3ff', sand: '#fde68a', sandd: '#f59e0b', tree: '#5b21b6', treed: '#3b0764', treel: '#8b5cf6', floor: '#4c1d95', floord: '#2e1065', plaza: '#f3e8ff', plazad: '#d8b4fe', plazal: '#ffffff' },
+    // Zone 22 (The Prototype's Citadel & Verity's Last Stand): warm sunset-gold & starlight turf, flame-orange/hydro-cyan/cosmic-violet tall grass, obsidian-gold citadel floor.
+    22: { g: '#78c97a', gd: '#56a658', gl: '#9ee3a0', t1: '#f97316', t2: '#06b6d4', t3: '#c084fc', p: '#fed7aa', pd: '#fb923c', pl: '#ffedd5', sand: '#fef08a', sandd: '#eab308', tree: '#c2410c', treed: '#7c2d12', treel: '#fb923c', floor: '#292524', floord: '#1c1917', plaza: '#fef3c7', plazad: '#fcd34d', plazal: '#ffffff' },
   };
   const GREY_CLIFF = { cliff: '#a3a39b', cliffd: '#76766e', cliffl: '#cfcfc6' };
 
@@ -269,7 +275,8 @@ const Art = (() => {
     if (typeof CQData !== 'undefined' && Array.isArray(CQData.SUBMAPS)) {
       for (const sm of CQData.SUBMAPS) {
         if (!sm) continue;
-        const pid = sm.paletteId || (20 + (sm.index || 1));
+        const pid = 40 + (sm.index || 1);
+        sm.paletteId = pid;
         if (!PAL[pid] && sm.palette) {
           PAL[pid] = Object.assign({}, PAL[sm.zoneId || 1] || PAL[1], sm.palette);
         }
@@ -278,7 +285,7 @@ const Art = (() => {
   }
   function cliffTile(c, z, v, edges) {
     ensureSubmapPalettes();
-    const p = (z > 20 && PAL[z] && PAL[z].cliff) ? PAL[z] : (z === 6 ? PAL[6] : z === 7 ? PAL[7] : GREY_CLIFF);
+    const p = (z > 40 && PAL[z] && PAL[z].cliff) ? PAL[z] : (z === 6 ? PAL[6] : z === 7 ? PAL[7] : GREY_CLIFF);
     c.fillStyle = p.cliff; c.fillRect(0, 0, 48, 48);
     c.strokeStyle = p.cliffd; c.lineWidth = 2;
     const r = rnd(v * 71 + z);
@@ -361,7 +368,7 @@ const Art = (() => {
   }
   function floorTile(c, z, v, plaza) {
     ensureSubmapPalettes();
-    if (z > 20 && PAL[z]) {
+    if ((z >= 16 && PAL[z]) || z > 40) {
       const p = PAL[z];
       if (plaza && p.plaza) {
         c.fillStyle = p.plaza; c.fillRect(0, 0, 48, 48);
@@ -488,8 +495,8 @@ const Art = (() => {
   function tile(type, z, v, f, edges, d) {
     if (NO_VARIANT[type]) v = 0;
     if (type === T.BRIDGE_H || type === T.BRIDGE_V) z = 0;
-    // 64 zone/palette slots (zones 0..40+) and 32 decal slots so sub-map palettes 21..40 never collide
-    const key = ((((type * 64 + z) * 4 + v) * 4 + f) * 16 + edges) * 32 + d;
+    // 128 zone/palette slots (zones 0..127) and 32 decal slots so sub-map palettes 41..72+ never collide
+    const key = ((((type * 128 + z) * 4 + v) * 4 + f) * 16 + edges) * 32 + d;
     let cv = tileCache.get(key);
     if (!cv) {
       if (tileCache.size > 2400) tileCache.clear();
@@ -1649,6 +1656,15 @@ const Art = (() => {
     craftlab: { box: [-16, -68, 224, 220], draw: drawCraftLab, anim: animCraftLab },
     glitcharena: { box: [-16, -68, 224, 220], draw: drawGlitchArena, anim: animGlitchArena },
     skyblockthrone: { box: [-20, -96, 280, 248], draw: drawSkyblockThrone, anim: animSkyblockThrone },
+    // Playtime Co., Nightmare Playcare & Prototype Continent (Zones 20..22)
+    playtimefactory: { box: [-16, -72, 272, 224], draw: drawPlaytimeFactory, anim: animPlaytimeFactory },
+    gamestation: { box: [-16, -68, 248, 216], draw: drawGameStation, anim: animGameStation },
+    safehaven: { box: [-16, -64, 248, 216], draw: drawSafeHaven, anim: animSafeHaven },
+    playcaredome: { box: [-20, -84, 280, 236], draw: drawPlaycareDome, anim: animPlaycareDome },
+    homesweethome: { box: [-16, -68, 248, 220], draw: drawHomeSweetHome },
+    lilydollhouse: { box: [-16, -76, 248, 228], draw: drawLilyDollhouse, anim: animLilyDollhouse },
+    sawyerlab: { box: [-16, -72, 248, 224], draw: drawSawyerLab, anim: animSawyerLab },
+    prototypecitadel: { box: [-20, -96, 288, 248], draw: drawPrototypeCitadel, anim: animPrototypeCitadel },
     // Sub-Map Portals & Interior Props
     subportal: { box: [-8, -28, 64, 78], draw: drawSubportal, anim: animSubportal },
     exitmat: { box: [-6, -12, 60, 62], draw: drawExitmat, anim: animExitmat },
@@ -2302,6 +2318,229 @@ const Art = (() => {
     c.restore();
   }
 
+  /* --- Playtime Co., Nightmare Playcare & Prototype Continent Landmark Drawers (Zones 20..22) --- */
+  function drawPlaytimeFactory(c) {
+    // Playtime Co. Main Toy Factory with Giant Red & Blue GrabPack Hands (5x4 / 6x4 = ~240x144)
+    shadow(c, 120, 140, 112, 14, 0.26);
+    c.fillStyle = '#eff6ff'; rr(c, 10, 32, 220, 104, 10); c.fill();
+    c.fillStyle = '#bfdbfe'; c.fillRect(10, 122, 220, 14);
+    // Primary-colored Playtime Co. striped roof!
+    const roofCols = ['#ef4444', '#facc15', '#3b82f6', '#22c55e', '#ec4899'];
+    for (let k = 0; k < 5; k++) {
+      c.fillStyle = roofCols[k];
+      rr(c, 8 + k * 44, 4, 46, 32, 8); c.fill();
+    }
+    // Giant Blue GrabPack Hand (left roof) & Red GrabPack Hand (right roof)
+    for (const [hx, col] of [[44, '#2563eb'], [196, '#dc2626']]) {
+      c.fillStyle = col;
+      rr(c, hx - 14, -22, 28, 24, 7); c.fill();
+      for (let f = -2; f <= 1; f++) { rr(c, hx + f * 6.5 + 1, -36, 5.5, 16, 2.5); c.fill(); }
+    }
+    // Poppy Flower Medallion Sign in center
+    c.fillStyle = '#fde047'; circ(c, 120, 20, 18); c.fill();
+    c.fillStyle = '#e11d48';
+    for (let a = 0; a < 5; a++) { const ang = a * PI2 / 5; circ(c, 120 + Math.cos(ang) * 8, 20 + Math.sin(ang) * 8, 6); c.fill(); }
+    c.fillStyle = '#1e293b'; circ(c, 120, 20, 4.5); c.fill();
+    // Grand Toy Factory Archway
+    c.fillStyle = '#1d4ed8'; rr(c, 92, 68, 56, 68, 10); c.fill();
+    c.fillStyle = '#38bdf8'; rr(c, 98, 74, 44, 62, 7); c.fill();
+    for (const wx of [26, 174]) {
+      c.fillStyle = '#fef08a'; rr(c, wx, 62, 40, 38, 6); c.fill();
+      c.strokeStyle = '#3b82f6'; c.lineWidth = 3; rr(c, wx, 62, 40, 38, 6); c.stroke();
+    }
+  }
+  function animPlaytimeFactory(c, o, t) {
+    const x = o.x * 48 + 120, y = o.y * 48 + 20;
+    c.save();
+    for (let k = 0; k < 4; k++) {
+      const a = t * 1.8 + k * Math.PI / 2;
+      c.fillStyle = k % 2 ? '#fde047' : '#fb7185';
+      sparkle(c, x + Math.cos(a) * 34, y + Math.sin(a) * 14, 3.5);
+    }
+    c.restore();
+  }
+  function drawGameStation(c) {
+    // Mommy Long Legs' Neon Game Station Dome (5x3 tiles = 240x144)
+    shadow(c, 108, 138, 100, 12, 0.25);
+    c.fillStyle = '#fdf2f8'; rr(c, 12, 40, 192, 94, 12); c.fill();
+    // Hot-pink dome roof with elastic web arcs
+    c.fillStyle = '#ec4899';
+    c.beginPath(); c.arc(108, 46, 86, Math.PI, 0); c.closePath(); c.fill();
+    c.strokeStyle = '#fbcfe8'; c.lineWidth = 2.5;
+    for (const r of [34, 58, 78]) { c.beginPath(); c.arc(108, 46, r, Math.PI * 1.08, Math.PI * 1.92); c.stroke(); }
+    // Three Mini-Game Tubes (Musical Memory yellow, Whack-a-Wuggy blue, Statues purple)
+    for (const [tx, col] of [[38, '#facc15'], [108, '#38bdf8'], [178, '#a855f7']]) {
+      c.fillStyle = col; rr(c, tx - 14, 58, 28, 42, 8); c.fill();
+    }
+    c.fillStyle = '#be185d'; rr(c, 84, 72, 48, 62, 8); c.fill();
+    c.fillStyle = '#f9a8d4'; rr(c, 90, 78, 36, 56, 6); c.fill();
+  }
+  function animGameStation(c, o, t) {
+    const x = o.x * 48 + 108, y = o.y * 48 - 4;
+    c.save();
+    c.fillStyle = '#f472b6';
+    heart(c, x + Math.sin(t * 2.5) * 18, y - (t * 14 % 22), 5);
+    c.restore();
+  }
+  function drawSafeHaven(c) {
+    // Doey's Safe Haven Rainbow Dough Bakery & Lounge (5x4 = ~240x144)
+    shadow(c, 108, 138, 100, 12, 0.25);
+    c.fillStyle = '#fffbeb'; rr(c, 12, 36, 192, 98, 12); c.fill();
+    // Three-color swirled Doey clay roof (sky-blue, sunny-yellow, cherry-red) and dapper bowler hat!
+    c.fillStyle = '#38bdf8'; rr(c, 6, 8, 68, 34, 10); c.fill();
+    c.fillStyle = '#facc15'; rr(c, 70, 8, 76, 34, 10); c.fill();
+    c.fillStyle = '#ef4444'; rr(c, 142, 8, 68, 34, 10); c.fill();
+    // Giant Navy Bowler Hat sign on roof!
+    c.fillStyle = '#1e3a8a'; ell(c, 108, 6, 38, 8); c.fill();
+    c.beginPath(); c.arc(108, 4, 24, Math.PI, 0); c.fill();
+    c.fillStyle = '#38bdf8'; c.fillRect(85, -2, 46, 5);
+    // Cozy Safe Haven Heart Door
+    c.fillStyle = '#f97316'; rr(c, 84, 68, 48, 66, 8); c.fill();
+    c.fillStyle = '#ffedd5'; heart(c, 108, 98, 11);
+  }
+  function animSafeHaven(c, o, t) {
+    const x = o.x * 48 + 108, y = o.y * 48 + 18;
+    c.save();
+    c.fillStyle = '#ff5c8a';
+    heart(c, x + Math.sin(t * 2) * 14, y - ((t * 16) % 26), 5);
+    c.restore();
+  }
+  function drawPlaycareDome(c) {
+    // Nightmare Playcare Red-Smoke Moon Cathedral & Dome (6x4 = ~240x144)
+    shadow(c, 120, 140, 114, 14, 0.28);
+    c.fillStyle = '#3b0764'; rr(c, 10, 44, 220, 92, 10); c.fill();
+    // Translucent Amethyst & Lavender Dome
+    c.fillStyle = '#6d28d9';
+    c.beginPath(); c.arc(120, 50, 92, Math.PI, 0); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(216,180,254,0.35)';
+    c.beginPath(); c.arc(120, 50, 74, Math.PI, 0); c.closePath(); c.fill();
+    // Giant Golden Crescent Moon Crest atop the Dome
+    c.fillStyle = '#facc15';
+    c.beginPath(); c.arc(120, -54, 18, 0.4, 5.9); c.arc(127, -58, 14, 5.5, 0.8, true); c.closePath(); c.fill();
+    // Glowing Monster Ring-Eyes Portal Arch
+    c.fillStyle = '#1e1b4b'; rr(c, 92, 68, 56, 68, 12); c.fill();
+    c.strokeStyle = '#c084fc'; c.lineWidth = 3; rr(c, 92, 68, 56, 68, 12); c.stroke();
+    for (const ex of [52, 188]) {
+      c.fillStyle = '#090a13'; ell(c, ex, 82, 14, 18); c.fill();
+      c.strokeStyle = '#ffffff'; c.lineWidth = 2.6; circ(c, ex, 82, 6); c.stroke();
+    }
+  }
+  function animPlaycareDome(c, o, t) {
+    const x = o.x * 48 + 120, y = o.y * 48 + 20;
+    c.save();
+    for (let k = 0; k < 5; k++) {
+      const ph = (t * 0.35 + k / 5) % 1;
+      c.fillStyle = k % 2 ? 'rgba(192,132,252,' + (0.55 * (1 - ph)) + ')' : 'rgba(251,113,133,' + (0.45 * (1 - ph)) + ')';
+      circ(c, x + Math.sin(t * 2 + k * 1.4) * 42, y - ph * 44, 7 + ph * 8); c.fill();
+    }
+    c.restore();
+  }
+  function drawHomeSweetHome(c) {
+    // Playcare Sun-Belt Playhouse & Home Sweet Home Manor
+    shadow(c, 108, 138, 100, 12, 0.26);
+    c.fillStyle = '#ffedd5'; rr(c, 12, 38, 192, 96, 8); c.fill();
+    c.fillStyle = '#ea580c';
+    c.beginPath(); c.moveTo(2, 42); c.lineTo(108, -14); c.lineTo(214, 42); c.closePath(); c.fill();
+    // Shining Sun Medallion for Nightmare DogDay
+    c.fillStyle = '#facc15'; circ(c, 108, 18, 14); c.fill();
+    c.strokeStyle = '#fef08a'; c.lineWidth = 3; circ(c, 108, 18, 18); c.stroke();
+    c.fillStyle = '#7c2d12'; rr(c, 86, 72, 44, 62, 6); c.fill();
+    for (const wx of [30, 152]) {
+      c.fillStyle = '#fde047'; rr(c, wx, 64, 34, 34, 5); c.fill();
+    }
+  }
+  function drawLilyDollhouse(c) {
+    // Lily Lovebraids' 2-Story Lavender Dollhouse with Twin Braided Purple Roof Towers!
+    shadow(c, 108, 138, 102, 12, 0.26);
+    c.fillStyle = '#f5d0fe'; rr(c, 18, 30, 180, 104, 10); c.fill();
+    c.fillStyle = '#9333ea';
+    c.beginPath(); c.moveTo(10, 36); c.lineTo(108, -16); c.lineTo(206, 36); c.closePath(); c.fill();
+    // Twin Giant Purple Braided Pigtail Roof Towers hanging down both sides!
+    for (const bx of [16, 200]) {
+      for (let b = 0; b < 5; b++) {
+        c.fillStyle = b % 2 ? '#7e22ce' : '#a855f7';
+        circ(c, bx, 26 + b * 18, 12); c.fill();
+      }
+      c.fillStyle = '#facc15'; star(c, bx, 114, 9, 4, 5); c.fill();
+    }
+    // Starry Tea Salon Door & Teapot Sign
+    c.fillStyle = '#fde047'; star(c, 108, 16, 13, 6, 5); c.fill();
+    c.fillStyle = '#581c87'; rr(c, 86, 70, 44, 64, 8); c.fill();
+    c.fillStyle = '#f9a8d4'; heart(c, 108, 98, 10);
+  }
+  function animLilyDollhouse(c, o, t) {
+    const x = o.x * 48 + 108, y = o.y * 48 + 10;
+    c.save();
+    c.fillStyle = '#e879f9';
+    sparkle(c, x + Math.cos(t * 2.4) * 28, y - ((t * 15) % 24), 4);
+    c.restore();
+  }
+  function drawSawyerLab(c) {
+    // Dr. Harley Sawyer's Cyber-Destroyer Lab with Giant CRT TV-Eye Tower & Green Kryptonite Tubes!
+    shadow(c, 108, 138, 102, 12, 0.28);
+    c.fillStyle = '#1e293b'; rr(c, 12, 36, 192, 98, 8); c.fill();
+    c.strokeStyle = '#22c55e'; c.lineWidth = 2.5; rr(c, 14, 38, 188, 94, 6); c.stroke();
+    // Giant Retro CRT Television Monitor Head on the Roof!
+    c.fillStyle = '#312e81'; rr(c, 70, -24, 76, 58, 10); c.fill();
+    c.fillStyle = '#581c87'; rr(c, 78, -16, 60, 42, 6); c.fill();
+    c.fillStyle = '#ffffff'; ell(c, 108, 5, 18, 11); c.fill();
+    c.fillStyle = '#9333ea'; circ(c, 108, 5, 7); c.fill();
+    c.fillStyle = '#090a13'; circ(c, 108, 5, 3.2); c.fill();
+    // Twin Green Kryptonite Tubes
+    for (const kx of [30, 162]) {
+      c.fillStyle = 'rgba(74,222,128,0.85)'; rr(c, kx, 56, 24, 52, 6); c.fill();
+    }
+    c.fillStyle = '#0f172a'; rr(c, 86, 72, 44, 62, 6); c.fill();
+  }
+  function animSawyerLab(c, o, t) {
+    const x = o.x * 48 + 108, y = o.y * 48 + 5;
+    c.save();
+    c.strokeStyle = 'rgba(168,85,247,' + (0.45 + 0.4 * Math.sin(t * 3.5)) + ')';
+    c.lineWidth = 2.5;
+    circ(c, x, y, 22 + Math.sin(t * 3) * 4); c.stroke();
+    c.restore();
+  }
+  function drawPrototypeCitadel(c) {
+    // The Prototype's Jester-Claw & Infernotype Blast-Furnace Citadel (6x4 = ~248x144)
+    shadow(c, 124, 140, 118, 14, 0.3);
+    // Obsidian & Molten-Gold Citadel Base
+    c.fillStyle = '#1c1917'; rr(c, 12, 38, 224, 98, 10); c.fill();
+    c.strokeStyle = '#f97316'; c.lineWidth = 3; rr(c, 14, 40, 220, 94, 8); c.stroke();
+    // Six Mechanical Arachnid Spider Legs flanking the Citadel!
+    c.strokeStyle = '#b91c1c'; c.lineWidth = 5; c.lineCap = 'round';
+    for (const s of [-1, 1]) {
+      for (let k = 0; k < 3; k++) {
+        const bx = 124 + s * 98, by = 64 + k * 20;
+        c.beginPath(); c.moveTo(bx, by); c.lineTo(bx + s * 22, by - 14); c.lineTo(bx + s * 28, by + 18); c.stroke();
+      }
+    }
+    // Giant Red & Royal-Blue Jester Hat Crest + Golden Pom-Poms on the Citadel Crown!
+    c.fillStyle = '#dc2626';
+    c.beginPath(); c.moveTo(124, 34); c.quadraticCurveTo(84, -36, 56, 6); c.quadraticCurveTo(88, 14, 96, 36); c.closePath(); c.fill();
+    c.fillStyle = '#2563eb';
+    c.beginPath(); c.moveTo(124, 34); c.quadraticCurveTo(164, -36, 192, 6); c.quadraticCurveTo(160, 14, 152, 36); c.closePath(); c.fill();
+    c.fillStyle = '#facc15'; rr(c, 92, 28, 64, 12, 5); c.fill();
+    circ(c, 55, 8, 8); c.fill(); circ(c, 193, 8, 8); c.fill();
+    // Left Orange Hellfire Brazier & Right Blue Cold-Flame Brazier (Infernotype's Dual Flames!)
+    c.fillStyle = '#fb923c'; circ(c, 48, 84, 15); c.fill();
+    c.fillStyle = '#fde047'; circ(c, 48, 84, 8); c.fill();
+    c.fillStyle = '#38bdf8'; circ(c, 200, 84, 15); c.fill();
+    c.fillStyle = '#e0f2fe'; circ(c, 200, 84, 8); c.fill();
+    // Blast-Furnace Gate
+    c.fillStyle = '#431407'; rr(c, 96, 68, 56, 68, 10); c.fill();
+    c.fillStyle = '#f97316'; rr(c, 104, 76, 40, 60, 6); c.fill();
+  }
+  function animPrototypeCitadel(c, o, t) {
+    const x = o.x * 48 + 124, y = o.y * 48 + 20;
+    c.save();
+    for (let k = 0; k < 6; k++) {
+      const a = t * 2.2 + k * (PI2 / 6);
+      c.fillStyle = k % 2 ? '#fb923c' : '#38bdf8';
+      sparkle(c, x + Math.cos(a) * 48, y + Math.sin(a) * 18, 4.5);
+    }
+    c.restore();
+  }
+
   /* --- Sub-Map Portals, Exit Mats & Interior Props --- */
   function drawSubportal(c, o) {
     const st = (o && o.style) || 'door';
@@ -2467,7 +2706,13 @@ const Art = (() => {
     carrie_npc: { skin: '#ffe0c8', hair: '#f472b6', hairStyle: 'long', shirt: '#facc15', pants: '#3b82f6', hat: 'cat' },
     police_npc: { skin: '#f2c49b', hair: '#1e293b', hairStyle: 'short', shirt: '#2563eb', pants: '#1e3a8a', hat: 'cap2' },
     scientist_npc: { skin: '#f5d0b5', hair: '#e5e7eb', hairStyle: 'spiky', shirt: '#ffffff', pants: '#065f46', coat: true, glasses: true },
-    hacker_npc: { skin: '#e2e8f0', hair: '#10b981', hairStyle: 'spiky', shirt: '#111827', pants: '#064e3b', hat: 'visor', glow: '#22c55e' }
+    hacker_npc: { skin: '#e2e8f0', hair: '#10b981', hairStyle: 'spiky', shirt: '#111827', pants: '#064e3b', hat: 'visor', glow: '#22c55e' },
+    poppy_npc: { skin: '#fff1f2', hair: '#e11d48', hairStyle: 'pigtails', shirt: '#38bdf8', pants: '#0284c7', hat: 'flower', glow: '#fb7185' },
+    doey_npc: { skin: '#38bdf8', hair: '#facc15', hairStyle: 'short', shirt: '#facc15', pants: '#ef4444', hat: 'gat', glow: '#38bdf8' },
+    ollie_npc: { skin: '#fde2c8', hair: '#f97316', hairStyle: 'spiky', shirt: '#22c55e', pants: '#1e3a8a', hat: 'cap2' },
+    delight_npc: { skin: '#fde6d2', hair: '#fbbf24', hairStyle: 'bun', shirt: '#c084fc', pants: '#4c1d95', hat: 'flower' },
+    rory_npc: { skin: '#fde2c8', hair: '#06b6d4', hairStyle: 'spiky', shirt: '#14b8a6', pants: '#1e293b', hat: 'crown', scarf: '#ef4444', glow: '#ef4444' },
+    player_verity_npc: { skin: '#fef08a', hair: '#facc15', hairStyle: 'short', shirt: '#fde047', pants: '#2563eb', hat: 'visor', glow: '#38bdf8' }
   };
   function drawPerson(c, look, dir, frame, opts) {
     look = typeof look === 'string' ? (LOOK_PRESETS[look] || LOOK_PRESETS.scholar) : (look || CHUYU_LOOK);
@@ -2782,6 +3027,14 @@ const Art = (() => {
         c.beginPath(); c.moveTo(-8, hy - 7); c.lineTo(-6.5, hy - 13); c.lineTo(-3.5, hy - 8); c.closePath(); c.fill();
         c.beginPath(); c.moveTo(8, hy - 7); c.lineTo(6.5, hy - 13); c.lineTo(3.5, hy - 8); c.closePath(); c.fill();
         break;
+      case 'jester':
+        c.fillStyle = '#dc2626';
+        c.beginPath(); c.moveTo(0, hy - 7); c.quadraticCurveTo(-9, hy - 20, -14, hy - 10); c.lineTo(-6, hy - 7); c.closePath(); c.fill();
+        c.fillStyle = '#2563eb';
+        c.beginPath(); c.moveTo(0, hy - 7); c.quadraticCurveTo(9, hy - 20, 14, hy - 10); c.lineTo(6, hy - 7); c.closePath(); c.fill();
+        c.fillStyle = '#facc15'; rr(c, -9, hy - 9, 18, 3.2, 1.5); c.fill();
+        circ(c, -14, hy - 9.5, 2.3); c.fill(); circ(c, 14, hy - 9.5, 2.3); c.fill();
+        break;
       default: break;
     }
   }
@@ -2822,6 +3075,12 @@ const Art = (() => {
     carrie: '#facc15', projj: '#38bdf8', noobmikey: '#a16207', burgerjj: '#ef4444', burgermikey: '#f59e0b',
     maizenwolf: '#94a3b8', bananacat: '#facc15', policechief: '#2563eb', maizenrobber: '#475569', scientist: '#10b981',
     redstonegolem: '#dc2626', mutantmikey: '#16a34a', maizenhacker: '#22c55e', herobrine: '#6366f1', kingjj: '#eab308', dragonmikey: '#9333ea',
+    poppydoll: '#e11d48', kissymissy: '#f472b6', mommylonglegs: '#ec4899', bunzobunny: '#facc15', pjpug: '#6366f1',
+    boxyboo: '#0ea5e9', missdelight: '#fbbf24', doey: '#38bdf8', yarnaby: '#f97316', pianosaurus: '#06b6d4',
+    nmcatnap: '#5b21b6', nmdogday: '#ea580c', nmhoppy: '#16a34a', nmbobby: '#be123c', nmcrafty: '#0891b2',
+    nmpicky: '#db2777', nmbubba: '#2563eb', nmkickin: '#d97706',
+    prototype: '#dc2626', verity: '#38bdf8', lilylovebraids: '#9333ea', chumchompkins: '#dc2626', giblet: '#14b8a6',
+    roryredcape: '#06b6d4', prototypejr: '#dc2626', cascadecat: '#06b6d4', lunalovebraids: '#e9d5ff', drsawyer: '#7c3aed', infernotype: '#f97316',
   };
   // accessories with a layer drawn OVER the portrait (hat brims, chin strings)
   const FRONT_EARS = { gat: 1, gatderpy: 1, magpie: 1, horns: 1, towel: 1, cap: 1 };
@@ -3100,6 +3359,16 @@ const Art = (() => {
       case 'bulb':
         c.fillStyle = '#49a86b'; ell(c, 0, -r * 1.02, r * 0.48, r * 0.36); c.fill(); c.stroke();
         break;
+      case 'jester':
+        c.save(); c.rotate(wig * 0.6);
+        c.fillStyle = '#dc2626';
+        c.beginPath(); c.moveTo(0, -r * 0.85); c.quadraticCurveTo(-r * 0.68, -r * 1.58, -r * 1.15, -r * 0.85); c.quadraticCurveTo(-r * 0.65, -r * 0.96, -r * 0.35, -r * 0.82); c.closePath(); c.fill(); c.stroke();
+        c.fillStyle = '#2563eb';
+        c.beginPath(); c.moveTo(0, -r * 0.85); c.quadraticCurveTo(r * 0.68, -r * 1.58, r * 1.15, -r * 0.85); c.quadraticCurveTo(r * 0.65, -r * 0.96, r * 0.35, -r * 0.82); c.closePath(); c.fill(); c.stroke();
+        c.fillStyle = '#facc15'; circ(c, -r * 1.16, -r * 0.82, r * 0.16); c.fill(); c.stroke();
+        circ(c, r * 1.16, -r * 0.82, r * 0.16); c.fill(); c.stroke();
+        c.restore();
+        break;
       default: break;
     }
     c.restore();
@@ -3279,7 +3548,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg?v=r15';
+      img.src = 'icons/' + icon + '.jpg?v=r17';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {
@@ -3310,10 +3579,10 @@ const Art = (() => {
       case T.BRIDGE_H: case T.BRIDGE_V: return [176, 122, 70];
       case T.SNOW: return [236, 244, 252];
       case T.ICE: return [190, 232, 255];
-      case T.FLOOR: return z === 10 ? [92, 52, 122] : [196, 187, 230];
+      case T.FLOOR: return z === 10 ? [92, 52, 122] : (z >= 16 && PAL[z] && PAL[z].floor) ? hex(PAL[z].floor) : [196, 187, 230];
       case T.CLIFF: return z === 6 ? [170, 100, 50] : z === 7 ? [140, 175, 205] : [140, 140, 132];
       case T.STONES: return [255, 143, 171];
-      case T.PLAZA: return z === 10 ? hex(PAL[10].plaza) : [234, 223, 198];
+      case T.PLAZA: return z === 10 ? hex(PAL[10].plaza) : (z >= 16 && PAL[z] && PAL[z].plaza) ? hex(PAL[z].plaza) : [234, 223, 198];
       default: return [255, 0, 255];
     }
   }
@@ -3364,6 +3633,11 @@ const Art = (() => {
         else if (ob.kind === 'mcdonalds') col = [239, 68, 68];
         else if (ob.kind === 'craftlab' || ob.kind === 'glitcharena') col = [16, 185, 129];
         else if (ob.kind === 'skyblockthrone') col = [234, 179, 8];
+        else if (ob.kind === 'playtimefactory') col = [239, 68, 68];
+        else if (ob.kind === 'gamestation' || ob.kind === 'lilydollhouse') col = [236, 72, 153];
+        else if (ob.kind === 'safehaven') col = [56, 189, 248];
+        else if (ob.kind === 'playcaredome' || ob.kind === 'sawyerlab') col = [147, 51, 234];
+        else if (ob.kind === 'homesweethome' || ob.kind === 'prototypecitadel') col = [249, 115, 22];
         else if (ob.kind === 'subportal') col = [253, 224, 71];
       }
       for (let yy = 0; yy < px; yy++) for (let xx = 0; xx < px; xx++) {
@@ -3389,6 +3663,9 @@ const Art = (() => {
     17: ['#38bdf8', '#e0f2fe', '#6bd968'],
     18: ['#059669', '#d1fae5', '#68d69c'],
     19: ['#ca8a04', '#fef9c3', '#7cd665'],
+    20: ['#2563eb', '#fef08a', '#6ed48c'],
+    21: ['#3b0764', '#c084fc', '#68b89e'],
+    22: ['#9a3412', '#fed7aa', '#78c97a'],
   };
   // Seoul skyline for the Honmoon battle backdrop: [x, width, height] as fractions of w / h (built once)
   let SKYLINE = null;

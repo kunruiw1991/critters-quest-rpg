@@ -5,10 +5,10 @@
  * ========================================================================== */
 const World = (() => {
   const D = CQData;
-  const OW_W = D.MAP_W, OW_H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, H3 = D.MAP_H3 || 230, OW_N = OW_W * OW_H;
+  const OW_W = D.MAP_W, OW_H = D.MAP_H, H0 = D.MAP_H0 || 90, H1 = D.MAP_H1 || 118, H2 = D.MAP_H2 || 174, H3 = D.MAP_H3 || 230, H4 = D.MAP_H4 || 286, OW_N = OW_W * OW_H;
   let W = OW_W, H = OW_H, N = OW_N;
   const HZ = 10; // Honmoon Island zone id
-  const MAX_Z = 19; // Highest zone id (Zones 17..19 on the Maizen Block Continent)
+  const MAX_Z = 22; // Highest zone id (Zones 20..22 on the Playtime, Nightmare Playcare & Prototype Continent)
   const T = { DEEP: 0, SHALLOW: 1, SAND: 2, GRASS: 3, TALL: 4, PATH: 5, FLOWERS: 6, BRIDGE_H: 7, BRIDGE_V: 8, SNOW: 9, ICE: 10, FLOOR: 11, CLIFF: 12, STONES: 13, PLAZA: 14 };
   const T_NAMES = Object.keys(T);
   const WALK = new Uint8Array([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]);
@@ -48,6 +48,11 @@ const World = (() => {
     mcdonalds: { block: 1, act: 'heal' }, bankvault: { block: 1, act: 'sign' },
     craftlab: { block: 1, act: 'heal' }, glitcharena: { block: 1, act: 'sign' },
     skyblockthrone: { block: 1, act: 'sign' },
+    // Playtime Co., Nightmare Playcare & Prototype Continent (Zones 20..22)
+    playtimefactory: { block: 1, act: 'sign' }, gamestation: { block: 1, act: 'sign' },
+    safehaven: { block: 1, act: 'heal' }, playcaredome: { block: 1, act: 'sign' },
+    homesweethome: { block: 1, act: 'sign' }, lilydollhouse: { block: 1, act: 'heal' },
+    sawyerlab: { block: 1, act: 'sign' }, prototypecitadel: { block: 1, act: 'sign' },
     // Sub-Map Portals & Interior Props
     subportal: { block: 0, act: 'subportal' }, exitmat: { block: 0, act: 'exitmat' },
     table: { block: 1, act: 'sign' }, bookshelf: { block: 1, act: 'sign' }, bed: { block: 1, act: 'heal' },
@@ -86,6 +91,12 @@ const World = (() => {
     return Math.hypot(dx, dy);
   }
   function zoneOf(x, y) {
+    if (y >= H4) {
+      const jx = x + (U.vnoise(x * 0.16, y * 0.16, 55) - 0.5) * 3;
+      if (jx < 44) return 20;
+      if (jx < 76) return 21;
+      return 22;
+    }
     if (y >= H3) {
       const jx = x + (U.vnoise(x * 0.16, y * 0.16, 45) - 0.5) * 3;
       if (jx < 44) return 17;
@@ -115,12 +126,17 @@ const World = (() => {
     }
     return best;
   }
-  /* Honmoon Island outline (rows H0..H1-1), Southern Continent (rows H1..H2-1), Grand Pokémon Continent (rows H2..H3-1), and Maizen Block Continent (rows H3..H-1). */
+  /* Honmoon Island outline (rows H0..H1-1), Southern Continent (rows H1..H2-1), Grand Pokémon Continent (rows H2..H3-1), Maizen Block Continent (rows H3..H4-1), and Playtime Continent (rows H4..H-1). */
   const HON = { x0: 18, x1: 101, y0: H0 - 1, y1: H1 - 1 };
   const SOUTH = { x0: 5, x1: 115, y0: H1 + 1, y1: H2 - 1 };
   const GEN234 = { x0: 5, x1: 115, y0: H2 + 1, y1: H3 - 1 };
-  const MAIZEN = { x0: 5, x1: 115, y0: H3 + 1, y1: H - 1 };
+  const MAIZEN = { x0: 5, x1: 115, y0: H3 + 1, y1: H4 - 1 };
+  const PLAYTIME = { x0: 5, x1: 115, y0: H4 + 1, y1: H - 1 };
   function coastVal(x, y) {
+    if (y >= H4) {
+      const d = Math.min(x - PLAYTIME.x0, PLAYTIME.x1 - x, y - PLAYTIME.y0, PLAYTIME.y1 - y);
+      return d + (U.fbm(x * 0.09, y * 0.09, 51) - 0.5) * 4;
+    }
     if (y >= H3) {
       const d = Math.min(x - MAIZEN.x0, MAIZEN.x1 - x, y - MAIZEN.y0, MAIZEN.y1 - y);
       return d + (U.fbm(x * 0.09, y * 0.09, 41) - 0.5) * 4;
@@ -165,7 +181,7 @@ const World = (() => {
           if (z === 3 && x < 77 + U.vnoise(x * 0.2, y * 0.2, 9) * 3) g = T.GRASS;
           ground[i] = g;
           if (z !== 1) {
-            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58, 14: 0.58, 15: 0.58, 16: 0.58, 17: 0.58, 18: 0.58, 19: 0.58 }[z];
+            const thr = { 2: 0.6, 3: 0.66, 4: 0.63, 5: 0.58, 6: 0.65, 7: 0.62, 8: 0.68, 9: 0.57, 10: 0.6, 11: 0.59, 12: 0.58, 13: 0.58, 14: 0.58, 15: 0.58, 16: 0.58, 17: 0.58, 18: 0.58, 19: 0.58, 20: 0.58, 21: 0.58, 22: 0.58 }[z];
             if (U.fbm(x * 0.13, y * 0.13, 100 + z) > thr) ground[i] = T.TALL;
             else if (z === 4 && U.fbm(x * 0.11, y * 0.11, 300) > 0.6) ground[i] = T.FLOWERS;
             else if (z >= HZ && U.fbm(x * 0.12, y * 0.12, 300 + z) > 0.64) ground[i] = T.FLOWERS;
@@ -1119,7 +1135,7 @@ const World = (() => {
     const r5 = U.mulberry32(20261114);
 
     // 1. Two scenic canals separating Zone 17 (Mansion & Burger Blvd) | Zone 18 (Vault & Science Lab) | Zone 19 (Skyblock & Hacker Arena)
-    for (let y = H3; y < H; y++) {
+    for (let y = H3; y < H4; y++) {
       for (const base of [44, 76]) {
         const xc = base + Math.round(Math.sin(y * 0.21) * 0.8);
         for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
@@ -1208,7 +1224,7 @@ const World = (() => {
     ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
 
     // 8. Scatter trees, bushes & rocks across Zones 17..19
-    for (let y = H3; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    for (let y = H3; y < H4 - 1; y++) for (let x = 1; x < W - 1; x++) {
       const i = I(x, y);
       const z = zone[i];
       if (z < 17 || z > 19 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
@@ -1247,7 +1263,7 @@ const World = (() => {
     bfs(start.x, start.y);
     for (const z of [17, 18, 19]) {
       const list = [];
-      for (let y = H3 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+      for (let y = H3 + 1; y < H4 - 2; y++) for (let x = 2; x < W - 2; x++) {
         const i = I(x, y);
         if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
         let blocked = 0;
@@ -1269,7 +1285,7 @@ const World = (() => {
     }
 
     // 10. Decals across Zones 17..19
-    for (let y = H3; y < H; y++) for (let x = 0; x < W; x++) {
+    for (let y = H3; y < H4; y++) for (let x = 0; x < W; x++) {
       const i = I(x, y);
       if (zone[i] < 17 || zone[i] > 19 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
       const z = zone[i], g = ground[i], r = r5();
@@ -1282,6 +1298,181 @@ const World = (() => {
         else if (g === T.PLAZA) d = r < 0.06 ? DEC.SPARKLE : 0;
       } else if (z === 19) {
         if (g === T.GRASS) d = r < 0.05 ? DEC.RUNE : r < 0.08 ? DEC.SHARD : r < 0.11 ? DEC.SPARKLE : 0;
+        else if (g === T.FLOOR) d = r < 0.08 ? DEC.SPARKLE : r < 0.12 ? DEC.RUNE : 0;
+      }
+      decal[i] = d;
+    }
+  }
+
+  /* ---------------- Zones 20..22: Playtime Co., Nightmare Playcare & Prototype Continent ----------------
+   * Built AFTER buildMaizenContinent() with its own RNG stream (r6 = U.mulberry32(20261115)),
+   * so all 101 existing chests in Zones 1..19 remain 100% untouched! */
+  function buildPlaytimeContinent() {
+    const r6 = U.mulberry32(20261115);
+
+    // 1. Two scenic canals separating Zone 20 (Playtime Factory) | Zone 21 (Nightmare Playcare) | Zone 22 (Prototype's Citadel)
+    for (let y = H4; y < H; y++) {
+      for (const base of [44, 76]) {
+        const xc = base + Math.round(Math.sin(y * 0.21) * 0.8);
+        for (let k = 0; k < 2; k++) if (isLand(xc + k, y) || ground[I(xc + k, y)] === T.SHALLOW) setT(xc + k, y, T.DEEP);
+      }
+    }
+
+    // 2. Plazas & Courtyards for Zones 20, 21, 22
+    // Zone 20: Playtime Factory & Game Station Courtyard (north) & Doey's Safe Haven Plaza (south)
+    for (let y = 294; y <= 305; y++) for (let x = 15; x <= 38; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    for (let y = 312; y <= 324; y++) for (let x = 15; x <= 35; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Zone 21: Red-Smoke Moon Cathedral Floor (north) & Playcare Playhouse Plaza (south)
+    for (let y = 294; y <= 305; y++) for (let x = 50; x <= 69; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    for (let y = 312; y <= 324; y++) for (let x = 50; x <= 69; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+    // Zone 22: Prototype's Blast-Furnace Citadel Floor (north) & Lily's Dollhouse / Dr. Sawyer's Lab Plaza (south)
+    for (let y = 293; y <= 305; y++) for (let x = 85; x <= 108; x++) { const i = I(x, y); ground[i] = T.FLOOR; clear[i] = 1; }
+    for (let y = 312; y <= 325; y++) for (let x = 83; x <= 109; x++) { const i = I(x, y); ground[i] = T.PLAZA; clear[i] = 1; }
+
+    // 3. Three Sea Bridges south from Zones 17, 18, 19 (y = 260..314) + Grand Playtime Boulevard (y = 310)
+    for (const bx of [24, 60, 95]) {
+      for (let y = 260; y <= 296; y++) for (let x = bx; x <= bx + 1; x++) {
+        const i = I(x, y);
+        if (objAt[i] >= 0 && objects[objAt[i]].rm) removeObj(objects[objAt[i]]);
+      }
+      roadSeg(bx, 260, bx, 316, 0);
+    }
+    roadSeg(15, 310, 106, 310, 0);
+
+    // 4. Zone 20 Landmarks (Playtime Toy Factory, Game Station & Safe Haven)
+    landmark('playtimefactory', 22, 296, 5, 4, {
+      name: 'Playtime Co. Main Toy Factory',
+      text: '🧸 The Playtime Co. Main Toy Factory! Giant Red & Blue GrabPack hands wave above the entrance to Sub-Map #27 (GrabPack Assembly Hall)!'
+    }, { ground: T.PLAZA, fx: 25 });
+    landmark('gamestation', 30, 297, 5, 3, {
+      name: "Mommy Long Legs' Game Station",
+      text: '🕷️ Mommy Long Legs\' Neon Game Station! Musical Memory, Whack-a-Wuggy, and Statues await inside Sub-Map #28!'
+    }, { ground: T.PLAZA, fx: 32 });
+    fountains[20] = landmark('safehaven', 23, 315, 5, 4, {
+      name: "Doey's Safe Haven Bakery & Dough Lounge"
+    }, { ground: T.PLAZA, fx: 25 });
+    waypoints[20] = landmark('waypoint', 18, 302, 1, 1, { region: 20 }, { ground: T.PLAZA, front: true, ring: true });
+    for (const [x, y] of [[17, 309], [36, 309]]) {
+      ensureWalk(x, y, true);
+      if (objAt[I(x, y)] < 0) addObj('trampoline', x, y, 1, 1);
+    }
+    berryTree(12, 300, 'apple'); berryTree(39, 321, 'gold');
+
+    // 5. Zone 21 Landmarks (Nightmare Playcare & Red-Smoke Moon Dome)
+    landmark('playcaredome', 54, 296, 5, 4, {
+      name: 'Red-Smoke Moon Cathedral & Playcare Dome',
+      text: '🌙 The Red-Smoke Moon Cathedral! Swirling lavender dream mist and all 8 Nightmare Smiling Critters guard Sub-Map #30!'
+    }, { ground: T.FLOOR, fx: 57 });
+    landmark('homesweethome', 53, 315, 5, 4, {
+      name: 'Playcare Sun-Belt Playhouse & Home Sweet Home',
+      text: '☀️ The Playcare Playhouse! Giant Nightmare DogDay and the Bigger Bodies Smiling Critters host friendly matches inside Sub-Map #29!'
+    }, { ground: T.PLAZA, fx: 55 });
+    fountains[21] = landmark('fountain', 61, 316, 2, 2, { style: 8, name: 'Dreamy Lavender Nap Fountain' }, { ground: T.PLAZA });
+    waypoints[21] = landmark('waypoint', 63, 302, 1, 1, { region: 21 }, { ground: T.FLOOR, front: true, ring: true });
+    berryTree(48, 300, 'moon'); berryTree(72, 321, 'plum');
+
+    // 6. Zone 22 Landmarks (The Prototype's Citadel & Verity's Last Stand)
+    landmark('prototypecitadel', 93, 295, 6, 4, {
+      name: "The Prototype's Jester-Claw & Blast-Furnace Citadel",
+      text: '🦾🔥 Experiment 1006\'s Jester-Claw Citadel & Blast Furnace! Step inside Sub-Map #32 for Verity vs. Prototype: The Last Stand against Legendary Infernotype!'
+    }, { ground: T.FLOOR, fx: 96 });
+    fountains[22] = landmark('lilydollhouse', 85, 315, 5, 4, {
+      name: "Lily Lovebraids' Lavender Dollhouse & Tea Salon"
+    }, { ground: T.PLAZA, fx: 87 });
+    landmark('sawyerlab', 99, 315, 5, 4, {
+      name: "Dr. Harley Sawyer's Cyber-Destroyer Lab",
+      text: '📺 Dr. Harley Sawyer\'s Cyber-Destroyer Lab! A giant single-eye CRT monitor scans the courtyard above Sub-Map #31!'
+    }, { ground: T.PLAZA, fx: 101 });
+    waypoints[22] = landmark('waypoint', 104, 302, 1, 1, { region: 22 }, { ground: T.FLOOR });
+    berryTree(81, 300, 'crystal'); berryTree(111, 321, 'gold');
+
+    // 7. NPCs, Special Critter Spots, and Signs for Zones 20..22
+    D.NPCS.forEach((def, k) => { if (def.zone >= 20 && def.zone <= 22) placeNPC(def, k); });
+    D.SPECIAL_SPOTS.forEach(s => { if (s.zone >= 20 && s.zone <= 22) addSpecial(s); });
+    for (const [x, y, text] of [
+      [23, 276, "⬇ GrabPack Toy Bridge → 🧸 Playtime Toy Factory, Game Station & Doey's Safe Haven!"],
+      [59, 276, '⬇ Lavender Mist Bridge → 🌙 Nightmare Playcare & All 8 Nightmare Smiling Critters!'],
+      [94, 276, "⬇ Last-Stand Bridge → 🦾 The Prototype's Citadel, Lily's Dollhouse & Infernotype!"],
+      [22, 309, "🧸 Playtime Factory & Safe Haven — ⬆ Factory & Mommy's Game Station · ⬇ Doey's Safe Haven"],
+      [58, 309, '🌙 Nightmare Playcare — ⬆ Red-Smoke Moon Cathedral (Nightmare CatNap) · ⬇ Sun Playhouse (Nightmare DogDay)'],
+      [93, 309, "🦾 Prototype's Citadel — ⬆ Prototype & Infernotype Sanctum · ↙ Lily's Dollhouse · ↘ Dr. Sawyer's Lab"],
+    ]) placeNear('sign', x, y, 1, 1, { text }, { radius: 3, ignoreClear: true, anyWalk: true, safe: true });
+
+    // 8. Scatter trees, bushes & rocks across Zones 20..22
+    for (let y = H4; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = I(x, y);
+      const z = zone[i];
+      if (z < 20 || z > 22 || road[i] || clear[i] || front[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+      const r = r6();
+      let kind = null, variant = null;
+      if (z === 20) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.024 ? 'blossom' : 'oak'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      } else if (z === 21) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.026 ? 'moon' : 'crystal'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      } else if (z === 22) {
+        if (r < 0.042) { kind = 'tree'; variant = r < 0.025 ? 'crystal' : 'pine'; }
+        else if (r < 0.058) kind = 'bush';
+        else if (r < 0.066) kind = 'rock';
+      }
+      if (!kind || !safeToBlock(x, y)) continue;
+      addObj(kind, x, y, 1, 1, { variant: variant || (r6() * 3) | 0 });
+    }
+
+    // 9. Treasure chests: 1 special Master Star chest + 4 hidden chests per new zone (15 new chests -> 116 overworld chests total)
+    for (const [x, y, where] of [
+      [13, 329, 'Playtime GrabPack Garden'],
+      [58, 330, 'Playcare Moonlit Glade'],
+      [108, 329, 'Prototype Citadel Overlook'],
+    ]) {
+      const i = I(x, y);
+      if (objAt[i] >= 0) removeObj(objects[objAt[i]]);
+      road[i] = 0;
+      if (!WALK[ground[i]] || ground[i] === T.SHALLOW) ground[i] = T.GRASS;
+      chests.push(addObj('chest', x, y, 1, 1, { loot: { master: 1, gold: 150 }, where, special: true }));
+      clearRect(x - 1, y - 1, 3, 3); ensureWalk(x, y + 1, true);
+    }
+    bfs(start.x, start.y);
+    for (const z of [20, 21, 22]) {
+      const list = [];
+      for (let y = H4 + 1; y < H - 2; y++) for (let x = 2; x < W - 2; x++) {
+        const i = I(x, y);
+        if (zone[i] !== z || !reach[i] || road[i] || front[i] || clear[i] || objAt[i] >= 0 || npcAt[i] >= 0 || !SOLID[ground[i]]) continue;
+        let blocked = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if ((dx || dy) && !isOpen(x + dx, y + dy)) blocked++;
+        if (blocked >= 2) list.push([x, y, blocked]);
+      }
+      for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(r6() * (k + 1)); const tmp = list[k]; list[k] = list[j]; list[j] = tmp; }
+      list.sort((a, b) => b[2] - a[2] + (r6() - 0.5) * 3);
+      let placed = 0;
+      for (const [x, y] of list) {
+        if (placed >= 4) break;
+        if (chests.some(c => Math.abs(c.x - x) + Math.abs(c.y - y) < 7)) continue;
+        if (objAt[I(x, y)] >= 0 || !safeToBlock(x, y)) continue;
+        const kind = U.weighted(r6, D.CHEST_LOOT);
+        const loot = kind === 'gold' ? { gold: 55 + 5 * U.randInt(r6, 0, 14) } : kind === 'berry' ? { berry: U.randInt(r6, 4, 7) } : kind === 'rainbow' ? { rainbow: U.randInt(r6, 2, 4) } : { master: 1 };
+        chests.push(addObj('chest', x, y, 1, 1, { loot }));
+        placed++;
+      }
+    }
+
+    // 10. Decals across Zones 20..22
+    for (let y = H4; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = I(x, y);
+      if (zone[i] < 20 || zone[i] > 22 || (objAt[i] >= 0 && objects[objAt[i]].block)) continue;
+      const z = zone[i], g = ground[i], r = r6();
+      let d = 0;
+      if (z === 20) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.CONFETTI : r < 0.08 ? DEC.FLOWER_P : r < 0.1 ? DEC.SPARKLE : 0;
+        else if (g === T.PLAZA || g === T.PATH) d = r < 0.07 ? DEC.CONFETTI : 0;
+      } else if (z === 21) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.RUNE : r < 0.08 ? DEC.FLOWER_B : r < 0.11 ? DEC.SPARKLE : 0;
+        else if (g === T.FLOOR || g === T.PLAZA) d = r < 0.07 ? DEC.SPARKLE : 0;
+      } else if (z === 22) {
+        if (g === T.GRASS) d = r < 0.05 ? DEC.SHARD : r < 0.08 ? DEC.CRYSTAL_GLOW : r < 0.11 ? DEC.SPARKLE : 0;
         else if (g === T.FLOOR) d = r < 0.08 ? DEC.SPARKLE : r < 0.12 ? DEC.RUNE : 0;
       }
       decal[i] = d;
@@ -1422,7 +1613,7 @@ const World = (() => {
 
   function buildSubmap(def) {
     const sw = def.width || 22, sh = def.height || 16, sn = sw * sh;
-    const palId = def.paletteId || (20 + (def.index || 1));
+    const palId = 40 + (def.index || 1);
     const zId = def.zoneId || 1;
     const smGround = new Uint8Array(sn);
     const smZone = new Uint8Array(sn);
@@ -1817,6 +2008,7 @@ const World = (() => {
     if (H > H1) buildSouthContinent();
     if (H > H2) buildGen234Continent();
     if (H > H3) buildMaizenContinent();
+    if (H > H4) buildPlaytimeContinent();
     placeSubmapEntrances();
     repairs = repair();
     bfs(start.x, start.y);
@@ -1888,7 +2080,7 @@ const World = (() => {
     const unreachable = [];
     const errors = [];
     const perMap = {};
-    const expectedCount = (D.SUBMAPS && D.SUBMAPS.length) || 26;
+    const expectedCount = (D.SUBMAPS && D.SUBMAPS.length) || 32;
     let allEntriesWalkable = ids.length === expectedCount;
     let allEntrancesReachable = ids.length === expectedCount;
     let roundTripOk = ids.length === expectedCount;

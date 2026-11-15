@@ -17,7 +17,7 @@ const Game = (() => {
     return DV[d] ? d : 'down';
   }
   const WALK_MS = 0.2, DASH_MS = 0.105, TREE_REGROW = 90, ENCOUNTER_RATE = 0.09;
-  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9, 17: 10, 18: 10, 19: 10 };
+  const ZONE_WILDS = { 2: 9, 3: 9, 4: 9, 5: 9, 6: 8, 7: 8, 8: 7, 9: 6, 10: 9, 11: 9, 12: 10, 13: 10, 14: 9, 15: 9, 16: 9, 17: 10, 18: 10, 19: 10, 20: 10, 21: 10, 22: 10 };
 
   let canvas, ctx, dpr = 1, zoom = 1, viewW = 0, viewH = 0;
   const cam = { x: 0, y: 0 };
@@ -46,7 +46,7 @@ const Game = (() => {
       chests: {}, subChests: {}, trees: {}, gifts: {}, pots: {}, bosses: {}, subVisited: {}, submap: null,
       visited: { 1: true }, lastHeal: { x: World.start.x, y: World.start.y },
       dash: false, stats: { steps: 0, battles: 0, caught: 1, chests: 0, playMs: 0, levelUps: 0 },
-      news: { honmoon: true, southlands: true, gen234: true, maizen: true },
+      news: { honmoon: true, southlands: true, gen234: true, maizen: true, playtime: true },
     };
   }
   function validate(s) {
@@ -845,6 +845,8 @@ const Game = (() => {
         else if (o.kind === 'pokecenter') { addFx('text', fx0, o.y * TS - 10, '❤️ Ding-ding-ding!'); UI.toast('❤️ Ding-ding-ding-ding-ding! Welcome to the Pokémon Center — your team is fighting fit!'); }
         else if (o.kind === 'mcdonalds') { addFx('text', fx0, o.y * TS - 10, '🍔🍟 Yum yum!'); UI.toast('🍔🍟 Noob vs Pro Burger Diner: hot golden burgers & crispy fries healed your whole team! 💖'); }
         else if (o.kind === 'craftlab') { addFx('text', fx0, o.y * TS - 10, '🧪✨ Eureka!'); UI.toast("🧪✨ Dr. Craft's Giant Potion Lab: emerald regen fizz healed your whole team! 💖"); }
+        else if (o.kind === 'safehaven') { addFx('text', fx0, o.y * TS - 10, '🎩🌈 Safe & Warm!'); UI.toast("🎩🌈 Doey's Safe Haven Lounge: warm rainbow dough-treats healed your whole team! 💖"); }
+        else if (o.kind === 'lilydollhouse') { addFx('text', fx0, o.y * TS - 10, '💜🫖 Tea Time!'); UI.toast("💜🫖 Lily Lovebraids' Lavender Dollhouse: hot crumpets & floral tea healed your whole team! 💖"); }
         else UI.toast('💖 ' + (o.name || 'Healing Fountain') + ': all your Critters are full of energy!');
         UI.updateHUD();
         save('heal');
@@ -1070,7 +1072,7 @@ const Game = (() => {
     for (const o of World.objects) if (o.shakeT > 0) o.shakeT -= dt;
     // ambient particles
     const z = curZone;
-    const want = z === 7 ? 'snow' : (z === 8 || z === 12 || z === 19) ? 'firefly' : (z === 4 || z === 16 || z === 18) ? 'sparkle' : (z === 2 || z === 13 || z === 14 || z === 17) ? 'leaf' : z === 6 ? 'dust' : (z === 3 || z === 15) ? 'bubble' : (z === 10 || z === 11) ? 'petal' : null;
+    const want = z === 7 ? 'snow' : (z === 8 || z === 12 || z === 19 || z === 21) ? 'firefly' : (z === 4 || z === 16 || z === 18 || z === 22) ? 'sparkle' : (z === 2 || z === 13 || z === 14 || z === 17) ? 'leaf' : z === 6 ? 'dust' : (z === 3 || z === 15) ? 'bubble' : (z === 10 || z === 11 || z === 20) ? 'petal' : null;
     if (want && parts.length < 46 && rng() < dt * 22) {
       parts.push({ type: want, x: cam.x + rng() * viewW, y: cam.y + (want === 'snow' || want === 'leaf' || want === 'petal' ? -10 : rng() * viewH), vx: (rng() - 0.5) * 20 + (want === 'petal' ? 14 : 0), vy: want === 'snow' ? 30 + rng() * 30 : want === 'leaf' || want === 'petal' ? 22 + rng() * 16 : (rng() - 0.5) * 10 - (want === 'bubble' ? 12 : 0), t: 0, life: 3 + rng() * 3, ph: rng() * 6 });
     }
@@ -1494,17 +1496,17 @@ const Game = (() => {
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
         'Wonderful choice, Chuyu! ' + sp.name + ' ' + sp.emoji + ' is so happy to be your partner!',
         sp.name + ' will follow you everywhere you go. 🐾',
-        'Look right here in Sunshine Village — Mikey 🐢, JJ 🌊, and Carrie 🐱 from the Maizen Show are waiting to join your team and give you presents!',
-        'And open the 🗺️ World Map any time to teleport to JJ & Mikey\'s Security Mansion 🏰, Dr. Craft\'s Science Lab 🧪, or Maizen Skyblock 👑 to catch all 96 Critters! 🌈',
+        'Look right here in Sunshine Village — The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸, Kissy Missy 💗, plus Mikey 🐢, JJ 🌊 & Carrie 🐱 are waiting to join your team and give you presents!',
+        'Open the 🗺️ World Map any time to teleport south to Playtime Factory 🏭, Nightmare Playcare Dome 🌙, or The Prototype\'s Last Stand Citadel 🔥 to catch all 125 Critters across 21 Lands & 32 Dungeons! 🌈',
       ]);
-    } else if (!s.news || !s.news.maizen) {
-      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true, maizen: true });
+    } else if (!s.news || !s.news.playtime) {
+      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true, maizen: true, playtime: true });
       save('auto-quiet');
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
-        'Welcome back, Chuyu! HUGE Maizen Show news — JJ, Mikey, Carrie & Friends have arrived! 🐢🌊🐱👑',
-        'Right here in Sunshine Village, Mikey 🐢, JJ 🌊, and Carrie 🐱 are waiting to join your team!',
-        'Three brand-new Maizen Lands & 6 dungeons just opened in the south (Zones 17–19): JJ & Mikey\'s 100-Layer Security Mansion & Burger Blvd 🍔, Maizen Laser Bank Vault & Dr. Craft\'s Giant Potion Lab 🧪, and Maizen Skyblock & Hacker Glitch Arena 💻!',
-        'Catch all 16 new Maizen characters — Carrie 🐱, Pro Diamond JJ 💎, Noob Dirt Mikey 🪨, Burger Chef JJ 🍔, Crispy Fries Mikey 🍟, Bolt the Wolf 🐕, Banana Cat 🍌, Officer Chief 🚓, Sneaky Robber 🦹, Dr. Craft 🧪, Redstone Golem 🤖, Super Mutant Mikey 🐢, Masked Hacker 💻, Herobrine ⚡, King Golden JJ 👑 & Ender Dragon Mikey 🌌 (96 Critters total)!',
+        'Welcome back, Chuyu! HUGE Poppy Playtime & Prototype news — The Prototype, Poppy, Huggy Wuggy, Mommy Long Legs, Verity & the Nightmare Smiling Critters have arrived! 🦾🎀🕷️🌙🔥',
+        'Right here in Sunshine Village, The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸, and Kissy Missy 💗 are waiting to join your team with Master Capsules & Rainbow Capsules!',
+        'Three brand-new Playtime Lands & 6 dungeons just opened in the far south (Zones 20–22): Playtime Factory & Game Station 🏭, Nightmare Playcare Dome 🌙 (all 8 Nightmare Smiling Critters!), and The Prototype\'s Last Stand Citadel 🔥!',
+        'Team up with Verity 💙, Doey 🎩, Lily Lovebraids 💜, Rory Redcape 🦸, Chum Chompkins 🪵, Giblet 🧩, Cascade Candy Cat 💧 & Prototype Jr. 👶 to befriend Dr. Sawyer 📺 and Infernotype 🔥 (125 Critters total)!',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');
