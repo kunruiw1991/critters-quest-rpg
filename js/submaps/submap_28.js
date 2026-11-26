@@ -83,7 +83,7 @@
     wildPool: {
       lv: [20, 26],
       maxWilds: 4,
-      table: [['mommylonglegs', 16], ['bunzobunny', 22], ['pjpug', 22], ['yarnaby', 20], ['pianosaurus', 20]]
+      table: [['mommylonglegs', 12], ['bunzobunny', 16], ['pjpug', 16], ['yarnaby', 14], ['pianosaurus', 14], ['bron', 12], ['smilinghuggy', 10], ['biggerbron', 6]]
     },
     boss: {
       key: 'boss_submap_28',

@@ -3035,6 +3035,12 @@ const Art = (() => {
         c.fillStyle = '#facc15'; rr(c, -9, hy - 9, 18, 3.2, 1.5); c.fill();
         circ(c, -14, hy - 9.5, 2.3); c.fill(); circ(c, 14, hy - 9.5, 2.3); c.fill();
         break;
+      case 'santa':
+        c.fillStyle = '#dc2626';
+        c.beginPath(); c.moveTo(-10, hy - 6); c.quadraticCurveTo(-2, hy - 22, 13, hy - 11); c.lineTo(10, hy - 6); c.closePath(); c.fill();
+        c.fillStyle = '#ffffff'; rr(c, -11, hy - 8, 22, 4, 2); c.fill();
+        circ(c, 13, hy - 10, 3); c.fill();
+        break;
       default: break;
     }
   }
@@ -3081,9 +3087,11 @@ const Art = (() => {
     nmpicky: '#db2777', nmbubba: '#2563eb', nmkickin: '#d97706',
     prototype: '#dc2626', verity: '#38bdf8', lilylovebraids: '#9333ea', chumchompkins: '#dc2626', giblet: '#14b8a6',
     roryredcape: '#06b6d4', prototypejr: '#dc2626', cascadecat: '#06b6d4', lunalovebraids: '#e9d5ff', drsawyer: '#7c3aed', infernotype: '#f97316',
+    holidayhuggy: '#84cc16', smilinghuggy: '#0284c7', scaryhuggy: '#1d4ed8', nmhuggy: '#2563eb',
+    bron: '#e11d48', biggerbron: '#b91c1c', monstercatnap: '#6d28d9', plushcatnap: '#a855f7',
   };
   // accessories with a layer drawn OVER the portrait (hat brims, chin strings)
-  const FRONT_EARS = { gat: 1, gatderpy: 1, magpie: 1, horns: 1, towel: 1, cap: 1 };
+  const FRONT_EARS = { gat: 1, gatderpy: 1, magpie: 1, horns: 1, towel: 1, cap: 1, santa: 1 };
   function gatHat(c, r, s, col, tilt, chin, y0) {
     // traditional Korean gat: translucent black horsehair brim + tall rounded crown (+ beaded chin string)
     c.save(); c.rotate(tilt);
@@ -3131,6 +3139,15 @@ const Art = (() => {
         // Cabin-crew flight cap
         c.fillStyle = '#243b6b'; c.strokeStyle = '#ffc93c'; c.lineWidth = r * 0.05;
         c.beginPath(); c.moveTo(-r * 0.55, -r * 0.86); c.lineTo(0, -r * 1.22); c.lineTo(r * 0.55, -r * 0.86); c.closePath(); c.fill(); c.stroke();
+      } else if (sp.ears === 'santa') {
+        // Festive red Santa hat tilted cheerfully on top with fluffy trim and bouncy pom-pom
+        c.save(); c.rotate(0.16 + wig * 0.4);
+        c.fillStyle = '#dc2626'; c.strokeStyle = '#7f1d1d'; c.lineWidth = r * 0.05;
+        c.beginPath(); c.moveTo(-r * 0.52, -r * 0.88); c.quadraticCurveTo(r * 0.08, -r * 1.62, r * 0.88, -r * 1.02); c.lineTo(r * 0.52, -r * 0.84); c.closePath(); c.fill(); c.stroke();
+        c.fillStyle = '#ffffff'; c.strokeStyle = '#cbd5e1'; c.lineWidth = r * 0.04;
+        rr(c, -r * 0.58, -r * 1.0, r * 1.16, r * 0.24, r * 0.12); c.fill(); c.stroke();
+        circ(c, r * 0.9, -r * 0.96, r * 0.17); c.fill(); c.stroke();
+        c.restore();
       }
       c.restore();
       return;
@@ -3369,6 +3386,29 @@ const Art = (() => {
         circ(c, r * 1.16, -r * 0.82, r * 0.16); c.fill(); c.stroke();
         c.restore();
         break;
+      case 'santa':
+        c.fillStyle = col;
+        for (let k = 0; k < 14; k++) { const a = k / 14 * PI2 + wig; c.beginPath(); c.moveTo(Math.cos(a - 0.2) * r * 0.9, Math.sin(a - 0.2) * r * 0.9); c.lineTo(Math.cos(a) * r * 1.22, Math.sin(a) * r * 1.22); c.lineTo(Math.cos(a + 0.2) * r * 0.9, Math.sin(a + 0.2) * r * 0.9); c.fill(); }
+        break;
+      case 'dino':
+        for (let k = -2; k <= 2; k++) {
+          const a = -Math.PI / 2 + k * 0.34;
+          c.save(); c.translate(Math.cos(a) * r * 0.98, Math.sin(a) * r * 0.98); c.rotate(a + Math.PI / 2);
+          c.fillStyle = k % 2 === 0 ? '#38bdf8' : col;
+          ell(c, 0, -r * 0.12, r * 0.16, r * 0.24); c.fill(); c.stroke();
+          c.restore();
+        }
+        break;
+      case 'tv':
+        c.fillStyle = col;
+        for (let k = 0; k < 14; k++) { const a = k / 14 * PI2 + wig; c.beginPath(); c.moveTo(Math.cos(a - 0.2) * r * 0.9, Math.sin(a - 0.2) * r * 0.9); c.lineTo(Math.cos(a) * r * 1.22, Math.sin(a) * r * 1.22); c.lineTo(Math.cos(a + 0.2) * r * 0.9, Math.sin(a + 0.2) * r * 0.9); c.fill(); }
+        c.strokeStyle = '#334155'; c.lineWidth = Math.max(1.5, r * 0.08); c.lineCap = 'round';
+        for (const s of [-1, 1]) {
+          c.beginPath(); c.moveTo(s * r * 0.18, -r * 0.9); c.lineTo(s * r * 0.62, -r * 1.48); c.stroke();
+          c.fillStyle = (Math.sin(t * 9 + s) > 0) ? '#38bdf8' : '#e0f2fe';
+          circ(c, s * r * 0.62, -r * 1.48, r * 0.13); c.fill();
+        }
+        break;
       default: break;
     }
     c.restore();
@@ -3548,7 +3588,7 @@ const Art = (() => {
       img.onload = () => finish(true);
       img.onerror = () => finish(false);
       setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
-      img.src = 'icons/' + icon + '.jpg?v=r17';
+      img.src = 'icons/' + icon + '.jpg?v=r18';
     }));
     return Promise.all(loads).then(results => {
       for (const sp of CQData.SPECIES) {

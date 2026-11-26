@@ -4,12 +4,25 @@
 
 A cozy, kid-friendly **2D classic RPG** — a Pokémon-style adventure where **Chuyu** explores a huge
 **120 × 342 tile world (41,040 tiles)** across **21 hand-themed lands + Rainbow Crossroads Park (`Zones 1..22`)** and **32 enterable embedded small maps** (including **Playtime GrabPack Assembly Hall**, **Mommy Long Legs' Game Station Arena**, **Playcare Playhouse & Sun-Belt Sanctum**, **Red-Smoke Moon Cathedral**, **Dr. Sawyer's Cyber-Destroyer Lair**, and **Infernotype's Blast-Furnace & God-Stone Sanctum**, plus Maizen bunkers & skyblock sanctums, village halls, mushroom grottos, crystal caverns, coral cities, pirate shipwrecks, pharaoh tombs, glacier caves, moon dungeons, secret treehouses, K-Pop backstage lounges, underworld sanctums, Minhwa tiger dens, bathhouse steam grottos, funhouse mazes, and legendary Pokémon sanctums),
-makes friends with **The Prototype, Poppy, Huggy Wuggy, Kissy Missy, Verity, Mommy Long Legs, the Nightmare Smiling Critters, JJ, Mikey & Carrie**, villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, battles 32 sub-map Bosses/Guardians, and
-**catches all 125 Critters** for the CritterDex!
+makes friends with **Holiday Huggy Wuggy, Bron the Dinosaur, The Prototype, Poppy, Huggy Wuggy, Kissy Missy, Verity, Mommy Long Legs, the Nightmare Smiling Critters, JJ, Mikey & Carrie**, villagers, heroes & Champions, rights knocked-over flowerpots, opens treasure chests, shakes fruit trees, battles 32 sub-map Bosses/Guardians, and
+**catches all 133 Critters** for the CritterDex!
 
 ![Chuyu's Critter Quest screenshot](screenshot.jpg)
 
-## 🦾🎀🌙🔥 NEW: Poppy Playtime, Nightmare Smiling Critters & *Verity vs. Prototype: The Last Stand* Expansion!
+## 🎅🦕🦖🐈‍⬛ NEW: Poppy Playtime Plush & Wiki Drop Expansion (`#126–#133`, 133 Critters Total!)
+
+Inspired by [`smiling-critters-assets#1`](https://github.com/kunruiw1991/smiling-critters-assets/pull/1) (`#855–#893`), **8 brand-new Poppy Playtime characters & plush editions** have arrived across Sunshine Village, Frostberry Glacier, Playtime Toy Factory, and Nightmare Playcare:
+
+- `#126` 🎅 **Holiday Huggy Wuggy** (`★ Rare` *Frost* — *Festive Gift Toss*, recruitable right in **Sunshine Village** + guaranteed spawn at Playtime Factory Holiday Plaza & wild in Zone 7 / Zone 20!)
+- `#127` 😁 **Smiling Huggy Wuggy** (*Pop* — *Mega Smile Beam*, wild in Zone 20 & Sub-Map #27/#28)
+- `#128` 😈 **Scary Huggy Wuggy** (*Demon* — *Goofy Chomp Grin*, wild in Zone 20, Zone 21 & Sub-Map #27)
+- `#129` 📺 **Nightmare Huggy Wuggy** (`★ Rare` *Demon* — *TV Static Pounce*, guaranteed spawn at Playcare Nightmare TV Courtyard + wild in Zone 21/22 & Sub-Map #30)
+- `#130` 🦕 **Bron the Dinosaur** (*Leaf* — *Dino Tail Wag*, recruitable right in **Safe Haven (Zone 20)** + wild in Zone 20 & Sub-Map #27/#28)
+- `#131` 🦖 **Bigger Body Bron** (`👑 Legendary` *Sun* — *Titan Bronto Stomp*, guaranteed spawn at Bron's Safe Haven Dino Paddock + rare in Zone 22 & Sub-Map #28)
+- `#132` 🐈‍⬛ **Monster CatNap** (`★ Rare` *Moon* — *Long-Leg Moon Pounce*, guaranteed spawn at Playcare Monster CatNap Arch + wild in Zone 21 & Sub-Map #29/#30)
+- `#133` 🌙 **Plush CatNap** (*Moon* — *Crescent Zipper Nap*, wild in Zone 20, Zone 21 & Sub-Map #29/#30)
+
+## 🦾🎀🌙🔥 Poppy Playtime, Nightmare Smiling Critters & *Verity vs. Prototype: The Last Stand* Expansion!
 
 | 🏭 Playtime Factory & Mommy's Game Station | 🌙 Nightmare Playcare & Nightmare CatNap | 🦾 The Prototype's Citadel & Infernotype | 🔥 Boss Battle: Prototype vs. Infernotype! |
 |---|---|---|---|

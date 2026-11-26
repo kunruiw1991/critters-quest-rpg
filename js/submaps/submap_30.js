@@ -85,7 +85,7 @@
     wildPool: {
       lv: [24, 29],
       maxWilds: 4,
-      table: [['nmcatnap', 14], ['nmcrafty', 22], ['nmbubba', 22], ['nmbobby', 21], ['nmhoppy', 21]]
+      table: [['nmcatnap', 11], ['nmcrafty', 15], ['nmbubba', 15], ['nmbobby', 14], ['nmhoppy', 14], ['monstercatnap', 12], ['nmhuggy', 10], ['plushcatnap', 9]]
     },
     boss: {
       key: 'boss_submap_30',

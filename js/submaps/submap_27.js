@@ -83,7 +83,7 @@
     wildPool: {
       lv: [18, 24],
       maxWilds: 4,
-      table: [['poppydoll', 22], ['kissymissy', 20], ['huggy', 20], ['bunzobunny', 20], ['boxyboo', 18]]
+      table: [['poppydoll', 14], ['kissymissy', 12], ['huggy', 12], ['bunzobunny', 12], ['boxyboo', 10], ['smilinghuggy', 12], ['scaryhuggy', 10], ['holidayhuggy', 8], ['bron', 10]]
     },
     boss: {
       key: 'boss_submap_27',
