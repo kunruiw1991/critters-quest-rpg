@@ -1496,17 +1496,17 @@ const Game = (() => {
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
         'Wonderful choice, Chuyu! ' + sp.name + ' ' + sp.emoji + ' is so happy to be your partner!',
         sp.name + ' will follow you everywhere you go. 🐾',
-        'Look right here in Sunshine Village — The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸, Kissy Missy 💗, plus Mikey 🐢, JJ 🌊 & Carrie 🐱 are waiting to join your team and give you presents!',
-        'Open the 🗺️ World Map any time to teleport south to Playtime Factory 🏭, Nightmare Playcare Dome 🌙, or The Prototype\'s Last Stand Citadel 🔥 to catch all 125 Critters across 21 Lands & 32 Dungeons! 🌈',
+        'Look right here in Sunshine Village — Holiday Huggy Wuggy 🎅, The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸, Kissy Missy 💗, plus Mikey 🐢, JJ 🌊 & Carrie 🐱 are waiting to join your team and give you presents!',
+        'Open the 🗺️ World Map any time to teleport south to Playtime Factory 🏭 (with Bron the Dinosaur 🦕 & Bigger Body Bron 🦖!), Nightmare Playcare Dome 🌙 (Monster CatNap 🐈‍⬛ & Nightmare TV Huggy 📺!), or The Prototype\'s Citadel 🔥 to catch all 133 Critters across 21 Lands & 32 Dungeons! 🌈',
       ]);
-    } else if (!s.news || !s.news.playtime) {
-      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true, maizen: true, playtime: true });
+    } else if (!s.news || !s.news.playtime || !s.news.plushdrop) {
+      s.news = Object.assign({}, s.news, { honmoon: true, southlands: true, gen234: true, maizen: true, playtime: true, plushdrop: true });
       save('auto-quiet');
       UI.dialog({ name: 'Professor Bubba', emoji: '👨‍🔬', look: profLook }, [
-        'Welcome back, Chuyu! HUGE Poppy Playtime & Prototype news — The Prototype, Poppy, Huggy Wuggy, Mommy Long Legs, Verity & the Nightmare Smiling Critters have arrived! 🦾🎀🕷️🌙🔥',
-        'Right here in Sunshine Village, The Prototype 🦾, Poppy 🎀, Huggy Wuggy 🧸, and Kissy Missy 💗 are waiting to join your team with Master Capsules & Rainbow Capsules!',
-        'Three brand-new Playtime Lands & 6 dungeons just opened in the far south (Zones 20–22): Playtime Factory & Game Station 🏭, Nightmare Playcare Dome 🌙 (all 8 Nightmare Smiling Critters!), and The Prototype\'s Last Stand Citadel 🔥!',
-        'Team up with Verity 💙, Doey 🎩, Lily Lovebraids 💜, Rory Redcape 🦸, Chum Chompkins 🪵, Giblet 🧩, Cascade Candy Cat 💧 & Prototype Jr. 👶 to befriend Dr. Sawyer 📺 and Infernotype 🔥 (125 Critters total)!',
+        'Welcome back, Chuyu! NEW Poppy Playtime Plush Drop characters just arrived — 8 brand-new Critters (133 total)! 🎅🦕🦖🐈‍⬛📺',
+        'Right here in Sunshine Village, Holiday Huggy Wuggy 🎅 is waiting to join your team with free berries & Rainbow Capsules!',
+        'Head to Playtime Toy Factory & Safe Haven (Zone 20) to recruit Bron the Dinosaur 🦕, meet Smiling Huggy 😁 & Scary Huggy 😈, and challenge Legendary Bigger Body Bron 🦖!',
+        'And in Nightmare Playcare (Zone 21), Monster CatNap 🐈‍⬛, cozy Plush CatNap 🌙, and Nightmare TV Huggy 📺 are waiting to befriend your team! 🏆',
       ]);
     } else {
       UI.toast('👋 Welcome back, Chuyu! Your adventure was saved. 💾');
